@@ -131,7 +131,7 @@ class ImageDataset(Dataset):
     def __init__(self, data_dir, paths, labels, transform):
         self.data_dir = Path(data_dir)
         self.paths = list(paths)
-        self.labels = torch.as_tensor(np.asarray(labels), dtype=torch.long)
+        self.labels = torch.tensor(np.array(labels), dtype=torch.long)
         self.transform = transform
 
     def __len__(self):

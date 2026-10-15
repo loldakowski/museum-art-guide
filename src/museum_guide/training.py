@@ -41,7 +41,12 @@ class TrainConfig:
 
 
 def make_optimizer(params, cfg: TrainConfig):
-    params = [p for p in params if p.requires_grad]
+    """`params` is an iterable of tensors or of param-group dicts (e.g. a smaller lr for a pretrained backbone)."""
+    params = list(params)
+    if params and isinstance(params[0], dict):
+        params = [{**g, "params": [p for p in g["params"] if p.requires_grad]} for g in params]
+    else:
+        params = [p for p in params if p.requires_grad]
     if cfg.optimizer == "sgd":
         return torch.optim.SGD(params, lr=cfg.lr, momentum=cfg.momentum, weight_decay=cfg.weight_decay)
     if cfg.optimizer == "adam":
@@ -73,7 +78,7 @@ def evaluate_loss(model, loader, device, label_smoothing=0.0):
 def train(model, train_loader, val_loader, cfg: TrainConfig, device="cpu", log=print, log_every=1):
     """Train `model` in place. Returns the history dict."""
     model.to(device)
-    opt = make_optimizer(model.parameters(), cfg)
+    opt = make_optimizer(model.param_groups(cfg.lr) if hasattr(model, "param_groups") else model.parameters(), cfg)
     sched = (torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=cfg.epochs) if cfg.scheduler == "cosine"
              else None)
     named = [(n, p) for n, p in model.named_parameters() if p.requires_grad]
