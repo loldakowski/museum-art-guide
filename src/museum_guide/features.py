@@ -16,7 +16,7 @@ from skimage.transform import resize
 
 def pixels(X: np.ndarray, size: int = 32) -> np.ndarray:
     """Down-sampled raw pixels in [0, 1], flattened: (N, 3*size*size). Input of the MLP."""
-    t = torch.from_numpy(X).permute(0, 3, 1, 2).float() / 255.0
+    t = torch.from_numpy(X if X.flags.writeable else X.copy()).permute(0, 3, 1, 2).float() / 255.0
     if t.shape[-1] != size:
         t = F.interpolate(t, size=(size, size), mode="bilinear", antialias=True, align_corners=False)
     return t.reshape(len(X), -1).numpy().astype(np.float32)
