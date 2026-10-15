@@ -54,3 +54,23 @@ def barh(labels, values, path, title, xlabel):
     for i, v in enumerate(values):
         ax.text(v, i, f" {v:g}", va="center", fontsize=8, color=MUTED)
     return _save(fig, path)
+
+
+def confusion(cm, class_names, path, title="Confusion matrix (test)"):
+    """Row-normalised confusion matrix (recall per class on the diagonal), counts annotated."""
+    cm = np.asarray(cm, dtype=float)
+    norm = cm / np.maximum(cm.sum(1, keepdims=True), 1)
+    k = len(class_names)
+    fig, ax = plt.subplots(figsize=(1.1 * k + 1.5, 1.0 * k + 1))
+    ax.imshow(norm, cmap="Blues", vmin=0, vmax=1)
+    ax.grid(False)
+    ax.set_xticks(range(k), class_names, rotation=35, ha="right")
+    ax.set_yticks(range(k), class_names)
+    ax.set_xlabel("predicted")
+    ax.set_ylabel("true")
+    for i in range(k):
+        for j in range(k):
+            ax.text(j, i, f"{int(cm[i, j])}\n{norm[i, j]:.0%}", ha="center", va="center", fontsize=7,
+                    color="white" if norm[i, j] > 0.55 else INK)
+    ax.set_title(title, loc="left")
+    return _save(fig, path)
