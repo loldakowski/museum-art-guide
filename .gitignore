@@ -31,3 +31,7 @@ dist/
 .DS_Store
 .vscode/
 .idea/
+
+# Figures that show paintings (sample grid, error grid): for the slides only, not published
+results/**/samples.png
+results/**/errors.png
