@@ -22,10 +22,10 @@ CLASSES = ["Baroque", "Cubism", "Impressionism", "Pop_Art", "Ukiyo_e"]
 
 def make_image(rng, cls: int, artist_shift: np.ndarray, size: int) -> np.ndarray:
     yy, xx = np.mgrid[0:size, 0:size] / size
-    base = np.array([[0.25, 0.15, 0.1], [0.5, 0.45, 0.4], [0.6, 0.7, 0.85], [0.9, 0.2, 0.5], [0.85, 0.8, 0.65]])[cls]
+    base = 0.5 + 0.05 * np.array([[-1, -1, -1], [0, 0, 0], [0, 0.5, 1], [1, -1, 0.5], [0.8, 0.6, 0]])[cls]
     freq = [2, 6, 12, 3, 4][cls]
-    pattern = np.sin(2 * np.pi * freq * (xx + yy * (cls % 2))) * 0.15
-    img = base[None, None, :] + pattern[..., None] + artist_shift + rng.normal(0, 0.08, (size, size, 3))
+    pattern = np.sin(2 * np.pi * freq * (xx + yy * (cls % 2))) * 0.10
+    img = base[None, None, :] + pattern[..., None] + artist_shift + rng.normal(0, 0.35, (size, size, 3))
     return (np.clip(img, 0, 1) * 255).astype(np.uint8)
 
 
@@ -41,7 +41,7 @@ def main():
     rows = []
     for c, name in enumerate(CLASSES):
         (a.out / name).mkdir(parents=True, exist_ok=True)
-        shifts = rng.normal(0, 0.1, (a.artists_per_class, 3))
+        shifts = rng.normal(0, 0.12, (a.artists_per_class, 3))
         for i in range(a.per_class):
             k = i % (a.artists_per_class + 1)  # the extra slot plays "Unknown Artist"
             artist = "Unknown Artist" if k == a.artists_per_class else f"{name} painter {k}"

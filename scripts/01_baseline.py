@@ -18,7 +18,7 @@ from museum_guide.baseline import fit_logreg
 from museum_guide.common import save_json
 from museum_guide.data import class_names, load_image_array, load_metadata, make_split, split_report
 from museum_guide.evaluation import classification_metrics, fmt, most_confused
-from museum_guide.features import FEATURE_SETS
+from museum_guide.features import FEATURE_SETS, compute_features
 from museum_guide.plots import confusion
 
 
@@ -29,7 +29,7 @@ def main():
     p.add_argument("--split", choices=["artist", "random"], default="artist")
     p.add_argument("--split-seed", type=int, default=0)
     p.add_argument("--size", type=int, default=128)
-    p.add_argument("--features", nargs="+", default=list(FEATURE_SETS))
+    p.add_argument("--features", nargs="+", default=["pixels32", "handcrafted"], choices=list(FEATURE_SETS))
     a = p.parse_args()
     out = Path(a.out)
 
@@ -42,7 +42,7 @@ def main():
 
     for fs in a.features:
         t0 = time.perf_counter()
-        F = FEATURE_SETS[fs](X)
+        F = compute_features(fs, X, Path(a.data_dir) / ".cache")
         t_feat = time.perf_counter() - t0
         t0 = time.perf_counter()
         model, val_scores = fit_logreg(F[tr], y[tr], F[va], y[va])

@@ -80,8 +80,16 @@ def training_history(h, path, title="Training monitoring"):
     """Loss, accuracy, gradient norms, update ratios (and dead/saturated units for the MLP)."""
     ep = h["epoch"]
     has_hidden = bool(h.get("hidden_stats"))
-    ncols = 5 if has_hidden else 4
-    fig, axes = plt.subplots(1, ncols, figsize=(3.6 * ncols, 3.1))
+    fig, axes = plt.subplots(2, 3, figsize=(13, 7))
+    axes = axes.ravel()
+    if not has_hidden:
+        axes[4].axis("off")
+    axes[5].axis("off")
+    axes[5].text(0, 0.9, "\n".join([
+        f"initial val loss: {h.get('initial_val_loss', np.nan):.3f}  (ln K = {h.get('expected_initial_loss', np.nan):.3f})",
+        f"best epoch: {h.get('best_epoch')}  |  status: {h.get('status')}",
+        f"best val acc: {h.get('best_val_acc', np.nan):.3f}",
+        f"train time: {h.get('total_time_s', np.nan):.1f} s"]), va="top", fontsize=9, color=INK, family="monospace")
     ax = axes[0]
     ax.plot(ep, h["train_loss"], label="train", color=PALETTE[0])
     ax.plot(ep, h["val_loss"], label="val", color=PALETTE[1])

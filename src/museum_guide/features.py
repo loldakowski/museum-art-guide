@@ -69,5 +69,22 @@ def handcrafted(X: np.ndarray) -> np.ndarray:
 
 FEATURE_SETS = {
     "pixels32": lambda X: pixels(X, 32),
+    "pixels64": lambda X: pixels(X, 64),
     "handcrafted": handcrafted,
 }
+
+
+def compute_features(name: str, X: np.ndarray, cache_dir=None) -> np.ndarray:
+    """FEATURE_SETS[name](X), cached on disk (hand-crafted features take ~1 min for 1 500 images)."""
+    import hashlib
+    from pathlib import Path
+    if cache_dir is None:
+        return FEATURE_SETS[name](X)
+    key = hashlib.md5(X[:, ::8, ::8].tobytes() + str(X.shape).encode()).hexdigest()[:10]
+    f = Path(cache_dir) / f"feat_{name}_{key}.npy"
+    if f.exists():
+        return np.load(f)
+    F_ = FEATURE_SETS[name](X)
+    f.parent.mkdir(parents=True, exist_ok=True)
+    np.save(f, F_)
+    return F_
