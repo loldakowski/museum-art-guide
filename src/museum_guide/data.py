@@ -5,8 +5,8 @@ Why the split is grouped by artist
 A painter has a recognisable hand (palette, brushwork, favourite subjects). With a random split, the
 same painter appears in train and test and a classifier can score well by recognising *Monet* rather
 than *Impressionism*. The museum guide will meet paintings by artists it has never seen, so the test
-set must contain unseen artists. We therefore use ``StratifiedGroupKFold`` with one group per named
-artist. "Unknown Artist" is a catch-all label (about half the rows), so each of those images is its
+set must contain unseen artists. We therefore split by groups (``grouped_stratified_split``), one group
+per named artist. "Unknown Artist" is a catch-all label (about half the rows), so each of those images is its
 own group. ``scripts/03_diagnose_mlp.py`` measures how much a random split inflates the accuracy.
 """
 from __future__ import annotations
@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 import torch
 from PIL import Image, ImageOps
-from sklearn.model_selection import StratifiedGroupKFold, train_test_split
+from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 
 UNKNOWN_ARTIST = "Unknown Artist"
@@ -54,6 +54,33 @@ def artist_groups(meta: pd.DataFrame) -> np.ndarray:
     return np.where(artist == UNKNOWN_ARTIST, "unknown_" + ids, "artist_" + artist)
 
 
+def grouped_stratified_split(strata, groups, fractions=(0.70, 0.15, 0.15), seed: int = 0) -> np.ndarray:
+    """Assign whole groups to splits so that every split gets its share of every stratum (class...).
+
+    Greedy and transparent: groups are visited largest first (random order among equal sizes); each
+    group goes to the split with the largest relative class deficit, weighted by the group's class
+    counts. Small groups (single 'Unknown Artist' images) come last and fill the remaining gaps, so they
+    are spread over all splits. (sklearn's StratifiedGroupKFold put all singletons in one fold here.)
+    Returns the split index (0, 1, 2...) of every sample.
+    """
+    rng = np.random.default_rng(seed)
+    classes, y_idx = np.unique(strata, return_inverse=True)
+    uniq, g_idx = np.unique(groups, return_inverse=True)
+    counts = np.zeros((len(uniq), len(classes)))
+    np.add.at(counts, (g_idx, y_idx), 1)
+    target = np.outer(fractions, counts.sum(0))
+    current = np.zeros_like(target)
+    order = rng.permutation(len(uniq))
+    order = order[np.argsort(-counts.sum(1)[order], kind="stable")]
+    assign = np.empty(len(uniq), dtype=int)
+    for g in order:
+        deficit = ((target - current) / np.maximum(target, 1)) @ counts[g]
+        best = int(np.argmax(deficit + rng.uniform(0, 1e-9, len(deficit))))
+        assign[g] = best
+        current[best] += counts[g]
+    return assign[g_idx]
+
+
 def make_split(meta: pd.DataFrame, mode: str = "artist", val_frac: float = 0.15,
                test_frac: float = 0.15, seed: int = 0) -> np.ndarray:
     """Return an array of 'train' / 'val' / 'test' (one entry per row of meta).
@@ -62,24 +89,21 @@ def make_split(meta: pd.DataFrame, mode: str = "artist", val_frac: float = 0.15,
     mode='random': stratified random split (kept only to *measure* the leakage it causes).
     """
     y = meta["label_idx"].to_numpy()
-    idx = np.arange(len(meta))
     if mode == "random":
+        idx = np.arange(len(meta))
         trval, test = train_test_split(idx, test_size=test_frac, stratify=y, random_state=seed)
         train, val = train_test_split(trval, test_size=val_frac / (1 - test_frac), stratify=y[trval],
                                       random_state=seed)
-    elif mode == "artist":
-        groups = artist_groups(meta)
-        outer = StratifiedGroupKFold(n_splits=max(2, round(1 / test_frac)), shuffle=True, random_state=seed)
-        trval, test = next(outer.split(idx, y, groups))
-        inner = StratifiedGroupKFold(n_splits=max(2, round((1 - test_frac) / val_frac)), shuffle=True,
-                                     random_state=seed)
-        tr, va = next(inner.split(trval, y[trval], groups[trval]))
-        train, val = trval[tr], trval[va]
-    else:
-        raise ValueError(f"unknown split mode {mode!r}")
-    split = np.empty(len(meta), dtype=object)
-    split[train], split[val], split[test] = "train", "val", "test"
-    return split
+        split = np.empty(len(meta), dtype=object)
+        split[train], split[val], split[test] = "train", "val", "test"
+        return split
+    if mode == "artist":
+        # strata = class x (named / unknown artist): every split gets its share of both kinds of images
+        strata = 2 * y + (meta["artist"].to_numpy() == UNKNOWN_ARTIST)
+        a = grouped_stratified_split(strata, artist_groups(meta), (1 - val_frac - test_frac, val_frac, test_frac),
+                                     seed)
+        return np.array(SPLITS, dtype=object)[a]
+    raise ValueError(f"unknown split mode {mode!r}")
 
 
 def split_report(meta: pd.DataFrame, split: np.ndarray) -> dict:
