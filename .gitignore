@@ -1,0 +1,33 @@
+# --- Data: WikiArt images are NOT ours to publish (licence unknown). Never commit them. ---
+data/*
+!data/README.md
+*.jpg
+*.jpeg
+*.png.part
+*.npy
+*.npz
+
+# Figures produced by experiments ARE committed
+!results/**/*.png
+
+# Model checkpoints (ResNet-18 = 45 MB): reproducible from the scripts, kept out of Git
+checkpoints/
+*.pt
+*.pth
+*.joblib
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+build/
+dist/
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
