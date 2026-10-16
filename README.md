@@ -1,141 +1,96 @@
-# Museum Art Guide — neural-network components
+# Museum Art Guide
 
-Final project, *Neural Networks & Deep Learning*.
+Final project for the Neural Networks & Deep Learning course.
 
-The (fictional) Museum wants a guide, on visitors' phones and on gallery kiosks, that recognises the
-**style** of the painting the visitor points the camera at and tells the story of that movement.
-This repository builds, **diagnoses** and compares the classifiers behind that feature, and answers
-the director's question:
+A (fictional) museum wants a guide that recognises the style of a painting from a visitor's photo. We built
+and compared several classifiers for this task, and tried to answer the director's question: the kiosks only
+have modest CPUs, so is a neural network worth it, or would a classical model be enough?
 
-> *The kiosks run on modest CPUs, the team is small, the budget is limited. Is a neural network worth
-> it in production, or would a simpler classical model do the job?*
+The three deliverables:
 
-Every number in the report is produced by a script of this repository, with confidence intervals.
+- a feed-forward network written from PyTorch primitives: `src/museum_guide/mlp.py`, `scripts/02_train_mlp.py`
+- training monitoring and failure diagnosis: `src/museum_guide/training.py`, `scripts/03_diagnose_mlp.py`
+- a pretrained ResNet-18: `src/museum_guide/resnet.py`, `scripts/04_train_resnet.py`
 
-| Deliverable | Where |
-|---|---|
-| Feed-forward network in PyTorch, built from primitives | `src/museum_guide/mlp.py`, `scripts/02_train_mlp.py` |
-| Training monitoring and failure diagnosis | `src/museum_guide/training.py`, `scripts/03_diagnose_mlp.py` |
-| Pretrained CNN (ResNet-18) | `src/museum_guide/resnet.py`, `scripts/04_train_resnet.py` |
-| Classical baseline + CPU cost → recommendation | `scripts/01_baseline.py`, `scripts/05_benchmark_cpu.py`, `scripts/06_summary.py` |
+We also trained a logistic regression baseline (`scripts/01_baseline.py`) and measured CPU latency
+(`scripts/05_benchmark_cpu.py`) to compare everything on the same test set.
+
+## Data
+
+5 styles from WikiArt (Impressionism, Baroque, Cubism, Ukiyo-e, Pop Art), 300 images each, resized to 128 px.
+The subset is built with the script provided for the course (`scripts/make_wikiart_subset.py`), see
+`scripts/build_dataset.sh` for the exact command. Images are not included in the repo (unknown licence).
+
+Train / val / test: 1001 / 263 / 236 images. The split is grouped by artist, so a named painter never appears
+in two splits (otherwise the model could learn to recognise the painter instead of the style).
 
 ## Results
 
-5 styles × 300 images, 128 px; artist-grouped split 1 001 / 263 / 236 (train / val / test). Chance = 20 %.
-Training on Colab (T4 GPU); CPU benchmark on Colab's 2-vCPU machine, one photo, 1 thread.
+Accuracy on the test set (chance = 20 %), with 95 % bootstrap intervals. Latency is the median time to
+classify one photo on CPU with one thread (Colab machine, 2 vCPU).
 
-| model | test accuracy [95 % CI] | macro-F1 | CPU latency | size | training |
-|---|---|---|---|---|---|
-| Logistic regression — raw pixels 32×32 | 35.2 % [28.8–41.5] | 0.34 | 1.9 ms | 0.2 MB | 40 s CPU |
-| Logistic regression — hand-crafted features | 62.7 % [56.8–69.1] | 0.62 | 16.7 ms | 0.1 MB | 4 s CPU |
-| **MLP from scratch** — raw pixels 32×32 | 35.7 % ± 1.1 (3 seeds) | 0.32 | 1.3 ms | 6.9 MB | 1 s |
-| MLP from scratch — hand-crafted features | 57.6 % ± 1.5 (3 seeds) | 0.58 | ~17 ms | — | 1 s |
-| ResNet-18 frozen + linear head | 69.9 % [64.0–75.4] | 0.70 | 23.1 ms | 44.8 MB | 1 s (cached embeddings) |
-| **ResNet-18 frozen + logistic regression** | **76.3 % [70.8–81.4]** | 0.76 | 23.1 ms | 44.8 MB | seconds, CPU |
-| ResNet-18 fine-tuned (`layer4` + head) | 77.1 % [71.6–82.6] | 0.77 | 23.1 ms | 44.8 MB | 63 s GPU |
+| Model | Test accuracy | Latency | Size |
+|---|---|---|---|
+| Logistic regression, raw pixels (32x32) | 35.2 % [28.8, 41.5] | 1.9 ms | 0.2 MB |
+| Logistic regression, hand-crafted features (colour, HOG, LBP) | 62.7 % [56.8, 69.1] | 16.7 ms | 0.1 MB |
+| MLP, raw pixels (mean of 3 seeds) | 35.7 % ± 1.1 | 1.3 ms | 6.9 MB |
+| MLP, hand-crafted features (mean of 3 seeds) | 57.6 % ± 1.5 | ~17 ms | - |
+| ResNet-18 frozen + linear head | 69.9 % [64.0, 75.4] | 23.1 ms | 44.8 MB |
+| ResNet-18 frozen + logistic regression | 76.3 % [70.8, 81.4] | 23.1 ms | 44.8 MB |
+| ResNet-18 fine-tuned (layer4 + head) | 77.1 % [71.6, 82.6] | 23.1 ms | 44.8 MB |
 
-![quality vs cost](results/tradeoff.png)
+![quality vs latency](results/tradeoff.png)
 
-**What the numbers say**
+Main observations:
 
-1. **The from-scratch MLP brings nothing over a linear model on the same input**: 35.7 % vs 35.2 % on pixels,
-   57.6 % vs 62.7 % on hand-crafted features. On raw pixels it overfits after 2–3 epochs (train accuracy keeps
-   rising to 83 %, validation stays at ~40 %, validation loss climbs: `results/02_mlp/pixels32/training_history.png`).
-   A fully connected network has no notion of neighbouring pixels and 1.7 M weights for 1 001 images.
-2. **Knowledge transferred from ImageNet is what makes the difference**: +14 points over the best classical model
-   (the confidence intervals do not overlap), top-2 accuracy 91 %.
-3. **Fine-tuning is not worth it here**: 77.1 % vs 76.3 % for the frozen backbone + logistic regression, well within
-   the confidence intervals, for a GPU and 60× more training time.
-4. **Cost on CPU is acceptable**: 23 ms per photo on one thread at 128 px (55 ms at 224 px), far below the ~100 ms
-   perceived as instantaneous; the hand-crafted pipeline is not much cheaper (17 ms, feature extraction dominates).
-5. **Remaining errors** are mostly Pop Art → Cubism (flat colour areas, geometric shapes) and Impressionism ↔ Baroque.
-6. **Diagnosis** (`results/03_diagnosis/summary.md`): every injected failure shows its expected, measured symptom —
-   zero init: zero hidden gradients and 100 % dead units; deep sigmoid: first-layer gradient 7 000× smaller than the
-   output layer's; LR 1e-6: update/weight ratio 1e-5; LR 0.1: 50 % dead ReLUs, chance-level accuracy; shuffled labels:
-   100 % train vs 22 % test; overfit-one-batch: 100 %. The LR range test puts the optimum at 1e-3 (the value used).
-   The same "initial loss = ln K" check flags the ResNet linear head (initial loss 2.8 instead of 1.61, unscaled
-   output initialisation), which explains part of its gap to the logistic regression on the same embeddings.
+- The MLP does not do better than a logistic regression on the same inputs. On raw pixels it overfits after
+  2-3 epochs: training accuracy keeps going up (83 %) while validation stays around 40 %
+  (`results/02_mlp/pixels32/training_history.png`).
+- The pretrained ResNet is clearly better than the best classical model (+14 points, the intervals don't overlap).
+  Top-2 accuracy is 91 %.
+- Fine-tuning gives almost nothing compared to the frozen backbone (77.1 % vs 76.3 %, inside the intervals) and
+  needs a GPU.
+- 23 ms per photo on one CPU core at 128 px (55 ms at 224 px), which is fine for a kiosk.
+- Most errors: Pop Art predicted as Cubism, and Impressionism / Baroque confusions.
 
-**Recommendation to the director.** Yes, a neural network is worth it — **a pretrained one, not one trained from
-scratch**. Deploy ResNet-18 as a frozen feature extractor followed by a logistic regression: 76 % vs 63 % for the best
-classical model, 23 ms per photo on one CPU core, 45 MB, and retraining (e.g. when styles are added) takes seconds on
-a laptop, with no GPU to buy. Fine-tuning does not pay for itself on this data.
+Failure diagnosis (`results/03_diagnosis/summary.md`): we broke the MLP on purpose to check that the monitoring
+shows each problem. Zero initialisation gives zero gradients in the hidden layers and 100 % dead units, a deep
+sigmoid network has first-layer gradients about 7000x smaller than the output layer, lr = 1e-6 gives an
+update/weight ratio around 1e-5, lr = 0.1 kills half of the ReLUs, and with shuffled labels the model reaches
+100 % on train but stays at chance on test. The LR range test gives 1e-3 as the best value, which is what we use.
+The same initial loss check (should be ln 5 = 1.61) shows that the ResNet linear head starts at 2.8, which
+probably explains why it does worse than the logistic regression on the same features.
 
-**Limits (stated, not hidden).** Only 15 named painters in the subset: Impressionism and Pop Art are 100 % "Unknown
-Artist" and Baroque 96 %, so the artist-grouped split cannot guarantee that test paintings come from unseen painters;
-consistently, the random-vs-artist split comparison is small and inconsistent (+4.8, +3.0 and −4.0 points, all inside
-the confidence intervals) and test accuracy may be optimistic. Other limits: 5 contrasted styles, 236 test images
-(±6 points), WikiArt scans rather than visitors' photos (reflections, angles), latency measured on a cloud CPU rather
-than the kiosk hardware.
+## Recommendation
 
-## Quick start
+A neural network is worth it, but a pretrained one, not one trained from scratch. We would deploy ResNet-18 as
+a frozen feature extractor followed by a logistic regression: 76 % accuracy against 63 % for the best classical
+model, 23 ms per photo on CPU, 45 MB, and it can be retrained in a few seconds on a laptop (no GPU needed).
+
+Limits: only 15 named painters in the subset (Impressionism and Pop Art are entirely "Unknown Artist"), so we
+cannot really guarantee that the test set only has unseen painters, and comparing the random and artist splits
+gave small, inconsistent differences. Test accuracy may therefore be a bit optimistic. The test set is small
+(about ±6 points), WikiArt scans are not visitor photos, and latency was measured on a cloud CPU.
+
+## How to run
 
 ```bash
-git clone https://github.com/<owner>/museum-art-guide.git && cd museum-art-guide
-pip install -r requirements.txt && pip install -e .
-python -m pytest -q                      # 18 tests, ~10 s, no download
+pip install -r requirements.txt
+pip install -e .
+python -m pytest -q             # unit tests, no download needed
 
-bash scripts/build_dataset.sh            # WikiArt subset -> data/wikiart_style5 (~4 GB streamed, 8 MB kept)
-bash scripts/run_all.sh                  # steps 0-6 -> results/
+bash scripts/build_dataset.sh   # downloads the subset into data/wikiart_style5
+bash scripts/run_all.sh         # runs steps 0 to 6, outputs in results/
 ```
 
-On Google Colab: open `notebooks/colab_run_all.ipynb` (GPU runtime) — it does all of the above.
+Or open `notebooks/colab_run_all.ipynb` in Google Colab (GPU runtime) and run all cells.
 
-Smoke test of the whole pipeline in ~4 minutes, without downloading anything (synthetic data, numbers
-meaningless): `python scripts/make_fake_dataset.py --out data/fake --per-class 80 && DATA=data/fake SIZE=64 RESULTS=/tmp/r QUICK=1 bash scripts/run_all.sh`
-
-## Pipeline
-
-| Step | Script | What it does | Main outputs |
-|---|---|---|---|
-| data | `build_dataset.sh` | 5 contrasted styles (Impressionism, Baroque, Cubism, Ukiyo-e, Pop Art) × 300 images, 128 px, ≤ 50 images per named artist | `data/wikiart_style5/` (git-ignored) |
-| 0 | `00_explore.py` | class / artist statistics, artist-grouped split | `results/00_explore/eda.json` |
-| 1 | `01_baseline.py` | logistic regression on raw pixels and on hand-crafted features (HSV histogram, colour moments, HOG, LBP) | `results/01_baseline/` |
-| 2 | `02_train_mlp.py` | from-scratch MLP: sweep on validation, then 3 seeds | `results/02_mlp/<features>/` |
-| 3 | `03_diagnose_mlp.py` | 11 controlled failure scenarios + learning-rate range test | `results/03_diagnosis/summary.md` |
-| 4 | `04_train_resnet.py` | ResNet-18: frozen backbone (+ linear head, + logistic regression) and fine-tuning of `layer4` | `results/04_resnet/` |
-| 5 | `05_benchmark_cpu.py` | end-to-end CPU latency for one photo (1/2/4 threads), size, parameters | `results/05_benchmark/` |
-| 6 | `06_summary.py` | quality vs cost table and figure | `results/summary.md`, `results/tradeoff.png` |
-
-## Methodological choices (and why)
-
-* **Split grouped by artist.** WikiArt is ordered by painter and a painter has a recognisable hand. With
-  a random split the same painter is in train and test and the model can recognise *Monet* instead of
-  *Impressionism*. The guide will meet unseen artists, so no named artist is shared between
-  train/val/test (`data.grouped_stratified_split`, stratified by class × named/unknown artist).
-  `--split random` exists only to **measure** the leakage (diagnosis scenario `random_split`).
-* **Validation for every choice, test once.** Hyper-parameters, regularisation strength and early
-  stopping use the validation split; the test split is only used for the final numbers.
-* **Uncertainty.** ~225 test images → about ±6 accuracy points. Every test metric carries a 95 %
-  bootstrap interval; MLP results are averaged over 3 seeds (mean ± std).
-* **Network from primitives.** `Linear` is `x @ W.T + b` on `nn.Parameter` with explicit He/Xavier
-  initialisation; dropout is written by hand; the training loop (optimiser step, early stopping,
-  monitoring) is ours. Only autograd, the optimiser and the cross-entropy come from PyTorch.
-* **Monitoring that diagnoses.** Initial loss vs ln(K), gradient norm and update/weight ratio per layer,
-  dead/saturated units; each failure scenario of step 3 shows the symptom it produces.
-* **Colour-preserving augmentation.** Only crops and flips for the CNN: colour is a style cue.
-* **Cost measured end to end.** Feature extraction is charged to the classical models; latency is the
-  median over 100 runs on CPU after warm-up.
-
-## Repository layout
+## Structure
 
 ```
-src/museum_guide/   data.py  features.py  baseline.py  mlp.py  training.py  resnet.py
-                    evaluation.py  plots.py  experiments.py  common.py
-scripts/            make_wikiart_subset.py (provided)  build_dataset.sh  make_fake_dataset.py
-                    00_explore.py ... 06_summary.py  run_all.sh
-notebooks/          colab_run_all.ipynb
-tests/              unit tests (pytest)
-results/            JSON + figures produced by the scripts (committed: they are the evidence)
-docs/               presentation plan, Q&A preparation, team workflow (French)
+src/museum_guide/   data loading and split, features, baseline, MLP, training loop, ResNet, metrics, plots
+scripts/            00_explore.py ... 06_summary.py, run_all.sh, dataset scripts
+notebooks/          Colab notebook
+tests/              unit tests
+results/            metrics (JSON) and figures from the full run
 ```
-
-## Data and licence
-
-WikiArt images belong to their rights holders (dataset card: "license: unknown"). They are **never**
-committed: `data/` and the figures showing paintings are git-ignored. The exact subset is reproducible
-from `scripts/build_dataset.sh` (pinned dataset revision, seed 0).
-
-## Team
-
-Two members — see `docs/CONTRIBUTING.md` for the split of work; the commit history shows who did what.
