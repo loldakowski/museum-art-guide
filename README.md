@@ -21,9 +21,52 @@ Every number in the report is produced by a script of this repository, with conf
 
 ## Results
 
-*To be filled from `results/summary.md` after the full run (`bash scripts/run_all.sh`).*
+5 styles × 300 images, 128 px; artist-grouped split 1 001 / 263 / 236 (train / val / test). Chance = 20 %.
+Training on Colab (T4 GPU); CPU benchmark on Colab's 2-vCPU machine, one photo, 1 thread.
+
+| model | test accuracy [95 % CI] | macro-F1 | CPU latency | size | training |
+|---|---|---|---|---|---|
+| Logistic regression — raw pixels 32×32 | 35.2 % [28.8–41.5] | 0.34 | 1.9 ms | 0.2 MB | 40 s CPU |
+| Logistic regression — hand-crafted features | 62.7 % [56.8–69.1] | 0.62 | 16.7 ms | 0.1 MB | 4 s CPU |
+| **MLP from scratch** — raw pixels 32×32 | 35.7 % ± 1.1 (3 seeds) | 0.32 | 1.3 ms | 6.9 MB | 1 s |
+| MLP from scratch — hand-crafted features | 57.6 % ± 1.5 (3 seeds) | 0.58 | ~17 ms | — | 1 s |
+| ResNet-18 frozen + linear head | 69.9 % [64.0–75.4] | 0.70 | 23.1 ms | 44.8 MB | 1 s (cached embeddings) |
+| **ResNet-18 frozen + logistic regression** | **76.3 % [70.8–81.4]** | 0.76 | 23.1 ms | 44.8 MB | seconds, CPU |
+| ResNet-18 fine-tuned (`layer4` + head) | 77.1 % [71.6–82.6] | 0.77 | 23.1 ms | 44.8 MB | 63 s GPU |
 
 ![quality vs cost](results/tradeoff.png)
+
+**What the numbers say**
+
+1. **The from-scratch MLP brings nothing over a linear model on the same input**: 35.7 % vs 35.2 % on pixels,
+   57.6 % vs 62.7 % on hand-crafted features. On raw pixels it overfits after 2–3 epochs (train accuracy keeps
+   rising to 83 %, validation stays at ~40 %, validation loss climbs: `results/02_mlp/pixels32/training_history.png`).
+   A fully connected network has no notion of neighbouring pixels and 1.7 M weights for 1 001 images.
+2. **Knowledge transferred from ImageNet is what makes the difference**: +14 points over the best classical model
+   (the confidence intervals do not overlap), top-2 accuracy 91 %.
+3. **Fine-tuning is not worth it here**: 77.1 % vs 76.3 % for the frozen backbone + logistic regression, well within
+   the confidence intervals, for a GPU and 60× more training time.
+4. **Cost on CPU is acceptable**: 23 ms per photo on one thread at 128 px (55 ms at 224 px), far below the ~100 ms
+   perceived as instantaneous; the hand-crafted pipeline is not much cheaper (17 ms, feature extraction dominates).
+5. **Remaining errors** are mostly Pop Art → Cubism (flat colour areas, geometric shapes) and Impressionism ↔ Baroque.
+6. **Diagnosis** (`results/03_diagnosis/summary.md`): every injected failure shows its expected, measured symptom —
+   zero init: zero hidden gradients and 100 % dead units; deep sigmoid: first-layer gradient 7 000× smaller than the
+   output layer's; LR 1e-6: update/weight ratio 1e-5; LR 0.1: 50 % dead ReLUs, chance-level accuracy; shuffled labels:
+   100 % train vs 22 % test; overfit-one-batch: 100 %. The LR range test puts the optimum at 1e-3 (the value used).
+   The same "initial loss = ln K" check flags the ResNet linear head (initial loss 2.8 instead of 1.61, unscaled
+   output initialisation), which explains part of its gap to the logistic regression on the same embeddings.
+
+**Recommendation to the director.** Yes, a neural network is worth it — **a pretrained one, not one trained from
+scratch**. Deploy ResNet-18 as a frozen feature extractor followed by a logistic regression: 76 % vs 63 % for the best
+classical model, 23 ms per photo on one CPU core, 45 MB, and retraining (e.g. when styles are added) takes seconds on
+a laptop, with no GPU to buy. Fine-tuning does not pay for itself on this data.
+
+**Limits (stated, not hidden).** Only 15 named painters in the subset: Impressionism and Pop Art are 100 % "Unknown
+Artist" and Baroque 96 %, so the artist-grouped split cannot guarantee that test paintings come from unseen painters;
+consistently, the random-vs-artist split comparison is small and inconsistent (+4.8, +3.0 and −4.0 points, all inside
+the confidence intervals) and test accuracy may be optimistic. Other limits: 5 contrasted styles, 236 test images
+(±6 points), WikiArt scans rather than visitors' photos (reflections, angles), latency measured on a cloud CPU rather
+than the kiosk hardware.
 
 ## Quick start
 
