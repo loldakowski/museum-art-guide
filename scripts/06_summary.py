@@ -84,15 +84,24 @@ def main():
     pts = [r for r in rows if r["latency_ms"]]
     if pts:
         fig, ax = plt.subplots(figsize=(7.5, 4.5))
-        seen = {}
-        for r in pts:  # models sharing a backbone have the same latency: spread them slightly
-            k = seen.get(r["latency_key"], 0)
-            seen[r["latency_key"]] = k + 1
-            r = {**r, "latency_ms": r["latency_ms"] * (1 + 0.06 * k)}
+        # labels: placed to the right of the points, pushed apart vertically when points are close
+        pts = sorted(pts, key=lambda r: r["test_acc"])
+        placed = []
+        for r in pts:
+            y = r["test_acc"]
+            for (x0, y0) in placed:
+                if 0.5 < r["latency_ms"] / x0 < 2.0 and abs(y - y0) < 0.045:
+                    y = y0 + 0.045
+            placed.append((r["latency_ms"], y))
             ax.errorbar(r["latency_ms"], r["test_acc"], yerr=[[r["test_acc"] - r["ci_lo"]], [r["ci_hi"] - r["test_acc"]]],
-                        fmt="o", color=PALETTE[0], ms=8, capsize=3, lw=1.5)
-            ax.annotate(r["model"], (r["latency_ms"], r["test_acc"]), xytext=(7, 4), textcoords="offset points",
-                        fontsize=8, color=INK)
+                        fmt="o", color=PALETTE[0], ms=7, capsize=3, lw=1.5)
+            # a neighbour just to the right -> write this label on the left instead
+            left = any(1.0 < o["latency_ms"] / r["latency_ms"] < 2.5 for o in pts)
+            ax.annotate(f"{r['model']}  {r['test_acc']:.0%}", (r["latency_ms"], r["test_acc"]),
+                        xytext=(r["latency_ms"] / 1.12 if left else r["latency_ms"] * 1.12, y), textcoords="data",
+                        fontsize=8, color=INK, va="center", ha="right" if left else "left",
+                        arrowprops={"arrowstyle": "-", "color": MUTED, "lw": 0.6})
+        ax.set_xlim(min(r["latency_ms"] for r in pts) / 8, max(r["latency_ms"] for r in pts) * 12)
         k = len(load_json(R / "00_explore" / "eda.json")["classes"]) if (R / "00_explore" / "eda.json").exists() else 5
         ax.axhline(1 / k, color=MUTED, ls=":", lw=1)
         ax.text(min(r["latency_ms"] for r in pts), 1 / k + 0.01, "chance", fontsize=7,
