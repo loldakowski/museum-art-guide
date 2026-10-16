@@ -1,0 +1,336 @@
+{
+  "model": "mlp_pixels32",
+  "features": "pixels32",
+  "split": "artist",
+  "selected": {
+    "hidden": [
+      512,
+      256
+    ],
+    "dropout": 0.2,
+    "weight_decay": 0.0001
+  },
+  "n_parameters": 1705989,
+  "sweep": [
+    {
+      "hidden": [
+        256
+      ],
+      "dropout": 0.2,
+      "weight_decay": 0.0001,
+      "val_acc": 0.38783269961977185,
+      "val_loss": 1.4844617952412071,
+      "best_epoch": 4,
+      "train_acc_at_end": 0.8551448551448552,
+      "params": 787973
+    },
+    {
+      "hidden": [
+        256
+      ],
+      "dropout": 0.2,
+      "weight_decay": 0.01,
+      "val_acc": 0.38022813688212925,
+      "val_loss": 1.4848312551984315,
+      "best_epoch": 4,
+      "train_acc_at_end": 0.8501498501498501,
+      "params": 787973
+    },
+    {
+      "hidden": [
+        256
+      ],
+      "dropout": 0.5,
+      "weight_decay": 0.0001,
+      "val_acc": 0.40304182509505704,
+      "val_loss": 1.482836008978434,
+      "best_epoch": 5,
+      "train_acc_at_end": 0.7442557442557443,
+      "params": 787973
+    },
+    {
+      "hidden": [
+        256
+      ],
+      "dropout": 0.5,
+      "weight_decay": 0.01,
+      "val_acc": 0.4068441064638783,
+      "val_loss": 1.4837825180459838,
+      "best_epoch": 5,
+      "train_acc_at_end": 0.7262737262737263,
+      "params": 787973
+    },
+    {
+      "hidden": [
+        512,
+        256
+      ],
+      "dropout": 0.2,
+      "weight_decay": 0.0001,
+      "val_acc": 0.44106463878326996,
+      "val_loss": 1.5031062949293013,
+      "best_epoch": 3,
+      "train_acc_at_end": 0.8451548451548452,
+      "params": 1705989
+    },
+    {
+      "hidden": [
+        512,
+        256
+      ],
+      "dropout": 0.2,
+      "weight_decay": 0.01,
+      "val_acc": 0.34600760456273766,
+      "val_loss": 1.4988143398734552,
+      "best_epoch": 2,
+      "train_acc_at_end": 0.8281718281718282,
+      "params": 1705989
+    },
+    {
+      "hidden": [
+        512,
+        256
+      ],
+      "dropout": 0.5,
+      "weight_decay": 0.0001,
+      "val_acc": 0.41064638783269963,
+      "val_loss": 1.4284846664834838,
+      "best_epoch": 5,
+      "train_acc_at_end": 0.5874125874125874,
+      "params": 1705989
+    },
+    {
+      "hidden": [
+        512,
+        256
+      ],
+      "dropout": 0.5,
+      "weight_decay": 0.01,
+      "val_acc": 0.3688212927756654,
+      "val_loss": 1.435777091254753,
+      "best_epoch": 4,
+      "train_acc_at_end": 0.5794205794205795,
+      "params": 1705989
+    },
+    {
+      "hidden": [
+        1024,
+        512,
+        256
+      ],
+      "dropout": 0.2,
+      "weight_decay": 0.0001,
+      "val_acc": 0.3726235741444867,
+      "val_loss": 1.476017825050499,
+      "best_epoch": 3,
+      "train_acc_at_end": 0.7602397602397603,
+      "params": 3804165
+    },
+    {
+      "hidden": [
+        1024,
+        512,
+        256
+      ],
+      "dropout": 0.2,
+      "weight_decay": 0.01,
+      "val_acc": 0.39543726235741444,
+      "val_loss": 1.4790584433668013,
+      "best_epoch": 3,
+      "train_acc_at_end": 0.7712287712287712,
+      "params": 3804165
+    },
+    {
+      "hidden": [
+        1024,
+        512,
+        256
+      ],
+      "dropout": 0.5,
+      "weight_decay": 0.0001,
+      "val_acc": 0.3840304182509506,
+      "val_loss": 1.456866826394665,
+      "best_epoch": 9,
+      "train_acc_at_end": 0.5194805194805194,
+      "params": 3804165
+    },
+    {
+      "hidden": [
+        1024,
+        512,
+        256
+      ],
+      "dropout": 0.5,
+      "weight_decay": 0.01,
+      "val_acc": 0.4220532319391635,
+      "val_loss": 1.426724394011407,
+      "best_epoch": 11,
+      "train_acc_at_end": 0.5264735264735265,
+      "params": 3804165
+    }
+  ],
+  "test_accuracy": {
+    "mean": 0.3573446327683616,
+    "std": 0.010663607959421964,
+    "values": [
+      0.3474576271186441,
+      0.3686440677966102,
+      0.3559322033898305
+    ]
+  },
+  "test_macro_f1": {
+    "mean": 0.34028203567226506,
+    "std": 0.01980821134355705,
+    "values": [
+      0.31762551379715,
+      0.3543263137347404,
+      0.34889427948490476
+    ]
+  },
+  "best_epoch": {
+    "mean": 2.6666666666666665,
+    "std": 0.5773502691896258,
+    "values": [
+      3.0,
+      2.0,
+      3.0
+    ]
+  },
+  "train_time_s": {
+    "mean": 0.9217218759999545,
+    "std": 0.041027583549551744,
+    "values": [
+      0.9486019349999424,
+      0.8744978349999428,
+      0.9420658579999781
+    ]
+  },
+  "initial_val_loss": 1.626304249346483,
+  "expected_initial_loss": 1.6094379124341003,
+  "generalisation_gap_at_best": 0.05543885772022655,
+  "metrics_seed0": {
+    "n": 236,
+    "accuracy": 0.3474576271186441,
+    "balanced_accuracy": 0.34488946784387514,
+    "macro_f1": 0.31762551379715,
+    "chance_level": 0.2,
+    "per_class": {
+      "Baroque": {
+        "precision": 0.38636363636363635,
+        "recall": 0.723404255319149,
+        "f1": 0.5037037037037037,
+        "support": 47
+      },
+      "Cubism": {
+        "precision": 0.23529411764705882,
+        "recall": 0.16326530612244897,
+        "f1": 0.1927710843373494,
+        "support": 49
+      },
+      "Impressionism": {
+        "precision": 0.25,
+        "recall": 0.15555555555555556,
+        "f1": 0.1917808219178082,
+        "support": 45
+      },
+      "Pop_Art": {
+        "precision": 0.38461538461538464,
+        "recall": 0.2222222222222222,
+        "f1": 0.28169014084507044,
+        "support": 45
+      },
+      "Ukiyo_e": {
+        "precision": 0.38333333333333336,
+        "recall": 0.46,
+        "f1": 0.41818181818181815,
+        "support": 50
+      }
+    },
+    "confusion_matrix": [
+      [
+        34,
+        1,
+        5,
+        1,
+        6
+      ],
+      [
+        15,
+        8,
+        7,
+        8,
+        11
+      ],
+      [
+        21,
+        6,
+        7,
+        2,
+        9
+      ],
+      [
+        9,
+        11,
+        4,
+        10,
+        11
+      ],
+      [
+        9,
+        8,
+        5,
+        5,
+        23
+      ]
+    ],
+    "class_names": [
+      "Baroque",
+      "Cubism",
+      "Impressionism",
+      "Pop_Art",
+      "Ukiyo_e"
+    ],
+    "top2_accuracy": 0.5720338983050848,
+    "accuracy_ci95": [
+      0.288135593220339,
+      0.4110169491525424
+    ],
+    "macro_f1_ci95": [
+      0.2602120030294565,
+      0.3748555799394005
+    ]
+  },
+  "most_confused_seed0": [
+    [
+      "Impressionism",
+      "Baroque",
+      21,
+      0.4666666666666667
+    ],
+    [
+      "Cubism",
+      "Baroque",
+      15,
+      0.30612244897959184
+    ],
+    [
+      "Cubism",
+      "Ukiyo_e",
+      11,
+      0.22448979591836735
+    ],
+    [
+      "Pop_Art",
+      "Cubism",
+      11,
+      0.24444444444444444
+    ],
+    [
+      "Pop_Art",
+      "Ukiyo_e",
+      11,
+      0.24444444444444444
+    ]
+  ],
+  "device": "cuda"
+}

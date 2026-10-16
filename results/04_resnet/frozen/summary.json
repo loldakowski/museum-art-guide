@@ -1,0 +1,242 @@
+{
+  "model": "resnet18_frozen",
+  "metrics": {
+    "n": 236,
+    "accuracy": 0.6991525423728814,
+    "balanced_accuracy": 0.6962935301780286,
+    "macro_f1": 0.6959787423355243,
+    "chance_level": 0.2,
+    "per_class": {
+      "Baroque": {
+        "precision": 0.782608695652174,
+        "recall": 0.7659574468085106,
+        "f1": 0.7741935483870968,
+        "support": 47
+      },
+      "Cubism": {
+        "precision": 0.6785714285714286,
+        "recall": 0.7755102040816326,
+        "f1": 0.7238095238095238,
+        "support": 49
+      },
+      "Impressionism": {
+        "precision": 0.6086956521739131,
+        "recall": 0.6222222222222222,
+        "f1": 0.6153846153846154,
+        "support": 45
+      },
+      "Pop_Art": {
+        "precision": 0.6842105263157895,
+        "recall": 0.5777777777777777,
+        "f1": 0.6265060240963856,
+        "support": 45
+      },
+      "Ukiyo_e": {
+        "precision": 0.74,
+        "recall": 0.74,
+        "f1": 0.74,
+        "support": 50
+      }
+    },
+    "confusion_matrix": [
+      [
+        36,
+        2,
+        7,
+        0,
+        2
+      ],
+      [
+        1,
+        38,
+        4,
+        4,
+        2
+      ],
+      [
+        6,
+        2,
+        28,
+        3,
+        6
+      ],
+      [
+        0,
+        13,
+        3,
+        26,
+        3
+      ],
+      [
+        3,
+        1,
+        4,
+        5,
+        37
+      ]
+    ],
+    "class_names": [
+      "Baroque",
+      "Cubism",
+      "Impressionism",
+      "Pop_Art",
+      "Ukiyo_e"
+    ],
+    "top2_accuracy": 0.9067796610169492,
+    "accuracy_ci95": [
+      0.6398305084745762,
+      0.7543432203389825
+    ],
+    "macro_f1_ci95": [
+      0.6352601941997867,
+      0.7513033766252278
+    ]
+  },
+  "history_summary": {
+    "initial_val_loss": 2.7915236324411836,
+    "expected_initial_loss": 1.6094379124341003,
+    "best_epoch": 20,
+    "best_val_loss": 0.9566977613325808,
+    "best_val_acc": 0.6692015209125475,
+    "total_time_s": 1.3620214279999345,
+    "status": "early_stopped"
+  },
+  "most_confused": [
+    [
+      "Pop_Art",
+      "Cubism",
+      13,
+      0.28888888888888886
+    ],
+    [
+      "Baroque",
+      "Impressionism",
+      7,
+      0.14893617021276595
+    ],
+    [
+      "Impressionism",
+      "Baroque",
+      6,
+      0.13333333333333333
+    ],
+    [
+      "Impressionism",
+      "Ukiyo_e",
+      6,
+      0.13333333333333333
+    ],
+    [
+      "Ukiyo_e",
+      "Pop_Art",
+      5,
+      0.1
+    ]
+  ],
+  "logreg_on_embeddings": {
+    "metrics": {
+      "n": 236,
+      "accuracy": 0.7627118644067796,
+      "balanced_accuracy": 0.7617851112076035,
+      "macro_f1": 0.7616956132595655,
+      "chance_level": 0.2,
+      "per_class": {
+        "Baroque": {
+          "precision": 0.7358490566037735,
+          "recall": 0.8297872340425532,
+          "f1": 0.78,
+          "support": 47
+        },
+        "Cubism": {
+          "precision": 0.8181818181818182,
+          "recall": 0.7346938775510204,
+          "f1": 0.7741935483870968,
+          "support": 49
+        },
+        "Impressionism": {
+          "precision": 0.6595744680851063,
+          "recall": 0.6888888888888889,
+          "f1": 0.6739130434782609,
+          "support": 45
+        },
+        "Pop_Art": {
+          "precision": 0.7727272727272727,
+          "recall": 0.7555555555555555,
+          "f1": 0.7640449438202247,
+          "support": 45
+        },
+        "Ukiyo_e": {
+          "precision": 0.8333333333333334,
+          "recall": 0.8,
+          "f1": 0.8163265306122449,
+          "support": 50
+        }
+      },
+      "confusion_matrix": [
+        [
+          39,
+          0,
+          8,
+          0,
+          0
+        ],
+        [
+          2,
+          36,
+          3,
+          5,
+          3
+        ],
+        [
+          9,
+          1,
+          31,
+          1,
+          3
+        ],
+        [
+          0,
+          6,
+          3,
+          34,
+          2
+        ],
+        [
+          3,
+          1,
+          2,
+          4,
+          40
+        ]
+      ],
+      "class_names": [
+        "Baroque",
+        "Cubism",
+        "Impressionism",
+        "Pop_Art",
+        "Ukiyo_e"
+      ],
+      "top2_accuracy": 0.9110169491525424,
+      "accuracy_ci95": [
+        0.7076271186440678,
+        0.8135593220338984
+      ],
+      "macro_f1_ci95": [
+        0.7048114974796046,
+        0.8129696925893973
+      ]
+    },
+    "val_acc_per_C": {
+      "0.001": 0.6958174904942965,
+      "0.01": 0.6844106463878327,
+      "0.1": 0.6768060836501901,
+      "1.0": 0.6577946768060836,
+      "10.0": 0.6501901140684411
+    },
+    "best_C": 0.001
+  },
+  "n_parameters": 11179077,
+  "trainable_parameters": 2565,
+  "img_size": 128,
+  "pretrained": true
+}

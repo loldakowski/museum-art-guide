@@ -1,0 +1,133 @@
+{
+  "n_images": 1500,
+  "classes": [
+    "Baroque",
+    "Cubism",
+    "Impressionism",
+    "Pop_Art",
+    "Ukiyo_e"
+  ],
+  "per_class": {
+    "Baroque": {
+      "n": 300,
+      "unknown_artist_share": 0.9633333333333334,
+      "named_artists": 7,
+      "top_artists": {
+        "peter-paul-rubens": 3,
+        "bartolome-esteban-murillo": 3,
+        "frans-hals": 1,
+        "joseph-wright": 1,
+        "jacob-jordaens": 1
+      }
+    },
+    "Cubism": {
+      "n": 300,
+      "unknown_artist_share": 0.86,
+      "named_artists": 6,
+      "top_artists": {
+        "georges-braque": 15,
+        "juan-gris": 14,
+        "fernand-leger": 10,
+        "ernst-ludwig-kirchner": 1,
+        "raoul-dufy": 1
+      }
+    },
+    "Impressionism": {
+      "n": 300,
+      "unknown_artist_share": 1.0,
+      "named_artists": 0,
+      "top_artists": {}
+    },
+    "Pop_Art": {
+      "n": 300,
+      "unknown_artist_share": 1.0,
+      "named_artists": 0,
+      "top_artists": {}
+    },
+    "Ukiyo_e": {
+      "n": 300,
+      "unknown_artist_share": 0.85,
+      "named_artists": 2,
+      "top_artists": {
+        "katsushika-hokusai": 34,
+        "utagawa-kuniyoshi": 11
+      }
+    }
+  },
+  "mean_rgb": {
+    "Baroque": [
+      0.452,
+      0.397,
+      0.333
+    ],
+    "Cubism": [
+      0.541,
+      0.505,
+      0.448
+    ],
+    "Impressionism": [
+      0.53,
+      0.482,
+      0.414
+    ],
+    "Pop_Art": [
+      0.599,
+      0.557,
+      0.516
+    ],
+    "Ukiyo_e": [
+      0.614,
+      0.556,
+      0.481
+    ]
+  },
+  "split": {
+    "n": {
+      "train": 1001,
+      "val": 263,
+      "test": 236
+    },
+    "per_class": {
+      "Baroque": {
+        "train": 206,
+        "val": 47,
+        "test": 47
+      },
+      "Cubism": {
+        "train": 197,
+        "val": 54,
+        "test": 49
+      },
+      "Impressionism": {
+        "train": 210,
+        "val": 45,
+        "test": 45
+      },
+      "Pop_Art": {
+        "train": 210,
+        "val": 45,
+        "test": 45
+      },
+      "Ukiyo_e": {
+        "train": 178,
+        "val": 72,
+        "test": 50
+      }
+    },
+    "named_artists": {
+      "train": 9,
+      "val": 3,
+      "test": 3
+    },
+    "shared_artists": {
+      "train-val": [],
+      "train-test": [],
+      "val-test": []
+    }
+  },
+  "image_shape": [
+    128,
+    128,
+    3
+  ]
+}

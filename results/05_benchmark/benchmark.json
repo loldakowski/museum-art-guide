@@ -1,0 +1,160 @@
+{
+  "environment": {
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "cpu_count": 2,
+    "torch": "2.11.0+cu130"
+  },
+  "results": [
+    {
+      "model": "logreg_pixels32",
+      "threads": 1,
+      "median_ms": 1.8553460000703126,
+      "p95_ms": 2.314334550055719,
+      "mean_ms": 1.8625167900017914,
+      "size_mb": 0.198065,
+      "params": 15365,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_handcrafted",
+      "threads": 1,
+      "median_ms": 16.695688000027076,
+      "p95_ms": 20.08532085006891,
+      "mean_ms": 17.112806629991155,
+      "size_mb": 0.127841,
+      "params": 9880,
+      "trained_weights": true
+    },
+    {
+      "model": "mlp_pixels32",
+      "threads": 1,
+      "median_ms": 1.253784500022448,
+      "p95_ms": 1.474057349969371,
+      "mean_ms": 1.2758337199966263,
+      "size_mb": 6.851597,
+      "params": 1705989,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_128px",
+      "threads": 1,
+      "median_ms": 23.089464500003487,
+      "p95_ms": 26.555526149968497,
+      "mean_ms": 23.54915319000611,
+      "size_mb": 44.794059,
+      "params": 11179077,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_224px",
+      "threads": 1,
+      "median_ms": 54.71819150000101,
+      "p95_ms": 66.47018775001925,
+      "mean_ms": 55.90921703999811,
+      "size_mb": 44.794059,
+      "params": 11179077,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_pixels32",
+      "threads": 2,
+      "median_ms": 1.4243205000639136,
+      "p95_ms": 1.6061345498087574,
+      "mean_ms": 1.478232399990702,
+      "size_mb": 0.198065,
+      "params": 15365,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_handcrafted",
+      "threads": 2,
+      "median_ms": 16.25443099999302,
+      "p95_ms": 17.738785700009885,
+      "mean_ms": 16.47411974000306,
+      "size_mb": 0.127841,
+      "params": 9880,
+      "trained_weights": true
+    },
+    {
+      "model": "mlp_pixels32",
+      "threads": 2,
+      "median_ms": 1.392701999975543,
+      "p95_ms": 1.5812816500670124,
+      "mean_ms": 1.4422820200047681,
+      "size_mb": 6.851597,
+      "params": 1705989,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_128px",
+      "threads": 2,
+      "median_ms": 22.76141150002786,
+      "p95_ms": 26.049413050111525,
+      "mean_ms": 23.45881380001856,
+      "size_mb": 44.794059,
+      "params": 11179077,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_224px",
+      "threads": 2,
+      "median_ms": 52.36678050005139,
+      "p95_ms": 79.40533640004332,
+      "mean_ms": 55.39158088000249,
+      "size_mb": 44.794059,
+      "params": 11179077,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_pixels32",
+      "threads": 4,
+      "median_ms": 1.4610380000021905,
+      "p95_ms": 1.6288951000205998,
+      "mean_ms": 1.4628492600104437,
+      "size_mb": 0.198065,
+      "params": 15365,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_handcrafted",
+      "threads": 4,
+      "median_ms": 16.355158000010306,
+      "p95_ms": 19.69404809990465,
+      "mean_ms": 16.716964119998465,
+      "size_mb": 0.127841,
+      "params": 9880,
+      "trained_weights": true
+    },
+    {
+      "model": "mlp_pixels32",
+      "threads": 4,
+      "median_ms": 1.6246220000084577,
+      "p95_ms": 1.7929238999727204,
+      "mean_ms": 1.6341825300082746,
+      "size_mb": 6.851597,
+      "params": 1705989,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_128px",
+      "threads": 4,
+      "median_ms": 36.67341299990312,
+      "p95_ms": 41.33391644999165,
+      "mean_ms": 37.25663158999623,
+      "size_mb": 44.794059,
+      "params": 11179077,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_224px",
+      "threads": 4,
+      "median_ms": 60.982176000038635,
+      "p95_ms": 95.86306320003357,
+      "mean_ms": 66.52777825000157,
+      "size_mb": 44.794059,
+      "params": 11179077,
+      "trained_weights": true
+    }
+  ]
+}

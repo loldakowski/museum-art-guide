@@ -1,0 +1,244 @@
+{
+  "reference_config": {
+    "hidden": [
+      512,
+      256
+    ],
+    "dropout": 0.2,
+    "weight_decay": 0.0001
+  },
+  "scenarios": [
+    {
+      "scenario": "reference",
+      "expected": "healthy: val loss decreases, then early stopping",
+      "status": "early_stopped",
+      "epochs_run": 13,
+      "initial_loss": 1.626304249346483,
+      "ln_K": 1.6094379124341003,
+      "final_train_loss": 0.49275343169222824,
+      "final_train_acc": 0.8291708291708292,
+      "best_val_acc": 0.4372623574144487,
+      "val_loss_rise": 0.7209994820134269,
+      "test_acc": 0.3389830508474576,
+      "grad_first_over_out": 0.10248568421579773,
+      "mean_update_ratio": 0.010380901531985518,
+      "dead_or_saturated_end": 0.013671875
+    },
+    {
+      "scenario": "overfit_one_batch",
+      "expected": "train acc reaches ~100 % on 32 images (the code can learn)",
+      "status": "ok",
+      "epochs_run": 200,
+      "initial_loss": 1.6376460790634155,
+      "ln_K": 1.6094379124341003,
+      "final_train_loss": 5.066386279395374e-07,
+      "final_train_acc": 1.0,
+      "best_val_acc": 1.0,
+      "val_loss_rise": 0.0,
+      "test_acc": 0.3008474576271186,
+      "grad_first_over_out": 0.197090755158591,
+      "mean_update_ratio": 0.002749462141686103,
+      "dead_or_saturated_end": 0.01171875
+    },
+    {
+      "scenario": "lr_too_high",
+      "expected": "loss explodes or stays at chance, many dead ReLUs",
+      "status": "early_stopped",
+      "epochs_run": 11,
+      "initial_loss": 1.626304249346483,
+      "ln_K": 1.6094379124341003,
+      "final_train_loss": 1.610800891013055,
+      "final_train_acc": 0.1928071928071928,
+      "best_val_acc": 0.20532319391634982,
+      "val_loss_rise": 0.17922613919914454,
+      "test_acc": 0.2076271186440678,
+      "grad_first_over_out": 0.01803657590198289,
+      "mean_update_ratio": 0.05018253903241359,
+      "dead_or_saturated_end": 0.498046875
+    },
+    {
+      "scenario": "lr_too_low",
+      "expected": "loss stays near ln(K), update/weight ratio << 1e-4",
+      "status": "ok",
+      "epochs_run": 60,
+      "initial_loss": 1.626304249346483,
+      "ln_K": 1.6094379124341003,
+      "final_train_loss": 1.5481090181238286,
+      "final_train_acc": 0.3116883116883117,
+      "best_val_acc": 0.22053231939163498,
+      "val_loss_rise": 0.0,
+      "test_acc": 0.3389830508474576,
+      "grad_first_over_out": 0.3249952194356142,
+      "mean_update_ratio": 1.1792877894895051e-05,
+      "dead_or_saturated_end": 0.0
+    },
+    {
+      "scenario": "init_zeros",
+      "expected": "symmetry: loss stuck at ln(K), zero gradients in hidden layers",
+      "status": "early_stopped",
+      "epochs_run": 11,
+      "initial_loss": 1.6094378917389496,
+      "ln_K": 1.6094379124341003,
+      "final_train_loss": 1.6082309775061898,
+      "final_train_acc": 0.2097902097902098,
+      "best_val_acc": 0.17110266159695817,
+      "val_loss_rise": 0.005550486053350845,
+      "test_acc": 0.1906779661016949,
+      "grad_first_over_out": 0.0,
+      "mean_update_ratio": 0.0,
+      "dead_or_saturated_end": 1.0
+    },
+    {
+      "scenario": "init_large",
+      "expected": "initial loss >> ln(K), unstable training",
+      "status": "ok",
+      "epochs_run": 60,
+      "initial_loss": 9316.995247148288,
+      "ln_K": 1.6094379124341003,
+      "final_train_loss": 980.5647445815903,
+      "final_train_acc": 0.6813186813186813,
+      "best_val_acc": 0.34600760456273766,
+      "val_loss_rise": 4.050617870722817,
+      "test_acc": 0.3347457627118644,
+      "grad_first_over_out": 0.9813768203823601,
+      "mean_update_ratio": 0.00010504980093363161,
+      "dead_or_saturated_end": 0.001953125
+    },
+    {
+      "scenario": "deep_sigmoid",
+      "expected": "vanishing gradients: first-layer grad norm << last-layer grad norm",
+      "status": "early_stopped",
+      "epochs_run": 28,
+      "initial_loss": 1.6162513181737168,
+      "ln_K": 1.6094379124341003,
+      "final_train_loss": 1.6112687759227924,
+      "final_train_acc": 0.2057942057942058,
+      "best_val_acc": 0.17110266159695817,
+      "val_loss_rise": 0.007937935368643068,
+      "test_acc": 0.1906779661016949,
+      "grad_first_over_out": 0.00013574626861532663,
+      "mean_update_ratio": 0.01826180756358613,
+      "dead_or_saturated_end": 0.0003102620442708333
+    },
+    {
+      "scenario": "no_normalisation",
+      "expected": "slower or worse convergence than the reference",
+      "status": "early_stopped",
+      "epochs_run": 33,
+      "initial_loss": 1.6052807710016634,
+      "ln_K": 1.6094379124341003,
+      "final_train_loss": 1.1708311732117826,
+      "final_train_acc": 0.5354645354645354,
+      "best_val_acc": 0.4220532319391635,
+      "val_loss_rise": 0.1426399724111811,
+      "test_acc": 0.3686440677966102,
+      "grad_first_over_out": 0.08158869162437127,
+      "mean_update_ratio": 0.005459261675901488,
+      "dead_or_saturated_end": 0.4677734375
+    },
+    {
+      "scenario": "no_regularisation",
+      "expected": "train acc ~100 %, val loss rises after its minimum (overfitting)",
+      "status": "ok",
+      "epochs_run": 60,
+      "initial_loss": 1.626304249346483,
+      "ln_K": 1.6094379124341003,
+      "final_train_loss": 0.023190613069406875,
+      "final_train_acc": 0.994005994005994,
+      "best_val_acc": 0.40304182509505704,
+      "val_loss_rise": 3.5558412501113956,
+      "test_acc": 0.3559322033898305,
+      "grad_first_over_out": 0.10679970890514905,
+      "mean_update_ratio": 0.005066632462651498,
+      "dead_or_saturated_end": 0.015625
+    },
+    {
+      "scenario": "shuffled_labels",
+      "expected": "train acc rises, val/test acc ~ chance (memorisation, no leakage)",
+      "status": "ok",
+      "epochs_run": 120,
+      "initial_loss": 1.626304249346483,
+      "ln_K": 1.6094379124341003,
+      "final_train_loss": 0.0007387760307427708,
+      "final_train_acc": 1.0,
+      "best_val_acc": 0.19011406844106463,
+      "val_loss_rise": 3.941246931997089,
+      "test_acc": 0.21610169491525424,
+      "grad_first_over_out": 0.11751904201276289,
+      "mean_update_ratio": 0.0019495195748352224,
+      "dead_or_saturated_end": 0.013671875
+    },
+    {
+      "scenario": "random_split",
+      "expected": "test acc higher than with the artist split (leakage through painters)",
+      "status": "early_stopped",
+      "epochs_run": 12,
+      "initial_loss": 1.6283649005721101,
+      "ln_K": 1.6094379124341003,
+      "final_train_loss": 0.48705398831853874,
+      "final_train_acc": 0.8207816968541468,
+      "best_val_acc": 0.38495575221238937,
+      "val_loss_rise": 0.597975064167934,
+      "test_acc": 0.38666666666666666,
+      "grad_first_over_out": 0.10443379944533454,
+      "mean_update_ratio": 0.010435598534854701,
+      "dead_or_saturated_end": 0.021484375
+    }
+  ],
+  "lr_range_test": [
+    {
+      "lr": 1e-06,
+      "train_loss": 1.6183827235386683,
+      "val_loss": 1.614755840809173,
+      "status": "ok"
+    },
+    {
+      "lr": 1e-05,
+      "train_loss": 1.5304038471037096,
+      "val_loss": 1.5592951901512,
+      "status": "ok"
+    },
+    {
+      "lr": 0.0001,
+      "train_loss": 1.333087527430379,
+      "val_loss": 1.4356513077768536,
+      "status": "ok"
+    },
+    {
+      "lr": 0.0003,
+      "train_loss": 1.1512591788818787,
+      "val_loss": 1.4535195238236691,
+      "status": "ok"
+    },
+    {
+      "lr": 0.001,
+      "train_loss": 1.067705893730903,
+      "val_loss": 1.5444691008941303,
+      "status": "ok"
+    },
+    {
+      "lr": 0.003,
+      "train_loss": 1.2241097320686212,
+      "val_loss": 1.5021227702441777,
+      "status": "ok"
+    },
+    {
+      "lr": 0.01,
+      "train_loss": 1.6066022958907928,
+      "val_loss": 1.6170674023066183,
+      "status": "ok"
+    },
+    {
+      "lr": 0.03,
+      "train_loss": 1.6097316663343828,
+      "val_loss": 1.6239655353270557,
+      "status": "ok"
+    },
+    {
+      "lr": 0.1,
+      "train_loss": 1.6086847276001663,
+      "val_loss": 2.4248838243375714,
+      "status": "ok"
+    }
+  ]
+}
