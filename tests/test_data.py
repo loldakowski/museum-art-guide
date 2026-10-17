@@ -87,3 +87,18 @@ def test_duplicate_of_a_named_artist_joins_the_artist_group(fake_data):
 def test_verdict_file_is_found_by_dataset_name(fake_data, tmp_path):
     assert duplicates_file(fake_data) is None                          # no annotations for the synthetic data
     assert duplicates_file("data/wikiart_style5") is not None
+
+
+def test_cross_validation_folds_test_every_image_once(fake_data):
+    meta = load_metadata(fake_data)
+    for mode in ("artist", "random"):
+        splits = [make_split(meta, mode, seed=0, fold=k) for k in range(5)]
+        tested = np.stack([s == "test" for s in splits])
+        assert (tested.sum(0) == 1).all(), mode                          # each image in exactly one test fold
+        for k, s in enumerate(splits):
+            assert (s == "val").any() and not ((s == "val") & tested[k]).any()
+            assert ((splits[(k + 1) % 5] == "test") == (s == "val")).all()  # val = next fold's test
+        if mode == "artist":
+            for s in splits:
+                rep = split_report(meta, s)
+                assert all(len(v) == 0 for v in rep["shared_artists"].values())

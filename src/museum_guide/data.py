@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 import torch
 from PIL import Image, ImageOps
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from torch.utils.data import DataLoader, Dataset
 
 UNKNOWN_ARTIST = "Unknown Artist"
@@ -128,36 +128,63 @@ def grouped_stratified_split(strata, groups, fractions=(0.70, 0.15, 0.15), seed:
     return assign[g_idx]
 
 
+def _keep_duplicates_together(meta: pd.DataFrame, assign: np.ndarray) -> np.ndarray:
+    """Each member of a duplicate group (column 'dup_group') takes the assignment of the group's first image."""
+    if "dup_group" not in meta:
+        return assign
+    dup = meta["dup_group"].to_numpy()
+    first = pd.Series(assign).groupby(dup).transform("first").to_numpy()  # NaN groups are skipped
+    grouped = pd.notna(dup)
+    assign = assign.copy()
+    assign[grouped] = first[grouped]
+    return assign
+
+
 def make_split(meta: pd.DataFrame, mode: str = "artist", val_frac: float = 0.15,
-               test_frac: float = 0.15, seed: int = 0) -> np.ndarray:
+               test_frac: float = 0.15, seed: int = 0, fold: int | None = None, n_folds: int = 5) -> np.ndarray:
     """Return an array of 'train' / 'val' / 'test' (one entry per row of meta).
 
     mode='artist': stratified by class AND grouped by artist (no painter in two splits).
     mode='random': stratified random split (kept only to *measure* the leakage it causes). Duplicate groups
-    (column 'dup_group') still stay whole: each member takes the split of the group's first image, so the random
-    split differs from the artist split by painters only, not by copies of the same painting.
+    (column 'dup_group') still stay whole, so the random split differs from the artist split by painters only,
+    not by copies of the same painting.
+    fold=k (cross-validation): the data is cut into n_folds parts the same way (grouped by artist, or stratified
+    random); test = part k, val = part k+1, train = the other parts. Over the folds every image (and, with
+    mode='artist', every painter) is tested exactly once. val_frac / test_frac are then ignored.
     """
     y = meta["label_idx"].to_numpy()
     if mode == "random":
+        if fold is not None:
+            part = np.empty(len(meta), dtype=int)
+            for k, (_, te) in enumerate(StratifiedKFold(n_folds, shuffle=True, random_state=seed).split(y, y)):
+                part[te] = k
+            return _cv_split(_keep_duplicates_together(meta, part), fold, n_folds)
         idx = np.arange(len(meta))
         trval, test = train_test_split(idx, test_size=test_frac, stratify=y, random_state=seed)
         train, val = train_test_split(trval, test_size=val_frac / (1 - test_frac), stratify=y[trval],
                                       random_state=seed)
         split = np.empty(len(meta), dtype=object)
         split[train], split[val], split[test] = "train", "val", "test"
-        if "dup_group" in meta:
-            dup = meta["dup_group"].to_numpy()
-            first = pd.Series(split).groupby(dup).transform("first").to_numpy()  # NaN groups are skipped
-            grouped = pd.notna(dup)
-            split[grouped] = first[grouped]
-        return split
+        return _keep_duplicates_together(meta, split)
     if mode == "artist":
         # strata = class x (named / unknown artist): every split gets its share of both kinds of images
         strata = 2 * y + (meta["artist"].to_numpy() == UNKNOWN_ARTIST)
+        if fold is not None:
+            return _cv_split(grouped_stratified_split(strata, artist_groups(meta), (1 / n_folds,) * n_folds, seed),
+                             fold, n_folds)
         a = grouped_stratified_split(strata, artist_groups(meta), (1 - val_frac - test_frac, val_frac, test_frac),
                                      seed)
         return np.array(SPLITS, dtype=object)[a]
     raise ValueError(f"unknown split mode {mode!r}")
+
+
+def _cv_split(part: np.ndarray, fold: int, n_folds: int) -> np.ndarray:
+    if not 0 <= fold < n_folds:
+        raise ValueError(f"fold must be in [0, {n_folds}), got {fold}")
+    split = np.full(len(part), "train", dtype=object)
+    split[part == (fold + 1) % n_folds] = "val"
+    split[part == fold] = "test"
+    return split
 
 
 def split_report(meta: pd.DataFrame, split: np.ndarray) -> dict:
