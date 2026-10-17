@@ -4,6 +4,9 @@
   --mode frozen   : ImageNet embeddings computed once, then (a) our linear head trained with the same
                     monitored loop as the MLP and (b) a logistic regression on the same embeddings
                     ("classical model on deep features" - a serious production candidate).
+                    Head ablation: the same head trained 3 ways (plain Xavier on raw embeddings = the earlier
+                    head, x0.1 init, x0.1 init + standardisation = the deployed head) to test whether the
+                    initialisation explains the gap to the logistic regression.
   --mode finetune : layer4 + head trained end-to-end with geometric augmentation (GPU recommended).
   --mode both     : both of the above.
 
@@ -24,7 +27,7 @@ from museum_guide.common import get_device, provenance, save_json, set_seed
 from museum_guide.data import class_names, load_image_array, load_metadata, make_image_loaders, make_split
 from museum_guide.evaluation import classification_metrics, fmt, most_confused, predict
 from museum_guide.plots import confusion, image_grid, training_history
-from museum_guide.resnet import LinearHead, ResNetClassifier, extract_embeddings
+from museum_guide.resnet import HEAD_VARIANTS, ResNetClassifier, extract_embeddings, make_head
 from museum_guide.training import TrainConfig, train
 
 
@@ -49,16 +52,25 @@ def run_frozen(a, meta, split, names, device, out):
     E = {s: extract_embeddings(model, L[s], device) for s in ("train", "val", "test")}
     print(f"embeddings: {', '.join(f'{s} {tuple(e[0].shape)}' for s, e in E.items())}")
 
-    # (a) linear head with the monitored training loop
-    head = LinearHead(model.embed_dim, len(names))
+    # (a) linear head with the monitored training loop, 3 variants (same seed, same data, same schedule)
     TL = {s: DataLoader(TensorDataset(*E[s]), batch_size=64 if s == "train" else 512, shuffle=(s == "train"))
           for s in E}
     cfg = TrainConfig(epochs=a.epochs_frozen, lr=1e-3, weight_decay=1e-2, patience=15, seed=a.seed)
-    h = train(head, TL["train"], TL["val"], cfg, device, log_every=10)
-    probs, y = predict(head, TL["test"], device)
-    m = classification_metrics(y, probs.argmax(1), names, probs)
-    print(f"[frozen + linear head]   test {fmt(m)}")
-    model.net.fc.load_state_dict(head.fc.state_dict())  # assemble the deployable model
+    ablation = {}
+    for variant in HEAD_VARIANTS:
+        set_seed(a.seed)
+        v_head = make_head(model.embed_dim, len(names), variant, train_embeddings=E["train"][0])
+        v_h = train(v_head, TL["train"], TL["val"], cfg, device, log_every=10)
+        v_probs, y = predict(v_head, TL["test"], device)
+        v_m = classification_metrics(y, v_probs.argmax(1), names, v_probs)
+        ablation[variant] = {"initial_val_loss": v_h["initial_val_loss"], "best_epoch": v_h["best_epoch"],
+                             "best_val_loss": v_h["best_val_loss"], "best_val_acc": v_h["best_val_acc"],
+                             "test_accuracy": v_m["accuracy"], "test_macro_f1": v_m["macro_f1"]}
+        print(f"[frozen + head {variant:12s}] initial loss {v_h['initial_val_loss']:.2f}, "
+              f"val acc {v_h['best_val_acc']:.3f}, test {fmt(v_m)}")
+        if variant == "standardised":  # the deployed head (chosen in advance, not on these numbers)
+            head, h, probs, m = v_head, v_h, v_probs, v_m
+    model.net.fc.load_state_dict(head.state_dict())  # assemble the deployable model
 
     # (b) logistic regression on the same embeddings
     lr_model, val_scores = fit_logreg(E["train"][0].numpy(), E["train"][1].numpy(),
@@ -73,9 +85,10 @@ def run_frozen(a, meta, split, names, device, out):
     error_grid(meta, split, a.data_dir, probs, names, out / "errors.png", a.size)
     save_json({"model": "resnet18_frozen", "metrics": m, "history_summary": _hsum(h),
                "most_confused": most_confused(m["confusion_matrix"], names),
+               "head": "standardised", "head_ablation": ablation,
                "logreg_on_embeddings": {"metrics": m2, "val_acc_per_C": val_scores,
                                         "best_C": float(lr_model[-1].C)},
-               "n_parameters": model.n_parameters(), "trainable_parameters": head.fc.weight.numel() + len(names),
+               "n_parameters": model.n_parameters(), "trainable_parameters": head.out.weight.numel() + len(names),
                "img_size": a.img_size, "pretrained": not a.no_pretrained, "provenance": provenance(a.data_dir)},
               out / "summary.json")
     save_json(h, out / "history.json")

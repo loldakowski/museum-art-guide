@@ -6,13 +6,19 @@ mode='frozen'   : the ImageNet backbone is a fixed feature extractor (512-d embe
 mode='finetune' : the last residual stage (layer4) is also trained, with a 10x smaller learning rate
                   than the head so that the pretrained filters are adapted, not destroyed.
 Frozen BatchNorm layers stay in eval mode (their running statistics come from ImageNet).
+
+The head is our MLP with no hidden layer (mlp.py): input standardisation (buffers, fitted on the training
+embeddings in frozen mode) and a x0.1 Xavier output layer, so that the initial loss is ~ln K, as for the MLP.
+make_head() also builds the earlier head (plain Xavier, raw embeddings) for the ablation in step 4.
 """
 from __future__ import annotations
 
 import torch
 import torch.nn as nn
 
-from .mlp import Linear
+from .mlp import MLP
+
+HEAD_VARIANTS = ("plain_xavier", "small_init", "standardised")
 
 
 class ResNetClassifier(nn.Module):
@@ -22,7 +28,7 @@ class ResNetClassifier(nn.Module):
         from torchvision.models import ResNet18_Weights, resnet18
         self.net = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1 if pretrained else None)
         self.embed_dim = self.net.fc.in_features
-        self.net.fc = Linear(self.embed_dim, n_classes, init="xavier")  # our own primitive layer as the head
+        self.net.fc = make_head(self.embed_dim, n_classes)  # our own primitive layers as the head
         self.mode, self.backbone_lr_factor = mode, backbone_lr_factor
         for p in self.net.parameters():
             p.requires_grad = False
@@ -74,12 +80,18 @@ def extract_embeddings(model: ResNetClassifier, loader, device="cpu"):
     return torch.cat(E), torch.cat(Y)
 
 
-class LinearHead(nn.Module):
-    """The classification head alone, trained on cached embeddings (mode='frozen')."""
+def make_head(dim: int, n_classes: int, variant: str = "standardised", train_embeddings=None) -> MLP:
+    """Linear classification head = MLP without hidden layer.
 
-    def __init__(self, dim, n_classes):
-        super().__init__()
-        self.fc = Linear(dim, n_classes, init="xavier")
-
-    def forward(self, x):
-        return self.fc(x)
+    'standardised' : x0.1 Xavier output layer + standardisation fitted on train_embeddings (if given)
+    'small_init'   : x0.1 Xavier output layer, raw embeddings
+    'plain_xavier' : plain Xavier, raw embeddings (the head used before; initial loss 2.79 instead of ln 5)
+    """
+    head = MLP(dim, n_classes, hidden=(), dropout=0.0)
+    if variant == "plain_xavier":
+        head.out.reset_parameters("xavier")
+    elif variant not in HEAD_VARIANTS:
+        raise ValueError(variant)
+    if variant == "standardised" and train_embeddings is not None:
+        head.set_normalization(train_embeddings.mean(0), train_embeddings.std(0))
+    return head
