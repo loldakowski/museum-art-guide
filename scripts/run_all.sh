@@ -8,7 +8,7 @@ RESULTS=${RESULTS:-results}
 SIZE=${SIZE:-128}
 if [ "${QUICK:-0}" = "1" ]; then
   MLP_ARGS="--epochs 15 --seeds 0 1 --no-sweep"; DIAG_ARGS="--epochs 15"
-  RES_ARGS="--epochs-frozen 20 --epochs-finetune 2 --no-pretrained --img-size $SIZE"; BENCH_ARGS="--runs 20 --threads 1"
+  RES_ARGS="--epochs-frozen 20 --epochs-finetune 2 --no-pretrained --img-size $SIZE"; BENCH_ARGS="--runs 20 --threads 1 --no-clip --no-pretrained"
   DUP_ARGS="--no-pretrained --img-size $SIZE"
 else
   MLP_ARGS=""; DIAG_ARGS=""; RES_ARGS=""; BENCH_ARGS=""; DUP_ARGS=""
