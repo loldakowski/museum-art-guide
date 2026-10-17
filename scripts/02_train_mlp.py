@@ -89,7 +89,8 @@ def main():
             Path("checkpoints").mkdir(exist_ok=True)
             torch.save({"state_dict": model.state_dict(), "in_features": d.dim, "n_classes": len(d.classes),
                         "mlp_kwargs": {"hidden": tuple(best["hidden"]), "dropout": best["dropout"]},
-                        "features": a.features, "classes": d.classes}, f"checkpoints/mlp_{tag}.pt")
+                        "features": a.features, "classes": d.classes, "provenance": provenance(a.data_dir)},
+                       f"checkpoints/mlp_{tag}.pt")
 
     m0 = runs[0]["metrics"]
     summary = {

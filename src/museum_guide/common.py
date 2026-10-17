@@ -1,6 +1,8 @@
 """Small shared helpers: seeding, device, JSON I/O, timing."""
 from __future__ import annotations
 
+import csv
+import hashlib
 import json
 import os
 import platform
@@ -78,13 +80,36 @@ def provenance(data_dir=None) -> dict:
     info = data_dir and Path(data_dir) / "subset_info.json"
     return {
         "git_sha": _git("rev-parse", "HEAD"), "git_dirty": None if status is None else bool(status),
+        "dataset_fingerprint": dataset_fingerprint(data_dir),
         "created_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "python": platform.python_version(), "platform": platform.platform(),
-        "versions": {"torch": torch.__version__, "torchvision": torchvision.__version__, "numpy": np.__version__,
-                     "sklearn": sklearn.__version__},
+        "versions": {"torch": str(torch.__version__), "torchvision": str(torchvision.__version__),  # plain str:
+                     "numpy": np.__version__, "sklearn": sklearn.__version__},  # torch.load(weights_only) needs it
         "command": " ".join([Path(sys.argv[0]).name, *sys.argv[1:]]),
         "subset_info": load_json(info) if info and info.exists() else None,
     }
+
+
+def dataset_fingerprint(data_dir) -> str | None:
+    """Short hash of metadata.csv and of every image file it lists, in order: changes if images, labels or artists
+    change, including a different image size or seed with identical metadata. None if there is no dataset."""
+    meta = data_dir and Path(data_dir) / "metadata.csv"
+    if not meta or not meta.exists():
+        return None
+    h = hashlib.sha256(meta.read_bytes())
+    with open(meta, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            h.update((Path(data_dir) / row["path"]).read_bytes())
+    return h.hexdigest()[:16]
+
+
+def check_checkpoint(ckpt: dict, data_dir, path) -> None:
+    """Refuse a checkpoint trained on another dataset (or saved before checkpoints recorded their dataset)."""
+    saved = (ckpt.get("provenance") or {}).get("dataset_fingerprint")
+    current = dataset_fingerprint(data_dir)
+    if saved is None or current is None or saved != current:
+        raise ValueError(f"{path}: checkpoint dataset {saved} does not match the current dataset {current} "
+                         f"({data_dir}). Retrain it on this dataset, or delete it.")
 
 
 @contextmanager

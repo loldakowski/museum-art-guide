@@ -63,7 +63,8 @@ def main():
         confusion(m["confusion_matrix"], names, out / f"confusion_{tag}.png",
                   f"Logistic regression on {fs} - test")
         Path("checkpoints").mkdir(exist_ok=True)
-        joblib.dump({"model": model, "features": fs, "classes": names}, f"checkpoints/baseline_{tag}.joblib")
+        joblib.dump({"model": model, "features": fs, "classes": names, "provenance": provenance(a.data_dir)},
+                    f"checkpoints/baseline_{tag}.joblib")
 
 
 if __name__ == "__main__":

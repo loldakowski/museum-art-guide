@@ -136,7 +136,8 @@ def main():
         out = Path(a.out) / f"{mode}{suffix}"
         print(f"\n=== ResNet-18 {mode} ===")
         model = (run_frozen if mode == "frozen" else run_finetune)(a, meta, split, names, device, out)
-        torch.save({"state_dict": model.state_dict(), "mode": mode, "classes": names, "img_size": a.img_size},
+        torch.save({"state_dict": model.state_dict(), "mode": mode, "classes": names, "img_size": a.img_size,
+                    "provenance": provenance(a.data_dir)},
                    f"checkpoints/resnet18_{mode}{suffix}.pt")
 
 
