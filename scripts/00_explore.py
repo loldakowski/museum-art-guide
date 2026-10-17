@@ -12,8 +12,8 @@ from pathlib import Path
 import numpy as np
 
 from museum_guide.common import provenance, save_json
-from museum_guide.data import (UNKNOWN_ARTIST, class_names, load_image_array, load_metadata, make_split,
-                               split_report)
+from museum_guide.data import (UNKNOWN_ARTIST, class_names, duplicates_file, load_image_array, load_metadata,
+                               make_split, split_report)
 from museum_guide.plots import barh, image_grid
 
 
@@ -28,7 +28,12 @@ def main():
 
     meta = load_metadata(a.data_dir)
     names = class_names(meta)
-    print(f"{len(meta)} images, {len(names)} classes: {names}")
+    raw = load_metadata(a.data_dir, duplicates=None)
+    dup = {"verdicts": getattr(duplicates_file(a.data_dir), "name", None),
+           "removed_label_conflicts": sorted(set(raw["id"]) - set(meta["id"])),
+           "duplicate_groups": int(meta["dup_group"].nunique()) if "dup_group" in meta else 0,
+           "images_in_duplicate_groups": int(meta["dup_group"].notna().sum()) if "dup_group" in meta else 0}
+    print(f"{len(meta)} images, {len(names)} classes: {names} | duplicates: {dup}")
 
     # Who painted the images? (the classifier must learn styles, not painters)
     named = meta[meta["artist"] != UNKNOWN_ARTIST]
@@ -62,7 +67,8 @@ def main():
     image_grid(imgs, titles, out / "samples.png", ncols=6, suptitle="Random samples per class")
 
     save_json({"n_images": len(meta), "classes": names, "per_class": per_class, "mean_rgb": mean_rgb,
-               "split": rep, "image_shape": list(X.shape[1:]), "provenance": provenance(a.data_dir)}, out / "eda.json")
+               "split": rep, "duplicates": dup, "image_shape": list(X.shape[1:]), "provenance": provenance(a.data_dir)},
+              out / "eda.json")
     print(f"-> {out}")
 
 

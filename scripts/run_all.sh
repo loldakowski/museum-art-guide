@@ -9,10 +9,12 @@ SIZE=${SIZE:-128}
 if [ "${QUICK:-0}" = "1" ]; then
   MLP_ARGS="--epochs 15 --seeds 0 1 --no-sweep"; DIAG_ARGS="--epochs 15"
   RES_ARGS="--epochs-frozen 20 --epochs-finetune 2 --no-pretrained --img-size $SIZE"; BENCH_ARGS="--runs 20 --threads 1"
+  DUP_ARGS="--no-pretrained --img-size $SIZE"
 else
-  MLP_ARGS=""; DIAG_ARGS=""; RES_ARGS=""; BENCH_ARGS=""
+  MLP_ARGS=""; DIAG_ARGS=""; RES_ARGS=""; BENCH_ARGS=""; DUP_ARGS=""
 fi
 python scripts/00_explore.py     --data-dir "$DATA" --size "$SIZE" --out "$RESULTS/00_explore"
+python scripts/find_duplicates.py --data-dir "$DATA" --out "$RESULTS/00_explore" $DUP_ARGS
 python scripts/01_baseline.py    --data-dir "$DATA" --size "$SIZE" --out "$RESULTS/01_baseline"
 python scripts/01_baseline.py    --data-dir "$DATA" --size "$SIZE" --out "$RESULTS/01_baseline" --split random
 python scripts/02_train_mlp.py   --data-dir "$DATA" --size "$SIZE" --out "$RESULTS/02_mlp" $MLP_ARGS
