@@ -16,6 +16,9 @@ from museum_guide.common import load_json, save_json
 from museum_guide.plots import INK, MUTED, PALETTE, _save, plt
 
 
+INPUTS = {"photo": "12-MP phone photo", "small": "128 px image"}
+
+
 def acc_row(name, family, m, ci=None, std=None, latency_key=None, train_time=None, note=""):
     lo, hi = ci if ci else m.get("accuracy_ci95", (np.nan, np.nan))
     return {"model": name, "family": family, "test_acc": m["accuracy"], "ci_lo": lo, "ci_hi": hi,
@@ -50,6 +53,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--results", default="results")
     p.add_argument("--threads", type=int, default=1, help="benchmark thread count shown in the table")
+    p.add_argument("--input", default="photo", choices=["photo", "small"], help="benchmark input shown in the table")
     a = p.parse_args()
     R = Path(a.results)
     rows = []
@@ -64,7 +68,7 @@ def main():
         if f.exists():
             s = load_json(f)
             rows.append(acc_row(f"MLP - {fs}", "MLP (from scratch)", s["metrics_seed0"],
-                                std=s["test_accuracy"]["std"], latency_key="mlp_pixels32" if fs == "pixels32" else None,
+                                std=s["test_accuracy"]["std"], latency_key=f"mlp_{fs}" if fs != "pixels64" else None,
                                 train_time=s["train_time_s"]["mean"],
                                 note=f"{len(s['test_accuracy']['values'])} seeds: {s['test_accuracy']['mean']:.3f} +/- {s['test_accuracy']['std']:.3f}"))
     f = R / "04_resnet" / "frozen" / "summary.json"
@@ -73,7 +77,7 @@ def main():
         rows.append(acc_row("ResNet-18 frozen + linear head", "CNN (pretrained)", s["metrics"],
                             latency_key="resnet18_128px", train_time=s["history_summary"]["total_time_s"]))
         rows.append(acc_row("ResNet-18 frozen + LogReg", "CNN features + classical",
-                            s["logreg_on_embeddings"]["metrics"], latency_key="resnet18_128px"))
+                            s["logreg_on_embeddings"]["metrics"], latency_key="resnet18_frozen_logreg"))
     f = R / "04_resnet" / "finetune" / "summary.json"
     if f.exists():
         s = load_json(f)
@@ -84,7 +88,7 @@ def main():
     fb = R / "05_benchmark" / "benchmark.json"
     if fb.exists():
         for b in load_json(fb)["results"]:
-            if b["threads"] == a.threads:
+            if b["threads"] == a.threads and b.get("input", "small") == a.input:
                 bench[b["model"]] = b
     for r in rows:
         b = bench.get(r["latency_key"] or "", {})
@@ -110,7 +114,8 @@ def main():
                else "- no provenance recorded in the input files")
     search = search_lines(R / "07_search" / "summary.json")
     (R / "summary.md").write_text("# Results summary (test set, artist-grouped split)\n\n" + "\n".join(lines) +
-                                  "\n\nLatency = median end-to-end time for one photo on CPU (see 05_benchmark).\n"
+                                  f"\n\nLatency = median end-to-end time for one {INPUTS[a.input]} "
+                                  "on CPU, decoding included (see 05_benchmark).\n"
                                   + search +
                                   "\nCode that produced these numbers (git commit):\n" + sources + "\n",
                                   encoding="utf-8")
