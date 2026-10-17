@@ -1,0 +1,14 @@
+# Exact versions of the direct dependencies, verified together (unit tests + QUICK smoke run, Python 3.11).
+# Use this file for any run whose numbers go into results/:  pip install -r requirements-lock.txt
+# requirements.txt keeps the looser minimum versions.
+torch==2.14.1
+torchvision==0.29.1
+numpy==2.4.6
+pandas==3.0.6
+scikit-learn==1.9.1
+scikit-image==0.26.0
+matplotlib==3.11.2
+pillow==13.0.0
+joblib==1.6.0
+datasets==5.1.0
+pytest==9.1.1
