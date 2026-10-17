@@ -23,6 +23,28 @@ def acc_row(name, family, m, ci=None, std=None, latency_key=None, train_time=Non
             "note": note}
 
 
+def search_lines(f: Path) -> str:
+    """Free-text search (step 7): mean precision@10 per system, CPU cost per query."""
+    if not f.exists():
+        return ""
+    s = load_json(f)
+    c = s["cost"]
+
+    def mean(rows, key):
+        return f"{np.mean([r[key] for r in rows]):.3f}" if rows else "not judged yet"
+    rows = [("CLIP " + s["clip_model"], "clip", f"{c['clip_latency']['median_ms']:.1f}",
+             f"{c['clip_model_mb']:.0f} + index {c['clip_image_index_mb']:.1f}"),
+            ("TF-IDF on metadata", "tfidf", f"{c['tfidf_latency']['median_ms']:.2f}", f"{c['tfidf_index_mb']:.2f}")]
+    out = ["", "## Free-text search (see 07_search/summary.md)", "",
+           "| system | P@10 metadata queries (TF-IDF: upper bound) | P@10 content queries (judged) | "
+           f"latency per query (ms, {c['threads']} thread) | size (MB) |", "|---|---|---|---|---|"]
+    out += [f"| {name} | {mean(s['auto'], key + '_P@10')} | {mean(s['content'], key + '_P@10')} | {lat} | {size} |"
+            for name, key, lat, size in rows]
+    if s["content"]:
+        out.append(f"| random | - | {mean(s['content'], 'random_P@10')} | - | - |")
+    return "\n".join(out) + "\n"
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--results", default="results")
@@ -85,8 +107,10 @@ def main():
             shas.setdefault(key, []).append(str(f.relative_to(R)))
     sources = ("\n".join(f"- `{k}`: {', '.join(v)}" for k, v in shas.items()) if shas
                else "- no provenance recorded in the input files")
+    search = search_lines(R / "07_search" / "summary.json")
     (R / "summary.md").write_text("# Results summary (test set, artist-grouped split)\n\n" + "\n".join(lines) +
                                   "\n\nLatency = median end-to-end time for one photo on CPU (see 05_benchmark).\n"
+                                  + search +
                                   "\nCode that produced these numbers (git commit):\n" + sources + "\n",
                                   encoding="utf-8")
     save_json(rows, R / "summary.json")

@@ -1,0 +1,142 @@
+{
+  "collection": "wikiart_style5",
+  "auto": [
+    {
+      "id": "style_impressionism",
+      "query": "an impressionist painting",
+      "field": "label",
+      "value": "Impressionism"
+    },
+    {
+      "id": "style_baroque",
+      "query": "a baroque painting",
+      "field": "label",
+      "value": "Baroque"
+    },
+    {
+      "id": "style_cubism",
+      "query": "a cubist painting",
+      "field": "label",
+      "value": "Cubism"
+    },
+    {
+      "id": "style_ukiyo_e",
+      "query": "a Japanese ukiyo-e woodblock print",
+      "field": "label",
+      "value": "Ukiyo_e"
+    },
+    {
+      "id": "style_pop_art",
+      "query": "a pop art image",
+      "field": "label",
+      "value": "Pop_Art"
+    },
+    {
+      "id": "genre_still_life",
+      "query": "a still life",
+      "field": "genre",
+      "value": "still_life"
+    },
+    {
+      "id": "genre_everyday_life",
+      "query": "a scene of everyday life",
+      "field": "genre",
+      "value": "genre_painting"
+    },
+    {
+      "id": "genre_sketch",
+      "query": "a sketch",
+      "field": "genre",
+      "value": "sketch_and_study"
+    },
+    {
+      "id": "genre_landscape",
+      "query": "a landscape",
+      "field": "genre",
+      "value": "landscape"
+    }
+  ],
+  "content": [
+    {
+      "id": "c00",
+      "query": "a stormy sea"
+    },
+    {
+      "id": "c01",
+      "query": "portraits of children"
+    },
+    {
+      "id": "c02",
+      "query": "flowers in a vase"
+    },
+    {
+      "id": "c03",
+      "query": "a bowl of fruit"
+    },
+    {
+      "id": "c04",
+      "query": "a boat on the water"
+    },
+    {
+      "id": "c05",
+      "query": "a mountain"
+    },
+    {
+      "id": "c06",
+      "query": "a winter scene with snow"
+    },
+    {
+      "id": "c07",
+      "query": "a horse"
+    },
+    {
+      "id": "c08",
+      "query": "a bird"
+    },
+    {
+      "id": "c09",
+      "query": "a musical instrument"
+    },
+    {
+      "id": "c10",
+      "query": "a close-up of a woman's face"
+    },
+    {
+      "id": "c11",
+      "query": "a city street"
+    },
+    {
+      "id": "c12",
+      "query": "angels"
+    },
+    {
+      "id": "c13",
+      "query": "a skull"
+    },
+    {
+      "id": "c14",
+      "query": "a bridge"
+    },
+    {
+      "id": "c15",
+      "query": "a crowd of people"
+    },
+    {
+      "id": "c16",
+      "query": "a scene at night"
+    },
+    {
+      "id": "c17",
+      "query": "a waterfall"
+    },
+    {
+      "id": "c18",
+      "query": "warriors in battle"
+    },
+    {
+      "id": "c19",
+      "query": "a bottle or a glass"
+    }
+  ],
+  "notes": "auto: relevance read from metadata.csv (field == value). Genre queries are scored on the images whose genre is known (82 % are 'Unknown Genre'). content: relevance judged by hand (judgments.csv), never filled in automatically."
+}
