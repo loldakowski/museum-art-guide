@@ -1,6 +1,8 @@
 import numpy as np
+import pandas as pd
 
-from museum_guide.data import (UNKNOWN_ARTIST, class_names, load_image_array, load_metadata, make_split,
+from museum_guide.data import (UNKNOWN_ARTIST, apply_duplicates, artist_groups, class_names, duplicates_file,
+                               load_image_array, load_metadata, make_split,
                                split_report)
 
 
@@ -47,3 +49,40 @@ def test_image_array(fake_data):
     meta = load_metadata(fake_data)
     X = load_image_array(meta.head(4), fake_data, size=32, cache=False)
     assert X.shape == (4, 32, 32, 3) and X.dtype == np.uint8
+
+
+def _verdicts(rows):
+    return pd.DataFrame(rows, columns=["id_a", "id_b", "verdict"])
+
+
+def test_duplicates_stay_in_one_split_and_conflicting_copies_are_removed(fake_data):
+    meta = load_metadata(fake_data)
+    unk = meta[meta["artist"] == UNKNOWN_ARTIST]
+    a, b, c, d = unk["id"].iloc[:4]                                     # all 'Baroque', unknown artist
+    other = unk[unk["label"] != unk["label"].iloc[0]]["id"].iloc[0]     # another class
+    named = meta[meta["artist"] != UNKNOWN_ARTIST]["id"].iloc[0]
+    v = _verdicts([(a, b, "same_image"), (b, c, "same_hidden_painter"), (d, other, "same_image"),
+                   (a, named, "different")])
+    kept, removed = apply_duplicates(meta, v)
+    assert removed == sorted([d, other])                                # same image, two labels: both copies go
+    assert len(kept) == len(meta) - 2
+    g = dict(zip(kept["id"], kept["dup_group"]))
+    assert g[a] == g[b] == g[c] and pd.isna(g[named])                   # "different" links nothing
+    for seed in range(5):
+        split = dict(zip(kept["id"], make_split(kept, "artist", seed=seed)))
+        assert split[a] == split[b] == split[c]
+
+
+def test_duplicate_of_a_named_artist_joins_the_artist_group(fake_data):
+    meta = load_metadata(fake_data)
+    named = meta[meta["artist"] != UNKNOWN_ARTIST].iloc[0]
+    unk = meta[(meta["artist"] == UNKNOWN_ARTIST) & (meta["label"] == named["label"])]["id"].iloc[0]
+    kept, _ = apply_duplicates(meta, _verdicts([(named["id"], unk, "same_image")]))
+    groups = dict(zip(kept["id"], artist_groups(kept)))
+    same_artist = kept[kept["artist"] == named["artist"]]["id"]
+    assert {groups[i] for i in same_artist} == {groups[unk]}           # the copy follows the painter's group
+
+
+def test_verdict_file_is_found_by_dataset_name(fake_data, tmp_path):
+    assert duplicates_file(fake_data) is None                          # no annotations for the synthetic data
+    assert duplicates_file("data/wikiart_style5") is not None

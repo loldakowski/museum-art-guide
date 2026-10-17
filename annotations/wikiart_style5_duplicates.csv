@@ -1,0 +1,16 @@
+pair,id_a,id_b,verdict,note
+0,s54_r0417,s71_r0461,same_image,labelled Cubism and Pop_Art
+1,s54_r0743,s71_r0721,same_image,
+2,s71_r0707,s71_r0523,same_image,labelled Cubism and Pop_Art
+3,s69_r0692,s69_r0705,same_image,different scan tone
+4,s68_r0246,s71_r0528,same_composition,different colours
+5,s69_r0511,s69_r0546,same_image,different scan tone
+6,s71_r0669,s71_r0444,different,
+7,s71_r0370,s71_r0628,different,
+8,s68_r0507,s71_r0599,different,
+9,s69_r0626,s69_r0705,same_hidden_painter,different works; grouped with pairs 3 and 10
+10,s69_r0605,s69_r0705,same_hidden_painter,different works; grouped with pairs 3 and 9
+11,s68_r0570,s68_r0774,different,
+12,s54_r0881,s70_r0069,different,
+13,s61_r0659,s68_r0531,different,
+9/10,s69_r0626,s69_r0605,same_image,first images of pairs 9 and 10 (measured cosine 0.843 and dHash distance 25)

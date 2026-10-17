@@ -91,8 +91,9 @@ def provenance(data_dir=None) -> dict:
 
 
 def dataset_fingerprint(data_dir) -> str | None:
-    """Short hash of metadata.csv and of every image file it lists, in order: changes if images, labels or artists
-    change, including a different image size or seed with identical metadata. None if there is no dataset."""
+    """Short hash of metadata.csv, of every image file it lists (in order) and of the dataset's duplicate verdicts:
+    changes if images, labels, artists or verdicts change, including a different image size or seed with identical
+    metadata. None if there is no dataset."""
     meta = data_dir and Path(data_dir) / "metadata.csv"
     if not meta or not meta.exists():
         return None
@@ -100,6 +101,10 @@ def dataset_fingerprint(data_dir) -> str | None:
     with open(meta, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             h.update((Path(data_dir) / row["path"]).read_bytes())
+    from .data import duplicates_file  # the duplicate verdicts change which images are used and how they split
+    dup = duplicates_file(data_dir)
+    if dup:
+        h.update(dup.read_bytes())
     return h.hexdigest()[:16]
 
 
