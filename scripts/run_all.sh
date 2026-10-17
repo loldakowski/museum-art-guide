@@ -24,3 +24,11 @@ python scripts/03_diagnose_mlp.py --data-dir "$DATA" --size "$SIZE" --out "$RESU
 python scripts/04_train_resnet.py --data-dir "$DATA" --size "$SIZE" --out "$RESULTS/04_resnet" $RES_ARGS
 python scripts/05_benchmark_cpu.py --data-dir "$DATA" --out "$RESULTS/05_benchmark" $BENCH_ARGS
 python scripts/06_summary.py --results "$RESULTS"
+# Step 8 (cost of unseen painters) needs the named-artist subset (bash scripts/build_named_dataset.sh).
+# Skipped in QUICK mode: 10 trainings of every model, about 7 min even on synthetic data.
+NAMED_DATA=${NAMED_DATA:-data/wikiart_named5}
+if [ "${QUICK:-0}" != "1" ] && [ -d "$NAMED_DATA" ]; then
+  python scripts/08_unseen_painters.py --data-dir "$NAMED_DATA" --results "$RESULTS" --out "$RESULTS/08_unseen_painters"
+else
+  echo "skipping step 8 (QUICK mode or no $NAMED_DATA)"
+fi

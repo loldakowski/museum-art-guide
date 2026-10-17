@@ -28,6 +28,7 @@ def main():
     p.add_argument("--out", default="results/01_baseline")
     p.add_argument("--split", choices=["artist", "random"], default="artist")
     p.add_argument("--split-seed", type=int, default=0)
+    p.add_argument("--fold", type=int, default=None, help="cross-validation fold (0-4) instead of the 70/15/15 split")
     p.add_argument("--size", type=int, default=128)
     p.add_argument("--features", nargs="+", default=["pixels32", "handcrafted"], choices=list(FEATURE_SETS))
     p.add_argument("--C", type=float, default=None, help="fixed regularisation (default: choose it on validation)")
@@ -37,7 +38,7 @@ def main():
 
     meta = load_metadata(a.data_dir)
     names = class_names(meta)
-    split = make_split(meta, a.split, seed=a.split_seed)
+    split = make_split(meta, a.split, seed=a.split_seed, fold=a.fold)
     y = meta["label_idx"].to_numpy()
     X = load_image_array(meta, a.data_dir, a.size)
     tr, va, te = (split == "train"), (split == "val"), (split == "test")

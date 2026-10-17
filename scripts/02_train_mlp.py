@@ -37,6 +37,7 @@ def main():
     p.add_argument("--features", default="pixels32", choices=list(FEATURE_SETS))
     p.add_argument("--split", choices=["artist", "random"], default="artist")
     p.add_argument("--split-seed", type=int, default=0)
+    p.add_argument("--fold", type=int, default=None, help="cross-validation fold (0-4) instead of the 70/15/15 split")
     p.add_argument("--checkpoint-dir", default="checkpoints")
     p.add_argument("--size", type=int, default=128)
     p.add_argument("--epochs", type=int, default=80)
@@ -53,7 +54,8 @@ def main():
     tag = a.features if a.split == "artist" else f"{a.features}_randomsplit"
     out = Path(a.out) / tag
 
-    d = load_feature_data(a.data_dir, a.features, a.split, split_seed=a.split_seed, size=a.size)
+    d = load_feature_data(a.data_dir, a.features, a.split, split_seed=a.split_seed, size=a.size,
+                          fold=a.fold)
     print(f"features={a.features} dim={d.dim} | train {len(d.y['train'])} val {len(d.y['val'])} "
           f"test {len(d.y['test'])} | device {device}")
 

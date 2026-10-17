@@ -117,6 +117,7 @@ def main():
     p.add_argument("--mode", choices=["frozen", "finetune", "both"], default="both")
     p.add_argument("--split", choices=["artist", "random"], default="artist")
     p.add_argument("--split-seed", type=int, default=0)
+    p.add_argument("--fold", type=int, default=None, help="cross-validation fold (0-4) instead of the 70/15/15 split")
     p.add_argument("--logreg-C", type=float, default=None,
                    help="fixed C of the logistic regression on embeddings (default: choose it on validation)")
     p.add_argument("--checkpoint-dir", default="checkpoints")
@@ -133,7 +134,7 @@ def main():
     device = get_device(a.device)
     meta = load_metadata(a.data_dir)
     names = class_names(meta)
-    split = make_split(meta, a.split, seed=a.split_seed)
+    split = make_split(meta, a.split, seed=a.split_seed, fold=a.fold)
     suffix = "" if a.split == "artist" else "_randomsplit"
     print(f"device {device} | {len(meta)} images | classes {names}")
     Path(a.checkpoint_dir).mkdir(parents=True, exist_ok=True)

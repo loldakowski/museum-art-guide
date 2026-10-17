@@ -35,3 +35,6 @@ dist/
 # Figures that show paintings (sample grid, error grid): for the slides only, not published
 results/**/samples.png
 results/**/errors.png
+
+# Per-run outputs of the unseen-painter experiment: every reported number is in its summary.json
+results/08_unseen_painters/runs/
