@@ -30,6 +30,8 @@ def main():
     p.add_argument("--split-seed", type=int, default=0)
     p.add_argument("--size", type=int, default=128)
     p.add_argument("--features", nargs="+", default=["pixels32", "handcrafted"], choices=list(FEATURE_SETS))
+    p.add_argument("--C", type=float, default=None, help="fixed regularisation (default: choose it on validation)")
+    p.add_argument("--checkpoint-dir", default="checkpoints")
     a = p.parse_args()
     out = Path(a.out)
 
@@ -45,7 +47,7 @@ def main():
         F = compute_features(fs, X, Path(a.data_dir) / ".cache")
         t_feat = time.perf_counter() - t0
         t0 = time.perf_counter()
-        model, val_scores = fit_logreg(F[tr], y[tr], F[va], y[va])
+        model, val_scores = fit_logreg(F[tr], y[tr], F[va], y[va], **({"Cs": (a.C,)} if a.C else {}))
         t_fit = time.perf_counter() - t0
         probs = model.predict_proba(F[te])
         m = classification_metrics(y[te], probs.argmax(1), names, probs)
@@ -62,9 +64,9 @@ def main():
         save_json(m, out / f"{tag}.json")
         confusion(m["confusion_matrix"], names, out / f"confusion_{tag}.png",
                   f"Logistic regression on {fs} - test")
-        Path("checkpoints").mkdir(exist_ok=True)
+        Path(a.checkpoint_dir).mkdir(parents=True, exist_ok=True)
         joblib.dump({"model": model, "features": fs, "classes": names, "provenance": provenance(a.data_dir)},
-                    f"checkpoints/baseline_{tag}.joblib")
+                    Path(a.checkpoint_dir) / f"baseline_{tag}.joblib")
 
 
 if __name__ == "__main__":
