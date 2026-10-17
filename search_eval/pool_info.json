@@ -5,15 +5,15 @@
     "tfidf",
     "random"
   ],
-  "n_queries": 20,
-  "n_to_judge": 594,
+  "n_queries": 22,
+  "n_to_judge": 654,
   "clip_model": "ViT-B-32/openai",
   "image_dir": "data/wikiart_style5_224",
   "image_provenance": {
-    "git_sha": "c0c2621aed14ef6d2cdebc58e723f476f9bcef71",
-    "git_dirty": false,
+    "git_sha": "0554f8fbc1e2a5ba6b6aa436abff1c55c5ec7574",
+    "git_dirty": true,
     "dataset_fingerprint": "38794f02486eb307",
-    "created_utc": "2026-10-17T20:31:55+00:00",
+    "created_utc": "2026-10-17T22:34:23+00:00",
     "python": "3.11.17",
     "platform": "macOS-26.5.1-arm64-arm-64bit",
     "versions": {

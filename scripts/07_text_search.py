@@ -5,7 +5,9 @@ Queries (search_eval/queries.json):
   * auto: style and genre queries, relevance read from metadata.csv. Genre queries are scored only on images whose
     genre is known (82 % of the collection is 'Unknown Genre'). TF-IDF reads the very field that defines relevance
     here, so its score on these queries is an upper bound, not a fair win.
-  * content: free-text queries ("a stormy sea"), relevance judged by hand in search_eval/judgments.csv.
+  * content: free-text queries ("a stormy sea"), relevance judged by hand in search_eval/judgments.csv. Queries
+    with 'paraphrase_of' are the brief's own wording of another query: reported next to it (phrasing comparison)
+    and left out of the content mean.
 
 Two modes:
   --make-pool   for each content query, pool the top-k of CLIP, the top-k of TF-IDF and k random images, shuffle
@@ -165,7 +167,7 @@ def evaluate(a, meta, S, queries) -> dict:
         for q in queries["content"]:
             ranked = {name: s.search(q["query"], max(KS)) for name, s in S.items()}
             ranked["random"] = random_ranking(ids, q["id"], a.seed)[:max(KS)]
-            row = {"id": q["id"], "query": q["query"]}
+            row = {"id": q["id"], "query": q["query"], "paraphrase_of": q.get("paraphrase_of")}
             for name, r in ranked.items():
                 unjudged += [(q["id"], i) for i in r if (q["id"], i) not in judged]
                 for k in KS:
@@ -175,6 +177,7 @@ def evaluate(a, meta, S, queries) -> dict:
             raise SystemExit(f"judgments.csv does not cover {len(set(unjudged))} pooled images, e.g. "
                              f"{sorted(set(unjudged))[:5]}: re-run --make-pool and judge again")
         res["content"] = rows
+    res["phrasing"] = phrasing(S, queries)
 
     torch.set_num_threads(1)  # kiosk-like: one core
     texts = [q["query"] for q in queries["content"]] + [q["query"] for q in queries["auto"]]
@@ -196,6 +199,34 @@ def evaluate(a, meta, S, queries) -> dict:
     clip.embed_images([Path(a.image_dir) / p for p in meta["path"][:32]], batch_size=32)
     res["cost"]["clip_index_build_s_per_image"] = (time.perf_counter() - t0) / 32
     return res
+
+
+def phrasing(S, queries) -> list[dict]:
+    """For each query worded as in the brief ('paraphrase_of'): how many of its top-10 images each system shares
+    with the original wording (10 = the wording does not matter). Needs no judgments."""
+    by_id = {q["id"]: q for q in queries["content"]}
+    out = []
+    for q in queries["content"]:
+        if q.get("paraphrase_of"):
+            o = by_id[q["paraphrase_of"]]
+            out.append({"id": q["id"], "query": q["query"], "original_id": o["id"], "original": o["query"],
+                        **{f"{name}_top10_shared": len(set(s.search(q["query"], 10)) & set(s.search(o["query"], 10)))
+                           for name, s in S.items()}})
+    return out
+
+
+def phrasing_table(res) -> list[str]:
+    """Each brief wording next to the original query: precision (if judged) and shared top-10 images."""
+    content = {r["id"]: r for r in res["content"] or []}
+    cols = [f"{s}_P@{k}" for s in ("clip", "tfidf", "random") for k in KS]
+    lines = ["| query | " + " | ".join(cols) + " | CLIP top-10 shared | TF-IDF top-10 shared |",
+             "|---|" + "---|" * (len(cols) + 2)]
+    for p in res["phrasing"]:
+        for qid, text, shared in ((p["original_id"], p["original"], ("", "")),
+                                  (p["id"], p["query"], (p["clip_top10_shared"], p["tfidf_top10_shared"]))):
+            vals = [f"{content[qid][c]:.2f}" if qid in content else "-" for c in cols]
+            lines.append(f"| {qid}: {text} | " + " | ".join(vals) + f" | {shared[0]} | {shared[1]} |")
+    return lines
 
 
 def mean_table(rows, systems) -> list[str]:
@@ -242,8 +273,12 @@ def main():
     lines += mean_table(res["auto"], ["clip", "tfidf"])
     lines += ["", f"Random ranking, mean expected precision: {auto['random_expected'].mean():.3f}", ""]
     lines += ["## Content queries (relevance judged by hand, search_eval/judgments.csv)", ""]
-    lines += mean_table(res["content"], ["clip", "tfidf", "random"]) if res["content"] else \
-        ["Not evaluated yet: judgments.csv does not exist."]
+    lines += mean_table([r for r in res["content"] if not r["paraphrase_of"]], ["clip", "tfidf", "random"]) \
+        if res["content"] else ["Not evaluated yet: judgments.csv does not exist."]
+    lines += ["", "## Phrasing: the brief's wording vs the short query", "",
+              "The brief's questions, verbatim, next to the short query on the same topic (left out of the mean "
+              "above). Shared = images that appear in the top 10 of both wordings.", ""]
+    lines += phrasing_table(res)
     c = res["cost"]
     lines += ["", "## CPU cost per query (1 thread)", "",
               f"- CLIP: median {c['clip_latency']['median_ms']:.1f} ms (text encoder alone "

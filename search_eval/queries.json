@@ -136,7 +136,19 @@
     {
       "id": "c19",
       "query": "a bottle or a glass"
+    },
+    {
+      "id": "c20",
+      "query": "Which painting shows a stormy sea?",
+      "paraphrase_of": "c00",
+      "source": "brief, verbatim"
+    },
+    {
+      "id": "c21",
+      "query": "I would like to see portraits of children",
+      "paraphrase_of": "c01",
+      "source": "brief, verbatim"
     }
   ],
-  "notes": "auto: relevance read from metadata.csv (field == value). Genre queries are scored on the images whose genre is known (82 % are 'Unknown Genre'). content: relevance judged by hand (judgments.csv), never filled in automatically."
+  "notes": "auto: relevance read from metadata.csv (field == value). Genre queries are scored on the images whose genre is known (82 % are 'Unknown Genre'). content: relevance judged by hand (judgments.csv), never filled in automatically. Queries with 'paraphrase_of' are the brief's own wording of another query: reported next to it as a phrasing comparison and left out of the content-query mean, so that the stormy-sea and children topics are not counted twice."
 }

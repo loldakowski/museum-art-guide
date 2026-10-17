@@ -30,7 +30,8 @@ def search_lines(f: Path) -> str:
     s = load_json(f)
     c = s["cost"]
 
-    def mean(rows, key):
+    def mean(rows, key):  # the brief's rewordings of a query ('paraphrase_of') are not counted twice
+        rows = [r for r in rows or [] if not r.get("paraphrase_of")]
         return f"{np.mean([r[key] for r in rows]):.3f}" if rows else "not judged yet"
     rows = [("CLIP " + s["clip_model"], "clip", f"{c['clip_latency']['median_ms']:.1f}",
              f"{c['clip_model_mb']:.0f} + index {c['clip_image_index_mb']:.1f}"),
