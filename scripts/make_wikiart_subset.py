@@ -108,6 +108,9 @@ def parse_args(argv=None) -> argparse.Namespace:
     p.add_argument("--max-per-artist", type=int, default=50,
                    help="cap on images per named artist over the whole subset (0 = no cap); "
                         "without it, e.g. 280 of 300 'Impressionism' images come from Renoir")
+    p.add_argument("--named-only", action="store_true",
+                   help="skip 'Unknown Artist' rows, so that every image has a known painter (needed for a truly "
+                        "artist-disjoint split)")
     p.add_argument("--quality", type=int, default=90, help="JPEG quality")
     p.add_argument("--revision", default=REVISION, help="dataset revision (commit hash or 'main')")
     p.add_argument("--index-cache", type=Path, default=None,
@@ -218,7 +221,8 @@ def list_classes(index: dict, label: str) -> None:
         log(f"  {names[label][c]:28s} {n:7d} {n_shards[c]:7d} {named:14d} {unk[c] / n:14.0%}")
 
 
-def make_plan(index: dict, label: str, class_ids, per_class: int, max_per_artist: int, strategy: str, seed: int):
+def make_plan(index: dict, label: str, class_ids, per_class: int, max_per_artist: int, strategy: str, seed: int,
+              named_only: bool = False):
     """Choose the rows to download: returns ({shard: [rows]}, {class_id: still missing})."""
     names, shards = index["names"], index["shards"]
     unknown = names["artist"].index(UNKNOWN_ARTIST) if UNKNOWN_ARTIST in names["artist"] else -1
@@ -226,7 +230,7 @@ def make_plan(index: dict, label: str, class_ids, per_class: int, max_per_artist
     wanted = set(class_ids)
     candidates = {}
     for s, cols in enumerate(shards):
-        rows = [r for r, c in enumerate(cols[label]) if c in wanted]
+        rows = [r for r, c in enumerate(cols[label]) if c in wanted and not (named_only and cols["artist"][r] == unknown)]
         rng.shuffle(rows)  # which rows of a shard are taken is random but reproducible
         candidates[s] = rows
     order = list(range(len(shards)))
@@ -375,7 +379,8 @@ def write_metadata(plan, index, label, class_ids, class_names, args, sizes) -> C
     info = {
         "repo": REPO, "revision": args.revision, "label": label, "classes": folder_order,
         "per_class": args.per_class, "size": args.size, "crop": not args.no_crop, "seed": args.seed,
-        "strategy": args.strategy, "max_per_artist": args.max_per_artist, "shards": sorted(plan),
+        "strategy": args.strategy, "max_per_artist": args.max_per_artist, "named_only": args.named_only,
+        "shards": sorted(plan),
         "counts": {n: counts[n] for n in folder_order}, "total": sum(counts.values()),
         "command": "python " + " ".join([Path(sys.argv[0]).name] + sys.argv[1:]),
         "created_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -405,7 +410,8 @@ def main(argv=None) -> int:
     names = index["names"][args.label]
     class_ids = resolve_classes(args.classes, names)
     class_names = {c: names[c] for c in class_ids}
-    plan, need = make_plan(index, args.label, class_ids, args.per_class, args.max_per_artist, args.strategy, args.seed)
+    plan, need = make_plan(index, args.label, class_ids, args.per_class, args.max_per_artist, args.strategy, args.seed,
+                           args.named_only)
     print_plan(plan, need, index, args.label, class_ids, args.per_class)
     if args.dry_run:
         return 0
