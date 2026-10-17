@@ -69,8 +69,9 @@ def test_duplicates_stay_in_one_split_and_conflicting_copies_are_removed(fake_da
     g = dict(zip(kept["id"], kept["dup_group"]))
     assert g[a] == g[b] == g[c] and pd.isna(g[named])                   # "different" links nothing
     for seed in range(5):
-        split = dict(zip(kept["id"], make_split(kept, "artist", seed=seed)))
-        assert split[a] == split[b] == split[c]
+        for mode in ("artist", "random"):
+            split = dict(zip(kept["id"], make_split(kept, mode, seed=seed)))
+            assert split[a] == split[b] == split[c], (mode, seed)
 
 
 def test_duplicate_of_a_named_artist_joins_the_artist_group(fake_data):

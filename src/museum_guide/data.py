@@ -133,7 +133,9 @@ def make_split(meta: pd.DataFrame, mode: str = "artist", val_frac: float = 0.15,
     """Return an array of 'train' / 'val' / 'test' (one entry per row of meta).
 
     mode='artist': stratified by class AND grouped by artist (no painter in two splits).
-    mode='random': stratified random split (kept only to *measure* the leakage it causes).
+    mode='random': stratified random split (kept only to *measure* the leakage it causes). Duplicate groups
+    (column 'dup_group') still stay whole: each member takes the split of the group's first image, so the random
+    split differs from the artist split by painters only, not by copies of the same painting.
     """
     y = meta["label_idx"].to_numpy()
     if mode == "random":
@@ -143,6 +145,11 @@ def make_split(meta: pd.DataFrame, mode: str = "artist", val_frac: float = 0.15,
                                       random_state=seed)
         split = np.empty(len(meta), dtype=object)
         split[train], split[val], split[test] = "train", "val", "test"
+        if "dup_group" in meta:
+            dup = meta["dup_group"].to_numpy()
+            first = pd.Series(split).groupby(dup).transform("first").to_numpy()  # NaN groups are skipped
+            grouped = pd.notna(dup)
+            split[grouped] = first[grouped]
         return split
     if mode == "artist":
         # strata = class x (named / unknown artist): every split gets its share of both kinds of images

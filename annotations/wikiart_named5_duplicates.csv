@@ -1,0 +1,17 @@
+pair,id_a,id_b,verdict,note
+0,s55_r0964,s56_r0569,same_image,
+1,s07_r0026,s07_r0070,same_image,caption added under one copy; different contrast
+2,s51_r0044,s51_r0135,different,"same place, different paintings (cars, pedestrians)"
+3,s07_r0021,s07_r0755,different,
+4,s07_r0786,s07_r0366,different,
+5,s51_r1073,s07_r0103,different,
+6,s07_r0507,s07_r0910,different,
+7,s07_r0128,s07_r0971,different,
+8,s51_r0561,s51_r0654,different,
+9,s51_r0142,s51_r0797,different,"same place, different paintings"
+10,s07_r0618,s51_r1129,different,
+11,s51_r1073,s07_r0366,different,
+12,s07_r0786,s51_r1073,different,
+13,s55_r0858,s56_r0015,different,
+14,s51_r0573,s51_r0658,different,
+15,s07_r0128,s07_r0755,different,
