@@ -12,6 +12,7 @@
 
     python scripts/04_train_resnet.py --data-dir data/wikiart_style5 --mode both
 Outputs: results/04_resnet/<mode>/{summary.json, training_history.png, confusion.png, errors.png}
+Checkpoints: resnet18_<mode>.pt and the deployable resnet18_frozen_logreg.joblib (backbone + logistic regression)
 """
 from __future__ import annotations
 
@@ -27,7 +28,7 @@ from museum_guide.common import get_device, provenance, save_json, set_seed
 from museum_guide.data import class_names, load_image_array, load_metadata, make_image_loaders, make_split
 from museum_guide.evaluation import classification_metrics, fmt, most_confused, predict
 from museum_guide.plots import confusion, image_grid, training_history
-from museum_guide.resnet import HEAD_VARIANTS, ResNetClassifier, extract_embeddings, make_head
+from museum_guide.resnet import HEAD_VARIANTS, ResNetClassifier, extract_embeddings, make_head, save_frozen_logreg
 from museum_guide.training import TrainConfig, train
 
 
@@ -79,6 +80,9 @@ def run_frozen(a, meta, split, names, device, out):
     p2 = lr_model.predict_proba(E["test"][0].numpy())
     m2 = classification_metrics(E["test"][1].numpy(), p2.argmax(1), names, p2)
     print(f"[frozen + logistic reg.] test {fmt(m2)}")
+    suffix = "" if a.split == "artist" else "_randomsplit"
+    save_frozen_logreg(Path(a.checkpoint_dir) / f"resnet18_frozen_logreg{suffix}.joblib", model, lr_model, names,
+                       a.img_size, provenance(a.data_dir))
 
     training_history(h, out / "training_history.png", "ResNet-18 frozen backbone + linear head")
     confusion(m["confusion_matrix"], names, out / "confusion.png", "ResNet-18 frozen + linear head - test")

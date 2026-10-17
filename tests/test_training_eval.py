@@ -1,12 +1,15 @@
 import math
 
 import numpy as np
+import pytest
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
 from museum_guide.evaluation import bootstrap_ci, classification_metrics
 from museum_guide.mlp import MLP
-from museum_guide.resnet import ResNetClassifier, make_head
+from museum_guide.baseline import make_logreg
+from museum_guide.common import provenance
+from museum_guide.resnet import FrozenLogReg, ResNetClassifier, make_head, save_frozen_logreg
 from museum_guide.training import TrainConfig, train
 
 
@@ -78,3 +81,17 @@ def test_standardised_head_starts_at_ln_k_and_plain_xavier_does_not():
     head = ResNetClassifier(5, "frozen", pretrained=False).net.fc
     assert torch.equal(head.mean, torch.zeros(512))  # standardisation buffers ship with the model
 
+
+def test_frozen_logreg_file_round_trip(fake_data, other_fake_data, tmp_path):
+    torch.manual_seed(0)
+    model = ResNetClassifier(5, "frozen", pretrained=False).eval()
+    x = torch.randn(10, 3, 32, 32)
+    E = model.embed(x).numpy()
+    logreg = make_logreg(1.0).fit(E, np.arange(10) % 5)
+    f = tmp_path / "resnet18_frozen_logreg.joblib"
+    save_frozen_logreg(f, model, logreg, list("abcde"), 32, provenance(fake_data))
+    loaded = FrozenLogReg(f, fake_data)
+    np.testing.assert_allclose(loaded.predict_proba(x), logreg.predict_proba(E), rtol=1e-5, atol=1e-6)
+    assert loaded.classes == list("abcde")
+    with pytest.raises(ValueError, match="does not match"):
+        FrozenLogReg(f, other_fake_data)

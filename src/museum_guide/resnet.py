@@ -10,12 +10,17 @@ Frozen BatchNorm layers stay in eval mode (their running statistics come from Im
 The head is our MLP with no hidden layer (mlp.py): input standardisation (buffers, fitted on the training
 embeddings in frozen mode) and a x0.1 Xavier output layer, so that the initial loss is ~ln K, as for the MLP.
 make_head() also builds the earlier head (plain Xavier, raw embeddings) for the ablation in step 4.
+
+The recommended kiosk model is the frozen backbone + a logistic regression on its embeddings:
+save_frozen_logreg / FrozenLogReg store and run it as one self-contained file.
 """
 from __future__ import annotations
 
+import joblib
 import torch
 import torch.nn as nn
 
+from .common import check_checkpoint
 from .mlp import MLP
 
 HEAD_VARIANTS = ("plain_xavier", "small_init", "standardised")
@@ -95,3 +100,29 @@ def make_head(dim: int, n_classes: int, variant: str = "standardised", train_emb
     if variant == "standardised" and train_embeddings is not None:
         head.set_normalization(train_embeddings.mean(0), train_embeddings.std(0))
     return head
+
+
+def save_frozen_logreg(path, model: ResNetClassifier, logreg, classes, img_size: int, prov: dict) -> None:
+    """The deployable kiosk model in one file: backbone weights (head left out) + scaler/logistic regression."""
+    backbone = {k: v for k, v in model.state_dict().items() if not k.startswith("net.fc.")}
+    joblib.dump({"backbone_state_dict": backbone, "logreg": logreg, "classes": list(classes),
+                 "img_size": img_size, "provenance": prov}, path)
+
+
+class FrozenLogReg:
+    """Photo tensor -> class probabilities with a file written by save_frozen_logreg (no download needed).
+    The file must come from the dataset in data_dir (check_checkpoint), as for every other checkpoint."""
+
+    def __init__(self, path, data_dir):
+        ck = joblib.load(path)
+        check_checkpoint(ck, data_dir, path)
+        self.classes, self.img_size, self.logreg = ck["classes"], ck["img_size"], ck["logreg"]
+        self.model = ResNetClassifier(len(self.classes), "frozen", pretrained=False)
+        missing, unexpected = self.model.load_state_dict(ck["backbone_state_dict"], strict=False)
+        if unexpected or any(not k.startswith("net.fc.") for k in missing):
+            raise ValueError(f"{path}: backbone weights do not match ResNet-18 ({missing[:3]}, {unexpected[:3]})")
+        self.model.eval()
+
+    @torch.no_grad()
+    def predict_proba(self, x: torch.Tensor):
+        return self.logreg.predict_proba(self.model.embed(x).numpy())
