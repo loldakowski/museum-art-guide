@@ -16,7 +16,7 @@ from pathlib import Path
 
 import torch
 
-from museum_guide.common import get_device, save_json
+from museum_guide.common import get_device, provenance, save_json
 from museum_guide.evaluation import fmt, most_confused
 from museum_guide.experiments import load_feature_data, mean_std, run_mlp
 from museum_guide.features import FEATURE_SETS
@@ -104,7 +104,7 @@ def main():
         "generalisation_gap_at_best": (runs[0]["history"]["train_acc"][runs[0]["history"]["best_epoch"] - 1]
                                        - runs[0]["history"]["val_acc"][runs[0]["history"]["best_epoch"] - 1]),
         "metrics_seed0": m0, "most_confused_seed0": most_confused(m0["confusion_matrix"], d.classes),
-        "device": str(device),
+        "device": str(device), "provenance": provenance(a.data_dir),
     }
     save_json(summary, out / "summary.json")
     save_json(runs[0]["history"], out / "history_seed0.json")

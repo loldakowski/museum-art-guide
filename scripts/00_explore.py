@@ -11,7 +11,7 @@ from pathlib import Path
 
 import numpy as np
 
-from museum_guide.common import save_json
+from museum_guide.common import provenance, save_json
 from museum_guide.data import (UNKNOWN_ARTIST, class_names, load_image_array, load_metadata, make_split,
                                split_report)
 from museum_guide.plots import barh, image_grid
@@ -62,7 +62,7 @@ def main():
     image_grid(imgs, titles, out / "samples.png", ncols=6, suptitle="Random samples per class")
 
     save_json({"n_images": len(meta), "classes": names, "per_class": per_class, "mean_rgb": mean_rgb,
-               "split": rep, "image_shape": list(X.shape[1:])}, out / "eda.json")
+               "split": rep, "image_shape": list(X.shape[1:]), "provenance": provenance(a.data_dir)}, out / "eda.json")
     print(f"-> {out}")
 
 

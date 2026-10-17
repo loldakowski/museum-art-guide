@@ -15,7 +15,7 @@ import joblib
 import numpy as np
 
 from museum_guide.baseline import fit_logreg
-from museum_guide.common import save_json
+from museum_guide.common import provenance, save_json
 from museum_guide.data import class_names, load_image_array, load_metadata, make_split, split_report
 from museum_guide.evaluation import classification_metrics, fmt, most_confused
 from museum_guide.features import FEATURE_SETS, compute_features
@@ -55,7 +55,7 @@ def main():
                   "val_acc": float(max(val_scores.values())),
                   "feature_time_s": t_feat, "fit_time_s": t_fit, "split": a.split,
                   "split_info": split_report(meta, split)["n"],
-                  "most_confused": most_confused(m["confusion_matrix"], names)})
+                  "most_confused": most_confused(m["confusion_matrix"], names), "provenance": provenance(a.data_dir)})
         print(f"[{fs:12s}] dim={F.shape[1]:5d} C={m['best_C']:g}  train {m['train_acc']:.3f}  "
               f"val {m['val_acc']:.3f}  test {fmt(m)}")
         tag = fs if a.split == "artist" else f"{fs}_randomsplit"

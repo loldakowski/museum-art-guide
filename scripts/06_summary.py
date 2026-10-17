@@ -75,8 +75,19 @@ def main():
         lines.append(f"| {r['model']} | {r['test_acc']:.3f} [{r['ci_lo']:.3f}-{r['ci_hi']:.3f}] | "
                      f"{r['macro_f1']:.3f} | {f_(r['latency_ms'], '.1f')} | {f_(r['size_mb'], '.1f')} | "
                      f"{f_(r['params'], ',')} | {f_(r['train_time_s'], '.0f')} | {r['note']} |")
+    # Which commits produced the inputs (a table mixing several commits must be re-run before it is reported)
+    shas = {}
+    for f in sorted(R.glob("0[0-5]_*/**/*.json")):
+        d = load_json(f)
+        prov = d.get("provenance") if isinstance(d, dict) else None
+        if prov:
+            key = f"{prov['git_sha'] or 'unknown'}{' (dirty)' if prov['git_dirty'] else ''}"
+            shas.setdefault(key, []).append(str(f.relative_to(R)))
+    sources = ("\n".join(f"- `{k}`: {', '.join(v)}" for k, v in shas.items()) if shas
+               else "- no provenance recorded in the input files")
     (R / "summary.md").write_text("# Results summary (test set, artist-grouped split)\n\n" + "\n".join(lines) +
-                                  "\n\nLatency = median end-to-end time for one photo on CPU (see 05_benchmark).\n",
+                                  "\n\nLatency = median end-to-end time for one photo on CPU (see 05_benchmark).\n"
+                                  "\nCode that produced these numbers (git commit):\n" + sources + "\n",
                                   encoding="utf-8")
     save_json(rows, R / "summary.json")
     print("\n".join(lines))

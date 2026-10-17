@@ -3,9 +3,13 @@ from __future__ import annotations
 
 import json
 import os
+import platform
 import random
+import subprocess
+import sys
 import time
 from contextlib import contextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -54,6 +58,33 @@ def save_json(obj, path) -> None:
 
 def load_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def _git(*args) -> str | None:
+    try:
+        return subprocess.run(["git", *args], cwd=Path(__file__).resolve().parent, capture_output=True, text=True,
+                              check=True, timeout=10).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def provenance(data_dir=None) -> dict:
+    """Which code, library versions and dataset produced a result file (saved next to the numbers).
+
+    git_dirty=True means tracked files had uncommitted changes: the SHA alone does not describe the code."""
+    import sklearn
+    import torchvision
+    status = _git("status", "--porcelain", "--untracked-files=no")
+    info = data_dir and Path(data_dir) / "subset_info.json"
+    return {
+        "git_sha": _git("rev-parse", "HEAD"), "git_dirty": None if status is None else bool(status),
+        "created_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "python": platform.python_version(), "platform": platform.platform(),
+        "versions": {"torch": torch.__version__, "torchvision": torchvision.__version__, "numpy": np.__version__,
+                     "sklearn": sklearn.__version__},
+        "command": " ".join([Path(sys.argv[0]).name, *sys.argv[1:]]),
+        "subset_info": load_json(info) if info and info.exists() else None,
+    }
 
 
 @contextmanager
