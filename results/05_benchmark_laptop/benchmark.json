@@ -1,0 +1,621 @@
+{
+  "environment": {
+    "machine": "laptop: Apple M5 (not a kiosk)",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "processor": "arm",
+    "cpu_count": 10,
+    "torch": "2.14.1",
+    "threads_skipped_above_cpu_count": [],
+    "inputs": {
+      "photo": {
+        "bytes": 1830418,
+        "size": [
+          4032,
+          3024
+        ]
+      },
+      "small": {
+        "bytes": 6582,
+        "size": [
+          128,
+          128
+        ]
+      }
+    }
+  },
+  "results": [
+    {
+      "model": "logreg_pixels32",
+      "input": "photo",
+      "threads": 1,
+      "median_ms": 27.469541500977357,
+      "p95_ms": 27.858837202438735,
+      "mean_ms": 27.56375373021001,
+      "size_mb": 0.136637,
+      "params": 15365,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_handcrafted",
+      "input": "photo",
+      "threads": 1,
+      "median_ms": 30.40733349916991,
+      "p95_ms": 30.564560100174276,
+      "mean_ms": 30.409464580043277,
+      "size_mb": 0.088365,
+      "params": 9880,
+      "trained_weights": true
+    },
+    {
+      "model": "mlp_pixels32",
+      "input": "photo",
+      "threads": 1,
+      "median_ms": 27.429041498180595,
+      "p95_ms": 27.68412980130961,
+      "mean_ms": 27.446763329899113,
+      "size_mb": 6.851597,
+      "params": 1705989,
+      "trained_weights": false
+    },
+    {
+      "model": "mlp_handcrafted",
+      "input": "photo",
+      "threads": 1,
+      "median_ms": 30.366375500307186,
+      "p95_ms": 30.522869048945722,
+      "mean_ms": 30.37025796023954,
+      "size_mb": 4.596237,
+      "params": 1144325,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_frozen_logreg",
+      "input": "photo",
+      "threads": 1,
+      "median_ms": 31.053916998644127,
+      "p95_ms": 31.34923154811986,
+      "mean_ms": 31.08084167011839,
+      "size_mb": 44.808104,
+      "params": 11179077,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_128px",
+      "input": "photo",
+      "threads": 1,
+      "median_ms": 30.923270500352373,
+      "p95_ms": 31.352336049712903,
+      "mean_ms": 30.970952920142736,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_224px",
+      "input": "photo",
+      "threads": 1,
+      "median_ms": 37.17956250147836,
+      "p95_ms": 37.54031460139231,
+      "mean_ms": 37.232416269907844,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "logreg_pixels32",
+      "input": "small",
+      "threads": 1,
+      "median_ms": 0.23947900081111584,
+      "p95_ms": 0.24889199830795405,
+      "mean_ms": 0.24173042980692117,
+      "size_mb": 0.136637,
+      "params": 15365,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_handcrafted",
+      "input": "small",
+      "threads": 1,
+      "median_ms": 2.999145499416045,
+      "p95_ms": 3.084557701549784,
+      "mean_ms": 3.0059337599595892,
+      "size_mb": 0.088365,
+      "params": 9880,
+      "trained_weights": true
+    },
+    {
+      "model": "mlp_pixels32",
+      "input": "small",
+      "threads": 1,
+      "median_ms": 0.1584999990882352,
+      "p95_ms": 0.16758895217208192,
+      "mean_ms": 0.1590182902145898,
+      "size_mb": 6.851597,
+      "params": 1705989,
+      "trained_weights": false
+    },
+    {
+      "model": "mlp_handcrafted",
+      "input": "small",
+      "threads": 1,
+      "median_ms": 2.8779790009139106,
+      "p95_ms": 2.9213090008852305,
+      "mean_ms": 2.878487109737762,
+      "size_mb": 4.596237,
+      "params": 1144325,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_frozen_logreg",
+      "input": "small",
+      "threads": 1,
+      "median_ms": 4.986374502550461,
+      "p95_ms": 5.047116999230639,
+      "mean_ms": 4.98378540014528,
+      "size_mb": 44.808104,
+      "params": 11179077,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_128px",
+      "input": "small",
+      "threads": 1,
+      "median_ms": 4.832395999983419,
+      "p95_ms": 4.90924999849085,
+      "mean_ms": 4.838872460277344,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_224px",
+      "input": "small",
+      "threads": 1,
+      "median_ms": 10.086416999911307,
+      "p95_ms": 10.1952312497815,
+      "mean_ms": 10.095461259988951,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "tfidf_search_query",
+      "input": "text query",
+      "threads": 1,
+      "median_ms": 0.2439994987071259,
+      "p95_ms": 0.25530240145599237,
+      "mean_ms": 0.24667248995683622,
+      "size_mb": 0.45707,
+      "params": 0,
+      "trained_weights": true
+    },
+    {
+      "model": "clip_search_query",
+      "input": "text query",
+      "threads": 1,
+      "median_ms": 10.806416501509375,
+      "p95_ms": 11.05416845275613,
+      "mean_ms": 10.812759600230493,
+      "size_mb": 608.284451,
+      "params": 63428097,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_pixels32",
+      "input": "photo",
+      "threads": 2,
+      "median_ms": 27.5145630021143,
+      "p95_ms": 27.66706249840354,
+      "mean_ms": 27.513887870081817,
+      "size_mb": 0.136637,
+      "params": 15365,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_handcrafted",
+      "input": "photo",
+      "threads": 2,
+      "median_ms": 30.81179149921809,
+      "p95_ms": 34.752279448912304,
+      "mean_ms": 32.45346289986628,
+      "size_mb": 0.088365,
+      "params": 9880,
+      "trained_weights": true
+    },
+    {
+      "model": "mlp_pixels32",
+      "input": "photo",
+      "threads": 2,
+      "median_ms": 27.698458499799017,
+      "p95_ms": 29.53391280170763,
+      "mean_ms": 28.430790829806938,
+      "size_mb": 6.851597,
+      "params": 1705989,
+      "trained_weights": false
+    },
+    {
+      "model": "mlp_handcrafted",
+      "input": "photo",
+      "threads": 2,
+      "median_ms": 30.48399950057501,
+      "p95_ms": 32.382379203045275,
+      "mean_ms": 30.76112124017527,
+      "size_mb": 4.596237,
+      "params": 1144325,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_frozen_logreg",
+      "input": "photo",
+      "threads": 2,
+      "median_ms": 30.54443750079372,
+      "p95_ms": 31.39715415200044,
+      "mean_ms": 30.65548040005524,
+      "size_mb": 44.808104,
+      "params": 11179077,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_128px",
+      "input": "photo",
+      "threads": 2,
+      "median_ms": 30.32581249863142,
+      "p95_ms": 30.565766700055974,
+      "mean_ms": 30.37326664005377,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_224px",
+      "input": "photo",
+      "threads": 2,
+      "median_ms": 35.011792000659625,
+      "p95_ms": 35.54104999802803,
+      "mean_ms": 35.25384660013515,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "logreg_pixels32",
+      "input": "small",
+      "threads": 2,
+      "median_ms": 0.26185450042248704,
+      "p95_ms": 0.27253330117673613,
+      "mean_ms": 0.26289458997780457,
+      "size_mb": 0.136637,
+      "params": 15365,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_handcrafted",
+      "input": "small",
+      "threads": 2,
+      "median_ms": 2.9923960009909933,
+      "p95_ms": 3.062698250323592,
+      "mean_ms": 2.99568416976399,
+      "size_mb": 0.088365,
+      "params": 9880,
+      "trained_weights": true
+    },
+    {
+      "model": "mlp_pixels32",
+      "input": "small",
+      "threads": 2,
+      "median_ms": 0.17535350161779206,
+      "p95_ms": 0.1853372030382161,
+      "mean_ms": 0.1760691103845602,
+      "size_mb": 6.851597,
+      "params": 1705989,
+      "trained_weights": false
+    },
+    {
+      "model": "mlp_handcrafted",
+      "input": "small",
+      "threads": 2,
+      "median_ms": 2.908666499934043,
+      "p95_ms": 3.052095849670877,
+      "mean_ms": 2.920402160125377,
+      "size_mb": 4.596237,
+      "params": 1144325,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_frozen_logreg",
+      "input": "small",
+      "threads": 2,
+      "median_ms": 4.3830835002154345,
+      "p95_ms": 4.486637500849611,
+      "mean_ms": 4.395312089873187,
+      "size_mb": 44.808104,
+      "params": 11179077,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_128px",
+      "input": "small",
+      "threads": 2,
+      "median_ms": 4.238437501044245,
+      "p95_ms": 4.3428589995528455,
+      "mean_ms": 4.245621240079345,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_224px",
+      "input": "small",
+      "threads": 2,
+      "median_ms": 7.791457999701379,
+      "p95_ms": 7.910920799622545,
+      "mean_ms": 7.802692130208015,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "tfidf_search_query",
+      "input": "text query",
+      "threads": 2,
+      "median_ms": 0.2453124998282874,
+      "p95_ms": 0.2705291504753404,
+      "mean_ms": 0.24972290972073097,
+      "size_mb": 0.45707,
+      "params": 0,
+      "trained_weights": true
+    },
+    {
+      "model": "clip_search_query",
+      "input": "text query",
+      "threads": 2,
+      "median_ms": 10.494645999642671,
+      "p95_ms": 10.7457896005144,
+      "mean_ms": 10.529081199929351,
+      "size_mb": 608.284451,
+      "params": 63428097,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_pixels32",
+      "input": "photo",
+      "threads": 4,
+      "median_ms": 27.6013545008027,
+      "p95_ms": 27.738648247759556,
+      "mean_ms": 27.60637878003763,
+      "size_mb": 0.136637,
+      "params": 15365,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_handcrafted",
+      "input": "photo",
+      "threads": 4,
+      "median_ms": 30.538604501998634,
+      "p95_ms": 30.698914900131058,
+      "mean_ms": 30.60446169023635,
+      "size_mb": 0.088365,
+      "params": 9880,
+      "trained_weights": true
+    },
+    {
+      "model": "mlp_pixels32",
+      "input": "photo",
+      "threads": 4,
+      "median_ms": 27.50731250125682,
+      "p95_ms": 27.696856249531265,
+      "mean_ms": 27.52663168030267,
+      "size_mb": 6.851597,
+      "params": 1705989,
+      "trained_weights": false
+    },
+    {
+      "model": "mlp_handcrafted",
+      "input": "photo",
+      "threads": 4,
+      "median_ms": 30.498083000566112,
+      "p95_ms": 30.73103924853058,
+      "mean_ms": 30.512777469884895,
+      "size_mb": 4.596237,
+      "params": 1144325,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_frozen_logreg",
+      "input": "photo",
+      "threads": 4,
+      "median_ms": 31.88647949900769,
+      "p95_ms": 32.1017660515281,
+      "mean_ms": 31.730332039733185,
+      "size_mb": 44.808104,
+      "params": 11179077,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_128px",
+      "input": "photo",
+      "threads": 4,
+      "median_ms": 31.69616649938689,
+      "p95_ms": 31.909743149662972,
+      "mean_ms": 31.590164150147757,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_224px",
+      "input": "photo",
+      "threads": 4,
+      "median_ms": 35.91774999949848,
+      "p95_ms": 36.13730445049441,
+      "mean_ms": 35.94788119993609,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "logreg_pixels32",
+      "input": "small",
+      "threads": 4,
+      "median_ms": 0.2880000010918593,
+      "p95_ms": 0.3116455029157805,
+      "mean_ms": 0.2901587103769998,
+      "size_mb": 0.136637,
+      "params": 15365,
+      "trained_weights": true
+    },
+    {
+      "model": "logreg_handcrafted",
+      "input": "small",
+      "threads": 4,
+      "median_ms": 3.0039164994377643,
+      "p95_ms": 3.2800566008518217,
+      "mean_ms": 3.046306679971167,
+      "size_mb": 0.088365,
+      "params": 9880,
+      "trained_weights": true
+    },
+    {
+      "model": "mlp_pixels32",
+      "input": "small",
+      "threads": 4,
+      "median_ms": 0.18654150153452065,
+      "p95_ms": 0.19992945181002142,
+      "mean_ms": 0.18777658013277687,
+      "size_mb": 6.851597,
+      "params": 1705989,
+      "trained_weights": false
+    },
+    {
+      "model": "mlp_handcrafted",
+      "input": "small",
+      "threads": 4,
+      "median_ms": 2.8707500005111797,
+      "p95_ms": 2.913841999179567,
+      "mean_ms": 2.8726875501524773,
+      "size_mb": 4.596237,
+      "params": 1144325,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_frozen_logreg",
+      "input": "small",
+      "threads": 4,
+      "median_ms": 3.9756455007591285,
+      "p95_ms": 4.111630598526972,
+      "mean_ms": 4.001486619927164,
+      "size_mb": 44.808104,
+      "params": 11179077,
+      "trained_weights": true
+    },
+    {
+      "model": "resnet18_128px",
+      "input": "small",
+      "threads": 4,
+      "median_ms": 3.8436875001934823,
+      "p95_ms": 3.9593330502611934,
+      "mean_ms": 3.854757890003384,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "resnet18_224px",
+      "input": "small",
+      "threads": 4,
+      "median_ms": 6.870958501167479,
+      "p95_ms": 7.094660446819034,
+      "mean_ms": 6.8866599899411085,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "trained_weights": false
+    },
+    {
+      "model": "tfidf_search_query",
+      "input": "text query",
+      "threads": 4,
+      "median_ms": 0.2715834998525679,
+      "p95_ms": 0.2856958493794082,
+      "mean_ms": 0.27457079992018407,
+      "size_mb": 0.45707,
+      "params": 0,
+      "trained_weights": true
+    },
+    {
+      "model": "clip_search_query",
+      "input": "text query",
+      "threads": 4,
+      "median_ms": 10.573333500360604,
+      "p95_ms": 10.878604148274462,
+      "mean_ms": 10.623050760259503,
+      "size_mb": 608.284451,
+      "params": 63428097,
+      "trained_weights": true
+    }
+  ],
+  "training_cost": {
+    "threads": 10,
+    "n_train": 1032,
+    "img_size": 128,
+    "pretrained": true,
+    "frozen_embed_train_s": 12.733697958999983,
+    "frozen_logreg_fit_s": 0.013986124999064486,
+    "logreg_C": 0.01,
+    "frozen_total_s": 12.747684083999047,
+    "finetune_one_epoch_s": 20.58844075000161
+  },
+  "provenance": {
+    "git_sha": "b5e42a9939d88d658bcd514bd9ec182f89c7500e",
+    "git_dirty": false,
+    "dataset_fingerprint": "b407cd646527a202",
+    "created_utc": "2026-10-17T23:32:16+00:00",
+    "python": "3.11.17",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "versions": {
+      "torch": "2.14.1",
+      "torchvision": "0.29.1",
+      "numpy": "2.4.6",
+      "sklearn": "1.9.1"
+    },
+    "command": "05_benchmark_cpu.py --checkpoint-dir /private/tmp/claude-501/-Users-dhiabencheikh-Projects-museum-art-guide/f470ba69-3ac4-4503-9644-a1135ab94bd0/scratchpad/p3real/ckpt --machine laptop: Apple M5 (not a kiosk) --out results/05_benchmark_laptop --threads 1 2 4",
+    "subset_info": {
+      "repo": "huggan/wikiart",
+      "revision": "d559852d2b232e0fcf195e775866964f0564f2b5",
+      "label": "style",
+      "classes": [
+        "Baroque",
+        "Cubism",
+        "Impressionism",
+        "Pop_Art",
+        "Ukiyo_e"
+      ],
+      "per_class": 300,
+      "size": 128,
+      "crop": true,
+      "seed": 0,
+      "strategy": "fewest-shards",
+      "max_per_artist": 50,
+      "shards": [
+        47,
+        48,
+        54,
+        61,
+        66,
+        68,
+        69,
+        70,
+        71
+      ],
+      "counts": {
+        "Baroque": 300,
+        "Cubism": 300,
+        "Impressionism": 300,
+        "Pop_Art": 300,
+        "Ukiyo_e": 300
+      },
+      "total": 1500,
+      "command": "python make_wikiart_subset.py --label style --classes Impressionism Baroque Cubism Ukiyo_e Pop_Art --per-class 300 --size 128 --out data/wikiart_style5 --index-cache /private/tmp/claude-501/-Users-dhiabencheikh-Projects-museum-art-guide/f470ba69-3ac4-4503-9644-a1135ab94bd0/scratchpad/wikiart_label_index.json",
+      "created_utc": "2026-10-17T18:51:56+00:00"
+    }
+  }
+}
