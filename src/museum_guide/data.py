@@ -18,10 +18,11 @@ import numpy as np
 import pandas as pd
 import torch
 from PIL import Image, ImageOps
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from torch.utils.data import DataLoader, Dataset
 
 UNKNOWN_ARTIST = "Unknown Artist"
+ANNOTATIONS_DIR = Path(__file__).resolve().parents[2] / "annotations"  # repo root (package installed with -e)
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
 SPLITS = ("train", "val", "test")
@@ -30,8 +31,46 @@ SPLITS = ("train", "val", "test")
 # --------------------------------------------------------------------------------------------------
 # Metadata and splits
 # --------------------------------------------------------------------------------------------------
-def load_metadata(data_dir) -> pd.DataFrame:
-    """metadata.csv written by make_wikiart_subset.py (one row per image)."""
+def duplicates_file(data_dir) -> Path | None:
+    """The committed duplicate verdicts of this dataset: annotations/<data dir name>_duplicates.csv, if any."""
+    f = ANNOTATIONS_DIR / f"{Path(data_dir).name}_duplicates.csv"
+    return f if f.exists() else None
+
+
+def _components(pairs) -> dict:
+    """Connected components of an undirected graph given as (a, b) pairs: {node: representative}."""
+    parent = {}
+
+    def find(x):
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+    for a, b in pairs:
+        parent[find(a)] = find(b)
+    return {x: find(x) for x in parent}
+
+
+def apply_duplicates(meta: pd.DataFrame, verdicts: pd.DataFrame) -> tuple[pd.DataFrame, list]:
+    """Use human duplicate verdicts (annotations/README.md): returns (meta with a 'dup_group' column, removed ids).
+
+    Every verdict except 'different' links two images; a dup_group is a connected component of links, and the
+    split keeps it whole. Images whose 'same_image' copies carry different labels are removed (label noise)."""
+    v = verdicts[verdicts["id_a"].isin(meta["id"]) & verdicts["id_b"].isin(meta["id"])]
+    label = dict(zip(meta["id"], meta["label"]))
+    same = _components(v.loc[v["verdict"] == "same_image", ["id_a", "id_b"]].itertuples(index=False))
+    copies = pd.Series(same).groupby(lambda i: same[i]).groups
+    removed = sorted(i for members in copies.values() if len({label[m] for m in members}) > 1 for i in members)
+    linked = _components(v.loc[v["verdict"] != "different", ["id_a", "id_b"]].itertuples(index=False))
+    meta = meta.assign(dup_group=meta["id"].map(lambda i: f"dup_{linked[i]}" if i in linked else None))
+    return meta[~meta["id"].isin(removed)].reset_index(drop=True), removed
+
+
+def load_metadata(data_dir, duplicates="auto") -> pd.DataFrame:
+    """metadata.csv written by make_wikiart_subset.py (one row per image), with the duplicate verdicts applied.
+
+    duplicates: 'auto' = duplicates_file(data_dir), a path to a verdict CSV, or None (raw metadata)."""
     path = Path(data_dir) / "metadata.csv"
     if not path.exists():
         raise FileNotFoundError(f"{path} not found. Build the dataset first: bash scripts/build_dataset.sh")
@@ -39,7 +78,9 @@ def load_metadata(data_dir) -> pd.DataFrame:
     missing = {"path", "label", "label_idx", "id", "artist"} - set(meta.columns)
     if missing:
         raise ValueError(f"metadata.csv lacks columns {missing}")
-    return meta.sort_values(["label_idx", "id"]).reset_index(drop=True)
+    meta = meta.sort_values(["label_idx", "id"]).reset_index(drop=True)
+    f = duplicates_file(data_dir) if duplicates == "auto" else duplicates
+    return apply_duplicates(meta, pd.read_csv(f))[0] if f else meta
 
 
 def class_names(meta: pd.DataFrame) -> list[str]:
@@ -48,10 +89,16 @@ def class_names(meta: pd.DataFrame) -> list[str]:
 
 
 def artist_groups(meta: pd.DataFrame) -> np.ndarray:
-    """One group per named artist; every 'Unknown Artist' image is its own group."""
+    """One group per named artist; every 'Unknown Artist' image is its own group. Groups that share a duplicate
+    group (column 'dup_group', from apply_duplicates) are merged, so copies of an image never cross splits."""
     artist = meta["artist"].astype(str).to_numpy()
     ids = meta["id"].astype(str).to_numpy()
-    return np.where(artist == UNKNOWN_ARTIST, "unknown_" + ids, "artist_" + artist)
+    groups = np.where(artist == UNKNOWN_ARTIST, "unknown_" + ids, "artist_" + artist)
+    if "dup_group" not in meta:
+        return groups
+    links = [(g, d) for g, d in zip(groups, meta["dup_group"]) if isinstance(d, str)]
+    merged = _components(links)
+    return np.array([merged.get(g, g) for g in groups], dtype=object)
 
 
 def grouped_stratified_split(strata, groups, fractions=(0.70, 0.15, 0.15), seed: int = 0) -> np.ndarray:
@@ -81,29 +128,63 @@ def grouped_stratified_split(strata, groups, fractions=(0.70, 0.15, 0.15), seed:
     return assign[g_idx]
 
 
+def _keep_duplicates_together(meta: pd.DataFrame, assign: np.ndarray) -> np.ndarray:
+    """Each member of a duplicate group (column 'dup_group') takes the assignment of the group's first image."""
+    if "dup_group" not in meta:
+        return assign
+    dup = meta["dup_group"].to_numpy()
+    first = pd.Series(assign).groupby(dup).transform("first").to_numpy()  # NaN groups are skipped
+    grouped = pd.notna(dup)
+    assign = assign.copy()
+    assign[grouped] = first[grouped]
+    return assign
+
+
 def make_split(meta: pd.DataFrame, mode: str = "artist", val_frac: float = 0.15,
-               test_frac: float = 0.15, seed: int = 0) -> np.ndarray:
+               test_frac: float = 0.15, seed: int = 0, fold: int | None = None, n_folds: int = 5) -> np.ndarray:
     """Return an array of 'train' / 'val' / 'test' (one entry per row of meta).
 
     mode='artist': stratified by class AND grouped by artist (no painter in two splits).
-    mode='random': stratified random split (kept only to *measure* the leakage it causes).
+    mode='random': stratified random split (kept only to *measure* the leakage it causes). Duplicate groups
+    (column 'dup_group') still stay whole, so the random split differs from the artist split by painters only,
+    not by copies of the same painting.
+    fold=k (cross-validation): the data is cut into n_folds parts the same way (grouped by artist, or stratified
+    random); test = part k, val = part k+1, train = the other parts. Over the folds every image (and, with
+    mode='artist', every painter) is tested exactly once. val_frac / test_frac are then ignored.
     """
     y = meta["label_idx"].to_numpy()
     if mode == "random":
+        if fold is not None:
+            part = np.empty(len(meta), dtype=int)
+            for k, (_, te) in enumerate(StratifiedKFold(n_folds, shuffle=True, random_state=seed).split(y, y)):
+                part[te] = k
+            return _cv_split(_keep_duplicates_together(meta, part), fold, n_folds)
         idx = np.arange(len(meta))
         trval, test = train_test_split(idx, test_size=test_frac, stratify=y, random_state=seed)
         train, val = train_test_split(trval, test_size=val_frac / (1 - test_frac), stratify=y[trval],
                                       random_state=seed)
         split = np.empty(len(meta), dtype=object)
         split[train], split[val], split[test] = "train", "val", "test"
-        return split
+        return _keep_duplicates_together(meta, split)
     if mode == "artist":
         # strata = class x (named / unknown artist): every split gets its share of both kinds of images
         strata = 2 * y + (meta["artist"].to_numpy() == UNKNOWN_ARTIST)
+        if fold is not None:
+            return _cv_split(grouped_stratified_split(strata, artist_groups(meta), (1 / n_folds,) * n_folds, seed),
+                             fold, n_folds)
         a = grouped_stratified_split(strata, artist_groups(meta), (1 - val_frac - test_frac, val_frac, test_frac),
                                      seed)
         return np.array(SPLITS, dtype=object)[a]
     raise ValueError(f"unknown split mode {mode!r}")
+
+
+def _cv_split(part: np.ndarray, fold: int, n_folds: int) -> np.ndarray:
+    if not 0 <= fold < n_folds:
+        raise ValueError(f"fold must be in [0, {n_folds}), got {fold}")
+    split = np.full(len(part), "train", dtype=object)
+    split[part == (fold + 1) % n_folds] = "val"
+    split[part == fold] = "test"
+    return split
 
 
 def split_report(meta: pd.DataFrame, split: np.ndarray) -> dict:

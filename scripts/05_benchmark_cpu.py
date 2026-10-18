@@ -23,7 +23,7 @@ import torch
 from PIL import Image, ImageOps
 
 from museum_guide.baseline import make_logreg
-from museum_guide.common import provenance, save_json
+from museum_guide.common import check_checkpoint, provenance, save_json
 from museum_guide.data import image_transform
 from museum_guide.features import handcrafted, pixels
 from museum_guide.mlp import MLP
@@ -53,28 +53,38 @@ def nbytes(obj, kind):
     return buf.tell()
 
 
-def sklearn_candidate(name, feat_fn, dim, n_classes):
-    ck = Path(f"checkpoints/baseline_{name}.joblib")
-    if ck.exists():
-        return joblib.load(ck)["model"], True
+def load_checkpoint(path, data_dir):
+    """A checkpoint trained on the dataset in data_dir, or None if the file does not exist.
+    A checkpoint from another dataset is refused (ValueError), never silently benchmarked."""
+    path = Path(path)
+    if not path.exists():
+        return None
+    ckpt = joblib.load(path) if path.suffix == ".joblib" else torch.load(path, map_location="cpu")
+    check_checkpoint(ckpt, data_dir, path)
+    return ckpt
+
+
+def sklearn_candidate(name, dim, n_classes, data_dir):
+    ck = load_checkpoint(f"checkpoints/baseline_{name}.joblib", data_dir)
+    if ck is not None:
+        return ck["model"], True
     rng = np.random.default_rng(0)  # same architecture, random data: same latency
     return make_logreg(1.0).fit(rng.normal(size=(50, dim)), np.arange(50) % n_classes), False
 
 
-def build_candidates(img_bytes, n_classes, img_size):
+def build_candidates(img_bytes, n_classes, img_size, data_dir):
     C = {}
     # 1-2. classical: logistic regression on pixels / hand-crafted features
     for name, feat in (("pixels32", lambda x: pixels(x, 32)), ("handcrafted", handcrafted)):
         dim = feat(np.zeros((1, 128, 128, 3), np.uint8)).shape[1]
-        model, trained = sklearn_candidate(name, feat, dim, n_classes)
+        model, trained = sklearn_candidate(name, dim, n_classes, data_dir)
         C[f"logreg_{name}"] = {
             "fn": (lambda m=model, f=feat: m.predict_proba(f(load_rgb(io.BytesIO(img_bytes), 128)[None]))),
             "size_bytes": nbytes(model, "joblib"), "params": int(model[-1].coef_.size + model[-1].intercept_.size),
             "trained_weights": trained}
     # 3. from-scratch MLP on 32x32 pixels
-    ck = Path("checkpoints/mlp_pixels32.pt")
-    if ck.exists():
-        c = torch.load(ck, map_location="cpu")
+    c = load_checkpoint("checkpoints/mlp_pixels32.pt", data_dir)
+    if c is not None:
         mlp = MLP(c["in_features"], c["n_classes"], **c["mlp_kwargs"])
         mlp.load_state_dict(c["state_dict"])
     else:
@@ -85,14 +95,14 @@ def build_candidates(img_bytes, n_classes, img_size):
     def run_mlp():
         return mlp(torch.from_numpy(pixels(load_rgb(io.BytesIO(img_bytes), 128)[None], 32)))
     C["mlp_pixels32"] = {"fn": run_mlp, "size_bytes": nbytes(mlp.state_dict(), "torch"),
-                         "params": mlp.n_parameters(), "trained_weights": ck.exists()}
+                         "params": mlp.n_parameters(), "trained_weights": c is not None}
     # 4. ResNet-18 (frozen and fine-tuned share the architecture, hence the latency)
     for s in sorted({img_size, 224}):
         net = ResNetClassifier(n_classes, "frozen", pretrained=False)
-        ck = Path("checkpoints/resnet18_finetune.pt")
-        trained = ck.exists()
+        ck = load_checkpoint("checkpoints/resnet18_finetune.pt", data_dir)
+        trained = ck is not None
         if trained:
-            net.load_state_dict(torch.load(ck, map_location="cpu")["state_dict"])
+            net.load_state_dict(ck["state_dict"])
         net.eval()
         tf = image_transform(s, train=False)
 
@@ -123,7 +133,7 @@ def main():
         buf = io.BytesIO()
         Image.fromarray(np.random.default_rng(0).integers(0, 255, (128, 128, 3), dtype=np.uint8)).save(buf, "JPEG")
         img_bytes = buf.getvalue()
-    C = build_candidates(img_bytes, a.n_classes, a.img_size)
+    C = build_candidates(img_bytes, a.n_classes, a.img_size, a.data_dir)
     env = {"platform": platform.platform(), "processor": platform.processor() or "n/a",
            "cpu_count": os.cpu_count(), "torch": torch.__version__}
     print(env)

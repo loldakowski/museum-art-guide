@@ -62,7 +62,8 @@ def run_frozen(a, meta, split, names, device, out):
 
     # (b) logistic regression on the same embeddings
     lr_model, val_scores = fit_logreg(E["train"][0].numpy(), E["train"][1].numpy(),
-                                      E["val"][0].numpy(), E["val"][1].numpy())
+                                      E["val"][0].numpy(), E["val"][1].numpy(),
+                                      **({"Cs": (a.logreg_C,)} if a.logreg_C else {}))
     p2 = lr_model.predict_proba(E["test"][0].numpy())
     m2 = classification_metrics(E["test"][1].numpy(), p2.argmax(1), names, p2)
     print(f"[frozen + logistic reg.] test {fmt(m2)}")
@@ -115,6 +116,11 @@ def main():
     p.add_argument("--out", default="results/04_resnet")
     p.add_argument("--mode", choices=["frozen", "finetune", "both"], default="both")
     p.add_argument("--split", choices=["artist", "random"], default="artist")
+    p.add_argument("--split-seed", type=int, default=0)
+    p.add_argument("--fold", type=int, default=None, help="cross-validation fold (0-4) instead of the 70/15/15 split")
+    p.add_argument("--logreg-C", type=float, default=None,
+                   help="fixed C of the logistic regression on embeddings (default: choose it on validation)")
+    p.add_argument("--checkpoint-dir", default="checkpoints")
     p.add_argument("--size", type=int, default=128, help="image size on disk")
     p.add_argument("--img-size", type=int, default=128, help="network input size (224 = ImageNet native)")
     p.add_argument("--batch-size", type=int, default=32)
@@ -128,16 +134,17 @@ def main():
     device = get_device(a.device)
     meta = load_metadata(a.data_dir)
     names = class_names(meta)
-    split = make_split(meta, a.split, seed=0)
+    split = make_split(meta, a.split, seed=a.split_seed, fold=a.fold)
     suffix = "" if a.split == "artist" else "_randomsplit"
     print(f"device {device} | {len(meta)} images | classes {names}")
-    Path("checkpoints").mkdir(exist_ok=True)
+    Path(a.checkpoint_dir).mkdir(parents=True, exist_ok=True)
     for mode in (["frozen", "finetune"] if a.mode == "both" else [a.mode]):
         out = Path(a.out) / f"{mode}{suffix}"
         print(f"\n=== ResNet-18 {mode} ===")
         model = (run_frozen if mode == "frozen" else run_finetune)(a, meta, split, names, device, out)
-        torch.save({"state_dict": model.state_dict(), "mode": mode, "classes": names, "img_size": a.img_size},
-                   f"checkpoints/resnet18_{mode}{suffix}.pt")
+        torch.save({"state_dict": model.state_dict(), "mode": mode, "classes": names, "img_size": a.img_size,
+                    "provenance": provenance(a.data_dir)},
+                   Path(a.checkpoint_dir) / f"resnet18_{mode}{suffix}.pt")
 
 
 if __name__ == "__main__":

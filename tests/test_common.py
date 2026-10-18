@@ -1,6 +1,9 @@
 import json
 
-from museum_guide.common import provenance, save_json
+import pytest
+import torch
+
+from museum_guide.common import check_checkpoint, dataset_fingerprint, provenance, save_json
 
 
 def test_provenance_records_code_versions_and_dataset(fake_data, tmp_path):
@@ -14,3 +17,23 @@ def test_provenance_records_code_versions_and_dataset(fake_data, tmp_path):
 
 def test_provenance_without_dataset():
     assert provenance()["subset_info"] is None
+
+
+def test_checkpoint_from_another_dataset_is_refused(fake_data, other_fake_data):
+    ckpt = {"state_dict": {}, "provenance": provenance(fake_data)}
+    check_checkpoint(ckpt, fake_data, "same.pt")                      # same dataset: accepted
+    with pytest.raises(ValueError, match="does not match"):
+        check_checkpoint(ckpt, other_fake_data, "other.pt")
+    with pytest.raises(ValueError, match="does not match"):
+        check_checkpoint({"state_dict": {}}, fake_data, "old.pt")     # saved before provenance existed
+
+
+def test_dataset_fingerprint_depends_on_image_content(fake_data, other_fake_data, tmp_path):
+    assert (other_fake_data / "metadata.csv").read_bytes() == (fake_data / "metadata.csv").read_bytes()
+    assert dataset_fingerprint(other_fake_data) != dataset_fingerprint(fake_data)  # same metadata, other pixels
+    assert dataset_fingerprint(tmp_path / "missing") is None
+
+
+def test_provenance_survives_a_safe_torch_load(fake_data, tmp_path):
+    torch.save({"provenance": provenance(fake_data)}, tmp_path / "c.pt")
+    assert torch.load(tmp_path / "c.pt")["provenance"]["versions"]["torch"]  # weights_only=True by default

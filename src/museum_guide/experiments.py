@@ -29,9 +29,10 @@ class FeatureData:
         return self.X["train"].shape[1]
 
 
-def load_feature_data(data_dir, features="pixels32", split_mode="artist", split_seed=0, size=128) -> FeatureData:
+def load_feature_data(data_dir, features="pixels32", split_mode="artist", split_seed=0, size=128,
+                      fold=None) -> FeatureData:
     meta = load_metadata(data_dir)
-    split = make_split(meta, split_mode, seed=split_seed)
+    split = make_split(meta, split_mode, seed=split_seed, fold=fold)
     X = compute_features(features, load_image_array(meta, data_dir, size), Path(data_dir) / ".cache")
     y = meta["label_idx"].to_numpy()
     Xs = {s: torch.from_numpy(X[split == s]).float() for s in ("train", "val", "test")}
