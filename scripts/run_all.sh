@@ -23,6 +23,14 @@ python scripts/03_diagnose_mlp.py --data-dir "$DATA" --size "$SIZE" --out "$RESU
        --reference "$RESULTS/02_mlp/pixels32/summary.json" $DIAG_ARGS
 python scripts/04_train_resnet.py --data-dir "$DATA" --size "$SIZE" --out "$RESULTS/04_resnet" $RES_ARGS
 python scripts/05_benchmark_cpu.py --data-dir "$DATA" --out "$RESULTS/05_benchmark" $BENCH_ARGS
+# Step 7 (free-text search) indexes the 224 px copy built by build_dataset.sh. Skipped in QUICK mode: CLIP
+# weights are a 605 MB download.
+SEARCH_IMAGES=${SEARCH_IMAGES:-${DATA}_224}
+if [ "${QUICK:-0}" != "1" ] && [ -d "$SEARCH_IMAGES" ]; then
+  python scripts/07_text_search.py --data-dir "$DATA" --image-dir "$SEARCH_IMAGES" --out "$RESULTS/07_search"
+else
+  echo "skipping step 7 (QUICK mode or no $SEARCH_IMAGES)"
+fi
 python scripts/06_summary.py --results "$RESULTS"
 # Step 8 (cost of unseen painters) needs the named-artist subset (bash scripts/build_named_dataset.sh).
 # Skipped in QUICK mode: 10 trainings of every model, about 7 min even on synthetic data.

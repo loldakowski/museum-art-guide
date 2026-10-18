@@ -1,0 +1,655 @@
+query_id,query,image_id
+c00,a stormy sea,s54_r1024
+c00,a stormy sea,s69_r0693
+c00,a stormy sea,s54_r0035
+c00,a stormy sea,s54_r1043
+c00,a stormy sea,s69_r0694
+c00,a stormy sea,s69_r0600
+c00,a stormy sea,s68_r0701
+c00,a stormy sea,s68_r0372
+c00,a stormy sea,s54_r0914
+c00,a stormy sea,s68_r0721
+c00,a stormy sea,s68_r0662
+c00,a stormy sea,s71_r0569
+c00,a stormy sea,s61_r0446
+c00,a stormy sea,s54_r1077
+c00,a stormy sea,s68_r0529
+c00,a stormy sea,s54_r0675
+c00,a stormy sea,s54_r1035
+c00,a stormy sea,s68_r0234
+c00,a stormy sea,s54_r1129
+c00,a stormy sea,s71_r0737
+c00,a stormy sea,s68_r0793
+c00,a stormy sea,s61_r0882
+c00,a stormy sea,s71_r0679
+c00,a stormy sea,s54_r0986
+c00,a stormy sea,s54_r0882
+c00,a stormy sea,s54_r0896
+c00,a stormy sea,s54_r0435
+c00,a stormy sea,s68_r0684
+c00,a stormy sea,s68_r0671
+c00,a stormy sea,s54_r0929
+c01,portraits of children,s71_r0499
+c01,portraits of children,s54_r0517
+c01,portraits of children,s68_r0721
+c01,portraits of children,s71_r0661
+c01,portraits of children,s69_r0576
+c01,portraits of children,s71_r0382
+c01,portraits of children,s68_r0468
+c01,portraits of children,s69_r0689
+c01,portraits of children,s71_r0514
+c01,portraits of children,s71_r0424
+c01,portraits of children,s66_r0860
+c01,portraits of children,s68_r0800
+c01,portraits of children,s68_r0638
+c01,portraits of children,s70_r0165
+c01,portraits of children,s71_r0560
+c01,portraits of children,s71_r0555
+c01,portraits of children,s69_r0499
+c01,portraits of children,s71_r0530
+c01,portraits of children,s70_r0063
+c01,portraits of children,s69_r0705
+c01,portraits of children,s69_r0614
+c01,portraits of children,s71_r0617
+c01,portraits of children,s68_r0106
+c01,portraits of children,s69_r0538
+c01,portraits of children,s68_r0749
+c01,portraits of children,s69_r0635
+c01,portraits of children,s68_r0438
+c01,portraits of children,s71_r0532
+c01,portraits of children,s66_r0058
+c01,portraits of children,s68_r0763
+c02,flowers in a vase,s71_r0555
+c02,flowers in a vase,s68_r0740
+c02,flowers in a vase,s61_r0480
+c02,flowers in a vase,s68_r0803
+c02,flowers in a vase,s69_r0686
+c02,flowers in a vase,s68_r0783
+c02,flowers in a vase,s69_r0692
+c02,flowers in a vase,s70_r0106
+c02,flowers in a vase,s70_r0155
+c02,flowers in a vase,s54_r0365
+c02,flowers in a vase,s54_r1110
+c02,flowers in a vase,s71_r0577
+c02,flowers in a vase,s68_r0576
+c02,flowers in a vase,s48_r0974
+c02,flowers in a vase,s68_r0622
+c02,flowers in a vase,s68_r0771
+c02,flowers in a vase,s69_r0524
+c02,flowers in a vase,s69_r0677
+c02,flowers in a vase,s54_r0291
+c02,flowers in a vase,s68_r0633
+c02,flowers in a vase,s68_r0539
+c02,flowers in a vase,s71_r0400
+c02,flowers in a vase,s61_r1015
+c02,flowers in a vase,s68_r0628
+c02,flowers in a vase,s68_r0665
+c02,flowers in a vase,s54_r1079
+c02,flowers in a vase,s70_r0168
+c02,flowers in a vase,s68_r0352
+c02,flowers in a vase,s68_r0428
+c03,a bowl of fruit,s54_r0311
+c03,a bowl of fruit,s68_r0551
+c03,a bowl of fruit,s70_r0075
+c03,a bowl of fruit,s68_r0487
+c03,a bowl of fruit,s54_r0663
+c03,a bowl of fruit,s54_r0365
+c03,a bowl of fruit,s68_r0719
+c03,a bowl of fruit,s61_r0480
+c03,a bowl of fruit,s69_r0638
+c03,a bowl of fruit,s54_r0503
+c03,a bowl of fruit,s54_r0916
+c03,a bowl of fruit,s68_r0352
+c03,a bowl of fruit,s71_r0402
+c03,a bowl of fruit,s54_r0461
+c03,a bowl of fruit,s48_r0974
+c03,a bowl of fruit,s54_r0298
+c03,a bowl of fruit,s54_r0468
+c03,a bowl of fruit,s54_r0627
+c03,a bowl of fruit,s54_r0460
+c03,a bowl of fruit,s61_r1015
+c03,a bowl of fruit,s71_r0555
+c03,a bowl of fruit,s54_r0692
+c03,a bowl of fruit,s54_r0282
+c03,a bowl of fruit,s54_r0382
+c03,a bowl of fruit,s54_r0499
+c03,a bowl of fruit,s70_r0155
+c03,a bowl of fruit,s71_r0691
+c03,a bowl of fruit,s68_r0778
+c03,a bowl of fruit,s70_r0106
+c03,a bowl of fruit,s54_r0475
+c04,a boat on the water,s68_r0694
+c04,a boat on the water,s71_r0637
+c04,a boat on the water,s69_r0535
+c04,a boat on the water,s69_r0651
+c04,a boat on the water,s54_r1105
+c04,a boat on the water,s54_r0655
+c04,a boat on the water,s54_r0399
+c04,a boat on the water,s68_r0726
+c04,a boat on the water,s54_r0843
+c04,a boat on the water,s54_r0528
+c04,a boat on the water,s68_r0566
+c04,a boat on the water,s68_r0201
+c04,a boat on the water,s54_r0734
+c04,a boat on the water,s68_r0536
+c04,a boat on the water,s68_r0551
+c04,a boat on the water,s70_r0093
+c04,a boat on the water,s68_r0280
+c04,a boat on the water,s68_r0644
+c04,a boat on the water,s68_r0018
+c04,a boat on the water,s54_r0280
+c04,a boat on the water,s54_r0221
+c04,a boat on the water,s54_r0712
+c04,a boat on the water,s71_r0733
+c04,a boat on the water,s61_r1015
+c04,a boat on the water,s54_r0037
+c04,a boat on the water,s68_r0712
+c04,a boat on the water,s54_r0540
+c04,a boat on the water,s68_r0372
+c04,a boat on the water,s54_r0580
+c04,a boat on the water,s69_r0555
+c05,a mountain,s70_r0106
+c05,a mountain,s69_r0708
+c05,a mountain,s48_r0974
+c05,a mountain,s61_r1128
+c05,a mountain,s61_r1015
+c05,a mountain,s47_r0425
+c05,a mountain,s68_r0538
+c05,a mountain,s71_r0653
+c05,a mountain,s68_r0352
+c05,a mountain,s61_r0432
+c05,a mountain,s68_r0487
+c05,a mountain,s68_r0636
+c05,a mountain,s66_r0531
+c05,a mountain,s54_r0916
+c05,a mountain,s68_r0200
+c05,a mountain,s61_r0480
+c05,a mountain,s71_r0555
+c05,a mountain,s70_r0155
+c05,a mountain,s69_r0649
+c05,a mountain,s71_r0572
+c05,a mountain,s71_r0494
+c05,a mountain,s71_r0691
+c05,a mountain,s54_r0050
+c05,a mountain,s69_r0641
+c05,a mountain,s71_r0603
+c05,a mountain,s47_r0555
+c05,a mountain,s71_r0545
+c05,a mountain,s70_r0088
+c05,a mountain,s48_r0481
+c05,a mountain,s54_r0365
+c06,a winter scene with snow,s54_r0399
+c06,a winter scene with snow,s68_r0696
+c06,a winter scene with snow,s68_r0564
+c06,a winter scene with snow,s68_r0744
+c06,a winter scene with snow,s54_r0182
+c06,a winter scene with snow,s54_r0580
+c06,a winter scene with snow,s54_r0037
+c06,a winter scene with snow,s68_r0778
+c06,a winter scene with snow,s70_r0165
+c06,a winter scene with snow,s70_r0167
+c06,a winter scene with snow,s54_r0540
+c06,a winter scene with snow,s54_r0221
+c06,a winter scene with snow,s61_r0659
+c06,a winter scene with snow,s68_r0665
+c06,a winter scene with snow,s54_r0357
+c06,a winter scene with snow,s54_r0842
+c06,a winter scene with snow,s69_r0489
+c06,a winter scene with snow,s71_r0554
+c06,a winter scene with snow,s68_r0581
+c06,a winter scene with snow,s71_r0426
+c06,a winter scene with snow,s70_r0108
+c06,a winter scene with snow,s54_r0843
+c06,a winter scene with snow,s61_r0465
+c06,a winter scene with snow,s54_r0280
+c06,a winter scene with snow,s54_r1105
+c06,a winter scene with snow,s54_r0528
+c06,a winter scene with snow,s54_r0712
+c06,a winter scene with snow,s71_r0471
+c06,a winter scene with snow,s61_r0095
+c06,a winter scene with snow,s54_r0134
+c07,a horse,s71_r0426
+c07,a horse,s48_r0422
+c07,a horse,s69_r0495
+c07,a horse,s71_r0607
+c07,a horse,s68_r0670
+c07,a horse,s68_r0786
+c07,a horse,s54_r0842
+c07,a horse,s71_r0736
+c07,a horse,s69_r0535
+c07,a horse,s54_r0225
+c07,a horse,s71_r0446
+c07,a horse,s69_r0540
+c07,a horse,s48_r0864
+c07,a horse,s54_r0310
+c07,a horse,s68_r0743
+c07,a horse,s68_r0672
+c07,a horse,s68_r0558
+c07,a horse,s47_r0879
+c07,a horse,s68_r0138
+c07,a horse,s68_r0792
+c07,a horse,s54_r0644
+c07,a horse,s54_r0871
+c07,a horse,s48_r0413
+c07,a horse,s68_r0530
+c07,a horse,s54_r0291
+c07,a horse,s68_r0756
+c07,a horse,s68_r0545
+c07,a horse,s47_r0425
+c07,a horse,s68_r0757
+c07,a horse,s68_r0560
+c08,a bird,s70_r0106
+c08,a bird,s68_r0544
+c08,a bird,s71_r0469
+c08,a bird,s68_r0352
+c08,a bird,s70_r0131
+c08,a bird,s54_r0799
+c08,a bird,s48_r0974
+c08,a bird,s54_r0365
+c08,a bird,s61_r0480
+c08,a bird,s70_r0160
+c08,a bird,s70_r0072
+c08,a bird,s71_r0691
+c08,a bird,s61_r0634
+c08,a bird,s54_r0676
+c08,a bird,s68_r0770
+c08,a bird,s70_r0155
+c08,a bird,s71_r0543
+c08,a bird,s54_r0330
+c08,a bird,s54_r0526
+c08,a bird,s61_r0432
+c08,a bird,s70_r0124
+c08,a bird,s68_r0182
+c08,a bird,s71_r0555
+c08,a bird,s61_r1015
+c08,a bird,s71_r0382
+c08,a bird,s68_r0495
+c08,a bird,s68_r0319
+c08,a bird,s54_r0768
+c08,a bird,s69_r0582
+c08,a bird,s61_r0119
+c09,a musical instrument,s70_r0106
+c09,a musical instrument,s54_r0458
+c09,a musical instrument,s47_r0961
+c09,a musical instrument,s47_r0287
+c09,a musical instrument,s54_r1052
+c09,a musical instrument,s54_r1056
+c09,a musical instrument,s54_r1117
+c09,a musical instrument,s68_r0068
+c09,a musical instrument,s54_r0572
+c09,a musical instrument,s61_r0239
+c09,a musical instrument,s54_r0365
+c09,a musical instrument,s61_r0743
+c09,a musical instrument,s69_r0590
+c09,a musical instrument,s68_r0715
+c09,a musical instrument,s61_r1015
+c09,a musical instrument,s48_r0079
+c09,a musical instrument,s68_r0352
+c09,a musical instrument,s69_r0494
+c09,a musical instrument,s54_r0793
+c09,a musical instrument,s47_r0418
+c09,a musical instrument,s54_r0279
+c09,a musical instrument,s71_r0651
+c09,a musical instrument,s54_r0757
+c09,a musical instrument,s71_r0555
+c09,a musical instrument,s71_r0546
+c09,a musical instrument,s71_r0560
+c09,a musical instrument,s69_r0562
+c09,a musical instrument,s54_r0858
+c09,a musical instrument,s54_r0831
+c09,a musical instrument,s61_r0480
+c10,a close-up of a woman's face,s54_r0294
+c10,a close-up of a woman's face,s54_r0291
+c10,a close-up of a woman's face,s61_r0204
+c10,a close-up of a woman's face,s68_r0763
+c10,a close-up of a woman's face,s66_r0052
+c10,a close-up of a woman's face,s68_r0011
+c10,a close-up of a woman's face,s61_r0327
+c10,a close-up of a woman's face,s68_r0646
+c10,a close-up of a woman's face,s54_r0916
+c10,a close-up of a woman's face,s71_r0427
+c10,a close-up of a woman's face,s68_r0316
+c10,a close-up of a woman's face,s68_r0721
+c10,a close-up of a woman's face,s54_r0444
+c10,a close-up of a woman's face,s68_r0215
+c10,a close-up of a woman's face,s71_r0630
+c10,a close-up of a woman's face,s71_r0728
+c10,a close-up of a woman's face,s54_r0231
+c10,a close-up of a woman's face,s54_r0605
+c10,a close-up of a woman's face,s71_r0485
+c10,a close-up of a woman's face,s54_r0734
+c10,a close-up of a woman's face,s68_r0774
+c10,a close-up of a woman's face,s68_r0168
+c10,a close-up of a woman's face,s68_r0645
+c10,a close-up of a woman's face,s54_r0582
+c10,a close-up of a woman's face,s54_r0642
+c10,a close-up of a woman's face,s68_r0589
+c10,a close-up of a woman's face,s71_r0545
+c10,a close-up of a woman's face,s68_r0351
+c10,a close-up of a woman's face,s54_r0757
+c10,a close-up of a woman's face,s61_r0981
+c11,a city street,s54_r0882
+c11,a city street,s54_r1028
+c11,a city street,s71_r0570
+c11,a city street,s71_r0472
+c11,a city street,s54_r0986
+c11,a city street,s47_r0281
+c11,a city street,s69_r0517
+c11,a city street,s68_r0696
+c11,a city street,s47_r0098
+c11,a city street,s54_r1024
+c11,a city street,s71_r0486
+c11,a city street,s71_r0604
+c11,a city street,s71_r0408
+c11,a city street,s54_r0684
+c11,a city street,s54_r0929
+c11,a city street,s54_r1129
+c11,a city street,s54_r1043
+c11,a city street,s68_r0542
+c11,a city street,s69_r0628
+c11,a city street,s54_r0896
+c11,a city street,s68_r0766
+c11,a city street,s54_r1077
+c11,a city street,s54_r0914
+c11,a city street,s54_r1035
+c11,a city street,s69_r0659
+c11,a city street,s69_r0515
+c11,a city street,s54_r0881
+c11,a city street,s71_r0512
+c11,a city street,s70_r0065
+c11,a city street,s69_r0609
+c12,angels,s69_r0610
+c12,angels,s68_r0768
+c12,angels,s68_r0687
+c12,angels,s69_r0594
+c12,angels,s47_r0405
+c12,angels,s68_r0352
+c12,angels,s71_r0392
+c12,angels,s70_r0155
+c12,angels,s48_r0974
+c12,angels,s69_r0558
+c12,angels,s69_r0593
+c12,angels,s54_r0311
+c12,angels,s71_r0393
+c12,angels,s69_r0704
+c12,angels,s68_r0349
+c12,angels,s54_r1079
+c12,angels,s71_r0555
+c12,angels,s71_r0757
+c12,angels,s70_r0106
+c12,angels,s68_r0293
+c12,angels,s54_r0365
+c12,angels,s68_r0754
+c12,angels,s71_r0431
+c12,angels,s70_r0075
+c12,angels,s61_r1015
+c12,angels,s61_r0480
+c12,angels,s66_r0688
+c12,angels,s69_r0687
+c12,angels,s68_r0744
+c12,angels,s71_r0659
+c13,a skull,s68_r0724
+c13,a skull,s54_r0896
+c13,a skull,s68_r0650
+c13,a skull,s69_r0693
+c13,a skull,s69_r0596
+c13,a skull,s69_r0625
+c13,a skull,s71_r0654
+c13,a skull,s68_r0669
+c13,a skull,s69_r0545
+c13,a skull,s68_r0548
+c13,a skull,s68_r0710
+c13,a skull,s54_r1077
+c13,a skull,s68_r0616
+c13,a skull,s54_r1035
+c13,a skull,s54_r0882
+c13,a skull,s71_r0549
+c13,a skull,s48_r0470
+c13,a skull,s54_r0914
+c13,a skull,s54_r0986
+c13,a skull,s54_r1024
+c13,a skull,s69_r0632
+c13,a skull,s54_r0298
+c13,a skull,s69_r0524
+c13,a skull,s54_r0311
+c13,a skull,s68_r0398
+c13,a skull,s54_r0929
+c13,a skull,s54_r1129
+c13,a skull,s54_r1043
+c13,a skull,s69_r0619
+c13,a skull,s68_r0772
+c14,a bridge,s71_r0514
+c14,a bridge,s69_r0650
+c14,a bridge,s69_r0625
+c14,a bridge,s54_r0544
+c14,a bridge,s47_r0395
+c14,a bridge,s68_r0759
+c14,a bridge,s69_r0628
+c14,a bridge,s54_r0151
+c14,a bridge,s54_r0693
+c14,a bridge,s71_r0472
+c14,a bridge,s54_r0271
+c14,a bridge,s54_r0674
+c14,a bridge,s69_r0570
+c14,a bridge,s54_r0382
+c14,a bridge,s54_r0669
+c14,a bridge,s54_r0858
+c14,a bridge,s54_r0406
+c14,a bridge,s71_r0592
+c14,a bridge,s69_r0517
+c14,a bridge,s66_r0255
+c14,a bridge,s69_r0681
+c14,a bridge,s69_r0649
+c14,a bridge,s54_r0428
+c14,a bridge,s54_r0539
+c14,a bridge,s48_r0922
+c14,a bridge,s54_r0458
+c14,a bridge,s71_r0753
+c14,a bridge,s70_r0089
+c14,a bridge,s70_r0131
+c15,a crowd of people,s69_r0691
+c15,a crowd of people,s69_r0529
+c15,a crowd of people,s61_r0082
+c15,a crowd of people,s54_r0458
+c15,a crowd of people,s48_r0456
+c15,a crowd of people,s54_r1105
+c15,a crowd of people,s70_r0106
+c15,a crowd of people,s47_r0255
+c15,a crowd of people,s68_r0780
+c15,a crowd of people,s61_r1015
+c15,a crowd of people,s68_r0537
+c15,a crowd of people,s69_r0491
+c15,a crowd of people,s71_r0555
+c15,a crowd of people,s54_r0037
+c15,a crowd of people,s68_r0770
+c15,a crowd of people,s61_r0480
+c15,a crowd of people,s48_r0974
+c15,a crowd of people,s61_r0655
+c15,a crowd of people,s68_r0453
+c15,a crowd of people,s69_r0500
+c15,a crowd of people,s71_r0392
+c15,a crowd of people,s69_r0643
+c15,a crowd of people,s47_r0886
+c15,a crowd of people,s54_r0221
+c15,a crowd of people,s71_r0479
+c15,a crowd of people,s54_r0482
+c15,a crowd of people,s68_r0352
+c15,a crowd of people,s54_r0365
+c15,a crowd of people,s71_r0570
+c15,a crowd of people,s71_r0659
+c16,a scene at night,s61_r0401
+c16,a scene at night,s70_r0155
+c16,a scene at night,s70_r0110
+c16,a scene at night,s61_r1015
+c16,a scene at night,s48_r0413
+c16,a scene at night,s66_r0036
+c16,a scene at night,s71_r0691
+c16,a scene at night,s61_r0465
+c16,a scene at night,s54_r0365
+c16,a scene at night,s71_r0555
+c16,a scene at night,s48_r0759
+c16,a scene at night,s54_r0298
+c16,a scene at night,s61_r0480
+c16,a scene at night,s54_r0882
+c16,a scene at night,s61_r0432
+c16,a scene at night,s68_r0571
+c16,a scene at night,s69_r0704
+c16,a scene at night,s71_r0689
+c16,a scene at night,s68_r0705
+c16,a scene at night,s48_r0974
+c16,a scene at night,s68_r0779
+c16,a scene at night,s68_r0352
+c16,a scene at night,s70_r0111
+c16,a scene at night,s70_r0106
+c16,a scene at night,s54_r0916
+c16,a scene at night,s70_r0143
+c16,a scene at night,s69_r0490
+c16,a scene at night,s68_r0453
+c16,a scene at night,s68_r0702
+c17,a waterfall,s54_r0365
+c17,a waterfall,s70_r0088
+c17,a waterfall,s71_r0555
+c17,a waterfall,s68_r0781
+c17,a waterfall,s71_r0596
+c17,a waterfall,s68_r0614
+c17,a waterfall,s71_r0545
+c17,a waterfall,s71_r0448
+c17,a waterfall,s68_r0793
+c17,a waterfall,s54_r1105
+c17,a waterfall,s69_r0542
+c17,a waterfall,s61_r0480
+c17,a waterfall,s54_r0037
+c17,a waterfall,s69_r0649
+c17,a waterfall,s68_r0613
+c17,a waterfall,s54_r0221
+c17,a waterfall,s71_r0593
+c17,a waterfall,s48_r0974
+c17,a waterfall,s68_r0352
+c17,a waterfall,s70_r0106
+c17,a waterfall,s69_r0686
+c17,a waterfall,s71_r0603
+c17,a waterfall,s71_r0691
+c17,a waterfall,s61_r0446
+c17,a waterfall,s71_r0542
+c17,a waterfall,s54_r0427
+c17,a waterfall,s68_r0563
+c17,a waterfall,s61_r1015
+c18,warriors in battle,s70_r0125
+c18,warriors in battle,s68_r0533
+c18,warriors in battle,s69_r0657
+c18,warriors in battle,s69_r0658
+c18,warriors in battle,s54_r0311
+c18,warriors in battle,s66_r0058
+c18,warriors in battle,s48_r0836
+c18,warriors in battle,s68_r0204
+c18,warriors in battle,s69_r0680
+c18,warriors in battle,s61_r0063
+c18,warriors in battle,s71_r0742
+c18,warriors in battle,s69_r0573
+c18,warriors in battle,s69_r0557
+c18,warriors in battle,s70_r0102
+c18,warriors in battle,s69_r0490
+c18,warriors in battle,s68_r0537
+c18,warriors in battle,s68_r0053
+c18,warriors in battle,s71_r0621
+c18,warriors in battle,s70_r0076
+c18,warriors in battle,s69_r0649
+c18,warriors in battle,s68_r0658
+c18,warriors in battle,s48_r0105
+c18,warriors in battle,s69_r0697
+c18,warriors in battle,s71_r0502
+c18,warriors in battle,s69_r0602
+c18,warriors in battle,s71_r0458
+c18,warriors in battle,s69_r0585
+c18,warriors in battle,s69_r0666
+c18,warriors in battle,s68_r0604
+c19,a bottle or a glass,s68_r0487
+c19,a bottle or a glass,s47_r0555
+c19,a bottle or a glass,s69_r0650
+c19,a bottle or a glass,s71_r0691
+c19,a bottle or a glass,s54_r0708
+c19,a bottle or a glass,s71_r0555
+c19,a bottle or a glass,s61_r0195
+c19,a bottle or a glass,s68_r0335
+c19,a bottle or a glass,s61_r0432
+c19,a bottle or a glass,s69_r0653
+c19,a bottle or a glass,s61_r0480
+c19,a bottle or a glass,s68_r0352
+c19,a bottle or a glass,s70_r0106
+c19,a bottle or a glass,s71_r0550
+c19,a bottle or a glass,s70_r0155
+c19,a bottle or a glass,s48_r0614
+c19,a bottle or a glass,s54_r0454
+c19,a bottle or a glass,s68_r0529
+c19,a bottle or a glass,s71_r0557
+c19,a bottle or a glass,s70_r0095
+c19,a bottle or a glass,s54_r0505
+c19,a bottle or a glass,s71_r0539
+c19,a bottle or a glass,s71_r0613
+c19,a bottle or a glass,s54_r0832
+c19,a bottle or a glass,s71_r0513
+c19,a bottle or a glass,s61_r1015
+c19,a bottle or a glass,s54_r0365
+c19,a bottle or a glass,s54_r1052
+c19,a bottle or a glass,s47_r0223
+c19,a bottle or a glass,s48_r0974
+c20,Which painting shows a stormy sea?,s69_r0693
+c20,Which painting shows a stormy sea?,s68_r0636
+c20,Which painting shows a stormy sea?,s68_r0777
+c20,Which painting shows a stormy sea?,s68_r0662
+c20,Which painting shows a stormy sea?,s70_r0103
+c20,Which painting shows a stormy sea?,s47_r0470
+c20,Which painting shows a stormy sea?,s68_r0529
+c20,Which painting shows a stormy sea?,s54_r1077
+c20,Which painting shows a stormy sea?,s71_r0717
+c20,Which painting shows a stormy sea?,s54_r1043
+c20,Which painting shows a stormy sea?,s68_r0126
+c20,Which painting shows a stormy sea?,s54_r0929
+c20,Which painting shows a stormy sea?,s54_r0882
+c20,Which painting shows a stormy sea?,s68_r0684
+c20,Which painting shows a stormy sea?,s54_r0914
+c20,Which painting shows a stormy sea?,s54_r1035
+c20,Which painting shows a stormy sea?,s69_r0648
+c20,Which painting shows a stormy sea?,s69_r0577
+c20,Which painting shows a stormy sea?,s71_r0747
+c20,Which painting shows a stormy sea?,s54_r1024
+c20,Which painting shows a stormy sea?,s68_r0580
+c20,Which painting shows a stormy sea?,s70_r0161
+c20,Which painting shows a stormy sea?,s71_r0499
+c20,Which painting shows a stormy sea?,s54_r1129
+c20,Which painting shows a stormy sea?,s70_r0154
+c20,Which painting shows a stormy sea?,s71_r0479
+c20,Which painting shows a stormy sea?,s54_r0986
+c20,Which painting shows a stormy sea?,s68_r0372
+c20,Which painting shows a stormy sea?,s68_r0701
+c20,Which painting shows a stormy sea?,s54_r0896
+c21,I would like to see portraits of children,s68_r0638
+c21,I would like to see portraits of children,s54_r0272
+c21,I would like to see portraits of children,s71_r0722
+c21,I would like to see portraits of children,s71_r0681
+c21,I would like to see portraits of children,s68_r0749
+c21,I would like to see portraits of children,s48_r0413
+c21,I would like to see portraits of children,s69_r0614
+c21,I would like to see portraits of children,s54_r0035
+c21,I would like to see portraits of children,s54_r0435
+c21,I would like to see portraits of children,s68_r0763
+c21,I would like to see portraits of children,s54_r0246
+c21,I would like to see portraits of children,s68_r0120
+c21,I would like to see portraits of children,s54_r0237
+c21,I would like to see portraits of children,s48_r0079
+c21,I would like to see portraits of children,s54_r0802
+c21,I would like to see portraits of children,s54_r0499
+c21,I would like to see portraits of children,s68_r0668
+c21,I would like to see portraits of children,s68_r0771
+c21,I would like to see portraits of children,s69_r0595
+c21,I would like to see portraits of children,s68_r0279
+c21,I would like to see portraits of children,s61_r0743
+c21,I would like to see portraits of children,s54_r0365
+c21,I would like to see portraits of children,s68_r0800
+c21,I would like to see portraits of children,s69_r0689
+c21,I would like to see portraits of children,s68_r0721
+c21,I would like to see portraits of children,s54_r0706
+c21,I would like to see portraits of children,s68_r0054
+c21,I would like to see portraits of children,s54_r0630
+c21,I would like to see portraits of children,s54_r0596
+c21,I would like to see portraits of children,s69_r0576
