@@ -13,17 +13,47 @@ from pathlib import Path
 import numpy as np
 
 from museum_guide.common import load_json, save_json
+from museum_guide.evaluation import holm, paired_comparison
 from museum_guide.plots import INK, MUTED, PALETTE, _save, plt
 
 
 INPUTS = {"photo": "phone photo", "small": "128 px image"}
 
 
-def acc_row(name, family, m, ci=None, std=None, latency_key=None, train_time=None, note=""):
+def acc_row(name, family, m, ci=None, std=None, latency_key=None, train_time=None, note="", seeds=None):
     lo, hi = ci if ci else m.get("accuracy_ci95", (np.nan, np.nan))
     return {"model": name, "family": family, "test_acc": m["accuracy"], "ci_lo": lo, "ci_hi": hi,
             "seed_std": std, "macro_f1": m["macro_f1"], "latency_key": latency_key, "train_time_s": train_time,
-            "note": note}
+            "note": note, "seeds": seeds, "labels": m.get("labels"), "predictions": m.get("predictions")}
+
+
+RECOMMENDED = "ResNet-18 frozen + LogReg"
+
+
+def paired_lines(rows) -> tuple[str, list]:
+    """The recommended model vs every other model on the same test images: paired bootstrap CI of the accuracy
+    difference and exact McNemar test, Holm-adjusted for the number of comparisons."""
+    ref = next((r for r in rows if r["model"] == RECOMMENDED and r["predictions"]), None)
+    others = [r for r in rows if r is not ref and r["predictions"]]
+    if ref is None or not others:
+        return "", []
+    comps = []
+    for r in others:
+        if r["labels"] != ref["labels"]:
+            raise SystemExit(f"{r['model']} was not tested on the same images as {RECOMMENDED}: re-run both")
+        comps.append({"model": r["model"], **paired_comparison(ref["labels"], ref["predictions"], r["predictions"])})
+    for c, p in zip(comps, holm([c["mcnemar_p"] for c in comps])):
+        c["mcnemar_p_holm"] = p
+    out = ["", f"## Paired comparisons: {RECOMMENDED} vs each model (same {comps[0]['n']} test images)", "",
+           "Difference = accuracy of the recommended model minus the other model, 95 % CI from a paired bootstrap "
+           "over test images. McNemar: exact test on the images where exactly one of the two models is right; "
+           f"Holm = p-value adjusted for the {len(comps)} comparisons. MLP rows: the saved model (seed 0).", "",
+           "| other model | its acc | difference [95% CI] | only recommended right | only other right | "
+           "McNemar p | Holm p |", "|---|---|---|---|---|---|---|"]
+    out += [f"| {c['model']} | {c['acc_b']:.3f} | {c['diff']:+.3f} [{c['diff_ci95'][0]:+.3f}, {c['diff_ci95'][1]:+.3f}] "
+            f"| {c['a_right_b_wrong']} | {c['a_wrong_b_right']} | {c['mcnemar_p']:.3g} | {c['mcnemar_p_holm']:.3g} |"
+            for c in comps]
+    return "\n".join(out) + "\n", comps
 
 
 def search_lines(f: Path) -> str:
@@ -70,7 +100,7 @@ def main():
             rows.append(acc_row(f"MLP - {fs}", "MLP (from scratch)", s["metrics_seed0"],
                                 std=s["test_accuracy"]["std"], latency_key=f"mlp_{fs}" if fs != "pixels64" else None,
                                 train_time=s["train_time_s"]["mean"],
-                                note=f"{len(s['test_accuracy']['values'])} seeds: {s['test_accuracy']['mean']:.3f} +/- {s['test_accuracy']['std']:.3f}"))
+                                seeds=s["test_accuracy"]))
     f = R / "04_resnet" / "frozen" / "summary.json"
     if f.exists():
         s = load_json(f)
@@ -98,10 +128,15 @@ def main():
 
     def f_(v, spec):
         return "-" if v is None or (isinstance(v, float) and np.isnan(v)) else format(v, spec)
-    lines = [f"| model | test acc [95% CI] | macro-F1 | latency (ms, {a.threads} thread) | latency, draft decoding (ms) "
-             "| size (MB) | params | train time (s) | note |", "|---|---|---|---|---|---|---|---|---|"]
+    # One rule for every row: the accuracy, CI, latency and paired tests are those of the SAVED model (for the MLP:
+    # seed 0, the checkpoint that is benchmarked); the spread over training seeds is a separate column.
+    lines = [f"| model | test acc [95% CI] (saved model) | mean ± std over seeds | macro-F1 | "
+             f"latency (ms, {a.threads} thread) | latency, draft decoding (ms) | size (MB) | params | train time (s) | "
+             "note |", "|---|---|---|---|---|---|---|---|---|---|"]
     for r in rows:
-        lines.append(f"| {r['model']} | {r['test_acc']:.3f} [{r['ci_lo']:.3f}-{r['ci_hi']:.3f}] | "
+        sd = r["seeds"]
+        spread = f"{sd['mean']:.3f} ± {sd['std']:.3f} ({len(sd['values'])} seeds)" if sd else "1 seed"
+        lines.append(f"| {r['model']} | {r['test_acc']:.3f} [{r['ci_lo']:.3f}-{r['ci_hi']:.3f}] | {spread} | "
                      f"{r['macro_f1']:.3f} | {f_(r['latency_ms'], '.1f')} | {f_(r['latency_draft_ms'], '.1f')} | "
                      f"{f_(r['size_mb'], '.1f')} | "
                      f"{f_(r['params'], ',')} | {f_(r['train_time_s'], '.0f')} | {r['note']} |")
@@ -116,14 +151,16 @@ def main():
     sources = ("\n".join(f"- `{k}`: {', '.join(v)}" for k, v in shas.items()) if shas
                else "- no provenance recorded in the input files")
     search = search_lines(R / "07_search" / "summary.json")
+    paired, comps = paired_lines(rows)
     (R / "summary.md").write_text("# Results summary (test set, artist-grouped split)\n\n" + "\n".join(lines) +
                                   f"\n\nLatency = median end-to-end time for one {INPUTS[a.input]} "
                                   "on CPU, decoding included (see 05_benchmark). Draft decoding = im.draft() + "
                                   "ImageOps.fit, the preprocessing that built the training images.\n"
-                                  + search +
+                                  + paired + search +
                                   "\nCode that produced these numbers (git commit):\n" + sources + "\n",
                                   encoding="utf-8")
-    save_json(rows, R / "summary.json")
+    save_json({"models": [{k: v for k, v in r.items() if k not in ("labels", "predictions")} for r in rows],
+               "paired_comparisons": comps}, R / "summary.json")
     print("\n".join(lines))
 
     pts = [r for r in rows if r["latency_ms"]]
