@@ -1,10 +1,15 @@
+import math
+
 import numpy as np
+import pytest
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
 from museum_guide.evaluation import bootstrap_ci, classification_metrics
 from museum_guide.mlp import MLP
-from museum_guide.resnet import ResNetClassifier
+from museum_guide.baseline import make_logreg
+from museum_guide.common import provenance
+from museum_guide.resnet import FrozenLogReg, ResNetClassifier, make_head, save_frozen_logreg
 from museum_guide.training import TrainConfig, train
 
 
@@ -61,3 +66,32 @@ def test_resnet_modes_freeze_the_right_layers():
     assert tuned.net.layer4[0].bn1.training          # trainable BN is in train mode
     assert tuned(torch.randn(2, 3, 64, 64)).shape == (2, 5)
     assert frozen.embed(torch.randn(2, 3, 64, 64)).shape == (2, 512)
+
+
+def test_standardised_head_starts_at_ln_k_and_plain_xavier_does_not():
+    # ResNet embeddings are non-negative averages of ReLUs with mean ~1: plain Xavier on raw inputs gives
+    # large logits (the earlier head started at 2.79 instead of ln 5)
+    E = torch.distributions.Exponential(1.0).sample((500, 512))
+    y = torch.arange(500) % 5
+    with torch.no_grad():
+        loss = {v: float(torch.nn.functional.cross_entropy(make_head(512, 5, v, train_embeddings=E)(E), y))
+                for v in ("plain_xavier", "small_init", "standardised")}
+    assert abs(loss["standardised"] - math.log(5)) < 0.05
+    assert loss["plain_xavier"] > math.log(5) + 0.5
+    head = ResNetClassifier(5, "frozen", pretrained=False).net.fc
+    assert torch.equal(head.mean, torch.zeros(512))  # standardisation buffers ship with the model
+
+
+def test_frozen_logreg_file_round_trip(fake_data, other_fake_data, tmp_path):
+    torch.manual_seed(0)
+    model = ResNetClassifier(5, "frozen", pretrained=False).eval()
+    x = torch.randn(10, 3, 32, 32)
+    E = model.embed(x).numpy()
+    logreg = make_logreg(1.0).fit(E, np.arange(10) % 5)
+    f = tmp_path / "resnet18_frozen_logreg.joblib"
+    save_frozen_logreg(f, model, logreg, list("abcde"), 32, provenance(fake_data))
+    loaded = FrozenLogReg(f, fake_data)
+    np.testing.assert_allclose(loaded.predict_proba(x), logreg.predict_proba(E), rtol=1e-5, atol=1e-6)
+    assert loaded.classes == list("abcde")
+    with pytest.raises(ValueError, match="does not match"):
+        FrozenLogReg(f, other_fake_data)
