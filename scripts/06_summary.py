@@ -16,7 +16,7 @@ from museum_guide.common import load_json, save_json
 from museum_guide.plots import INK, MUTED, PALETTE, _save, plt
 
 
-INPUTS = {"photo": "12-MP phone photo", "small": "128 px image"}
+INPUTS = {"photo": "phone photo", "small": "128 px image"}
 
 
 def acc_row(name, family, m, ci=None, std=None, latency_key=None, train_time=None, note=""):
@@ -89,18 +89,20 @@ def main():
     if fb.exists():
         for b in load_json(fb)["results"]:
             if b["threads"] == a.threads and b.get("input", "small") == a.input:
-                bench[b["model"]] = b
+                bench[(b["model"], b.get("decode", "full"))] = b
     for r in rows:
-        b = bench.get(r["latency_key"] or "", {})
+        b = bench.get((r["latency_key"], "full"), {})
         r["latency_ms"], r["size_mb"], r["params"] = b.get("median_ms"), b.get("size_mb"), b.get("params")
+        r["latency_draft_ms"] = bench.get((r["latency_key"], "draft"), {}).get("median_ms")
 
     def f_(v, spec):
         return "-" if v is None or (isinstance(v, float) and np.isnan(v)) else format(v, spec)
-    lines = [f"| model | test acc [95% CI] | macro-F1 | latency (ms, {a.threads} thread) | size (MB) | params | "
-             "train time (s) | note |", "|---|---|---|---|---|---|---|---|"]
+    lines = [f"| model | test acc [95% CI] | macro-F1 | latency (ms, {a.threads} thread) | latency, draft decoding (ms) "
+             "| size (MB) | params | train time (s) | note |", "|---|---|---|---|---|---|---|---|---|"]
     for r in rows:
         lines.append(f"| {r['model']} | {r['test_acc']:.3f} [{r['ci_lo']:.3f}-{r['ci_hi']:.3f}] | "
-                     f"{r['macro_f1']:.3f} | {f_(r['latency_ms'], '.1f')} | {f_(r['size_mb'], '.1f')} | "
+                     f"{r['macro_f1']:.3f} | {f_(r['latency_ms'], '.1f')} | {f_(r['latency_draft_ms'], '.1f')} | "
+                     f"{f_(r['size_mb'], '.1f')} | "
                      f"{f_(r['params'], ',')} | {f_(r['train_time_s'], '.0f')} | {r['note']} |")
     # Which commits produced the inputs (a table mixing several commits must be re-run before it is reported)
     shas = {}
@@ -115,7 +117,8 @@ def main():
     search = search_lines(R / "07_search" / "summary.json")
     (R / "summary.md").write_text("# Results summary (test set, artist-grouped split)\n\n" + "\n".join(lines) +
                                   f"\n\nLatency = median end-to-end time for one {INPUTS[a.input]} "
-                                  "on CPU, decoding included (see 05_benchmark).\n"
+                                  "on CPU, decoding included (see 05_benchmark). Draft decoding = im.draft() + "
+                                  "ImageOps.fit, the preprocessing that built the training images.\n"
                                   + search +
                                   "\nCode that produced these numbers (git commit):\n" + sources + "\n",
                                   encoding="utf-8")
