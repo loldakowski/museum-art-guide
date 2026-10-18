@@ -175,8 +175,8 @@ def main():
     p.add_argument("--out", default="results/03_diagnosis")
     p.add_argument("--features", default="pixels32")
     p.add_argument("--size", type=int, default=128)
-    p.add_argument("--epochs", type=int, default=60)
-    p.add_argument("--batch-size", type=int, default=64)
+    p.add_argument("--epochs", type=int, default=None, help="default: the epochs of step 2 (--reference)")
+    p.add_argument("--batch-size", type=int, default=None, help="default: the batch size of step 2")
     p.add_argument("--reference", default="results/02_mlp/pixels32/summary.json",
                    help="summary of step 2 (selected config); defaults are used if it does not exist")
     p.add_argument("--only", nargs="*", help="run only these scenarios")
@@ -184,14 +184,22 @@ def main():
     a = p.parse_args()
     device, out = get_device(a.device), Path(a.out)
 
+    # reference = the model of step 2, trained exactly as there (architecture, regularisation, schedule, epochs,
+    # early stopping, batch size, seed); the defaults below are step 2's defaults
     ref = {"hidden": (512, 256), "dropout": 0.5, "weight_decay": 1e-2}
-    if Path(a.reference).exists():
-        ref.update(load_json(a.reference)["selected"])
-        ref["hidden"] = tuple(ref["hidden"])
-    print(f"reference configuration: {ref}")
+    train_cfg = {"epochs": 80, "lr": 1e-3, "batch_size": 64, "seed": 0}
+    step2 = load_json(a.reference) if Path(a.reference).exists() else None
+    if step2:
+        ref.update(step2["selected"])
+        train_cfg.update(step2.get("train_config", {}))
+    ref["hidden"] = tuple(ref["hidden"])
+    train_cfg.update({k: v for k, v in (("epochs", a.epochs), ("batch_size", a.batch_size)) if v is not None})
+    a.batch_size = train_cfg.pop("batch_size")
+    train_cfg.pop("weight_decay", None)
+    print(f"reference configuration: {ref} | training: {train_cfg} | batch size {a.batch_size}")
     d = load_feature_data(a.data_dir, a.features, "artist", size=a.size)
-    E = a.epochs
-    base_cfg = dict(epochs=E, lr=1e-3, weight_decay=ref["weight_decay"])
+    E = train_cfg["epochs"]
+    base_cfg = dict(train_cfg, weight_decay=ref["weight_decay"])
     mk = {"hidden": ref["hidden"], "dropout": ref["dropout"]}
 
     S = {  # name: (data, mlp kwargs, train config, run options)
@@ -235,7 +243,14 @@ def main():
 
     if not a.only:
         overview_figure(H, rows, lr_test, out / "diagnosis_overview.png", len(d.classes))
-    save_json({"reference_config": ref, "scenarios": rows, "lr_range_test": lr_test,
+    r0 = next((r for r in rows if r["scenario"] == "reference"), None)
+    same = None
+    if step2 and r0 and a.epochs is None:  # same model as step 2 -> same test accuracy (up to GPU nondeterminism)
+        same = {"step2_seed0_test_acc": step2["metrics_seed0"]["accuracy"], "reference_test_acc": r0["test_acc"]}
+        print(f"reference vs step 2 (seed {train_cfg['seed']}): test acc {r0['test_acc']:.3f} vs "
+              f"{same['step2_seed0_test_acc']:.3f}")
+    save_json({"reference_config": ref, "train_config": {**base_cfg, "batch_size": a.batch_size},
+               "reference_vs_step2": same, "scenarios": rows, "lr_range_test": lr_test,
                "provenance": provenance(a.data_dir)}, out / "summary.json")
     cols = ["scenario", "status", "initial_loss", "final_train_acc", "best_val_acc", "test_acc",
             "grad_first_over_out", "mean_update_ratio", "dead_or_saturated_end"]

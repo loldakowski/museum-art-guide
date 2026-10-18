@@ -105,6 +105,9 @@ def main():
     m0 = runs[0]["metrics"]
     summary = {
         "model": f"mlp_{a.features}", "features": a.features, "split": a.split, "selected": best,
+        # the exact training setting of the seed runs (step 3 reuses it for its reference scenario)
+        "train_config": {**{k: v for k, v in cfg.to_dict().items() if k != "seed"}, "batch_size": a.batch_size,
+                         "seed": a.seeds[0]},
         "n_parameters": runs[0]["history"]["n_parameters"], "sweep": sweep_rows,
         "test_accuracy": mean_std([r["metrics"]["accuracy"] for r in runs]),
         "test_macro_f1": mean_std([r["metrics"]["macro_f1"] for r in runs]),

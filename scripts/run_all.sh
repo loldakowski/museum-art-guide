@@ -7,7 +7,7 @@ DATA=${DATA:-data/wikiart_style5}
 RESULTS=${RESULTS:-results}
 SIZE=${SIZE:-128}
 if [ "${QUICK:-0}" = "1" ]; then
-  MLP_ARGS="--epochs 15 --seeds 0 1 --no-sweep"; DIAG_ARGS="--epochs 15"
+  MLP_ARGS="--epochs 15 --seeds 0 1 --no-sweep"; DIAG_ARGS=""  # step 3 takes its epochs from step 2
   RES_ARGS="--epochs-frozen 20 --epochs-finetune 2 --no-pretrained --img-size $SIZE"; BENCH_ARGS="--runs 20 --threads 1 --no-clip --no-pretrained"
   DUP_ARGS="--no-pretrained --img-size $SIZE"
 else
