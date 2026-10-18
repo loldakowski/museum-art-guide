@@ -80,7 +80,9 @@ def compute_features(name: str, X: np.ndarray, cache_dir=None) -> np.ndarray:
     from pathlib import Path
     if cache_dir is None:
         return FEATURE_SETS[name](X)
-    key = hashlib.md5(X[:, ::8, ::8].tobytes() + str(X.shape).encode()).hexdigest()[:10]
+    # key: every pixel and the code of this module (a change of a feature parameter gives a new file)
+    key = hashlib.md5(np.ascontiguousarray(X).tobytes() + str(X.shape).encode()
+                      + Path(__file__).read_bytes()).hexdigest()[:10]
     f = Path(cache_dir) / f"feat_{name}_{key}.npy"
     if f.exists():
         return np.load(f)
