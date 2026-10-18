@@ -1,0 +1,501 @@
+{
+  "auto": [
+    {
+      "id": "style_impressionism",
+      "query": "an impressionist painting",
+      "n_relevant": 300,
+      "n_candidates": 1496,
+      "random_expected": 0.20053475935828877,
+      "clip_P@5": 1.0,
+      "clip_P@10": 1.0,
+      "tfidf_P@5": 1.0,
+      "tfidf_P@10": 1.0
+    },
+    {
+      "id": "style_baroque",
+      "query": "a baroque painting",
+      "n_relevant": 300,
+      "n_candidates": 1496,
+      "random_expected": 0.20053475935828877,
+      "clip_P@5": 1.0,
+      "clip_P@10": 1.0,
+      "tfidf_P@5": 1.0,
+      "tfidf_P@10": 1.0
+    },
+    {
+      "id": "style_cubism",
+      "query": "a cubist painting",
+      "n_relevant": 298,
+      "n_candidates": 1496,
+      "random_expected": 0.19919786096256684,
+      "clip_P@5": 1.0,
+      "clip_P@10": 1.0,
+      "tfidf_P@5": 1.0,
+      "tfidf_P@10": 1.0
+    },
+    {
+      "id": "style_ukiyo_e",
+      "query": "a Japanese ukiyo-e woodblock print",
+      "n_relevant": 300,
+      "n_candidates": 1496,
+      "random_expected": 0.20053475935828877,
+      "clip_P@5": 1.0,
+      "clip_P@10": 1.0,
+      "tfidf_P@5": 1.0,
+      "tfidf_P@10": 1.0
+    },
+    {
+      "id": "style_pop_art",
+      "query": "a pop art image",
+      "n_relevant": 298,
+      "n_candidates": 1496,
+      "random_expected": 0.19919786096256684,
+      "clip_P@5": 1.0,
+      "clip_P@10": 0.9,
+      "tfidf_P@5": 1.0,
+      "tfidf_P@10": 1.0
+    },
+    {
+      "id": "genre_still_life",
+      "query": "a still life",
+      "n_relevant": 135,
+      "n_candidates": 270,
+      "random_expected": 0.5,
+      "clip_P@5": 1.0,
+      "clip_P@10": 1.0,
+      "tfidf_P@5": 1.0,
+      "tfidf_P@10": 1.0
+    },
+    {
+      "id": "genre_everyday_life",
+      "query": "a scene of everyday life",
+      "n_relevant": 99,
+      "n_candidates": 270,
+      "random_expected": 0.36666666666666664,
+      "clip_P@5": 0.4,
+      "clip_P@10": 0.5,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0
+    },
+    {
+      "id": "genre_sketch",
+      "query": "a sketch",
+      "n_relevant": 28,
+      "n_candidates": 270,
+      "random_expected": 0.1037037037037037,
+      "clip_P@5": 0.8,
+      "clip_P@10": 0.8,
+      "tfidf_P@5": 1.0,
+      "tfidf_P@10": 1.0
+    },
+    {
+      "id": "genre_landscape",
+      "query": "a landscape",
+      "n_relevant": 8,
+      "n_candidates": 270,
+      "random_expected": 0.02962962962962963,
+      "clip_P@5": 0.6,
+      "clip_P@10": 0.4,
+      "tfidf_P@5": 1.0,
+      "tfidf_P@10": 0.8
+    }
+  ],
+  "content": [
+    {
+      "id": "c00",
+      "query": "a stormy sea",
+      "paraphrase_of": null,
+      "clip_P@5": 0.8,
+      "clip_P@10": 0.6,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c01",
+      "query": "portraits of children",
+      "paraphrase_of": null,
+      "clip_P@5": 0.4,
+      "clip_P@10": 0.4,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c02",
+      "query": "flowers in a vase",
+      "paraphrase_of": null,
+      "clip_P@5": 0.8,
+      "clip_P@10": 0.8,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c03",
+      "query": "a bowl of fruit",
+      "paraphrase_of": null,
+      "clip_P@5": 0.6,
+      "clip_P@10": 0.6,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c04",
+      "query": "a boat on the water",
+      "paraphrase_of": null,
+      "clip_P@5": 1.0,
+      "clip_P@10": 1.0,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c05",
+      "query": "a mountain",
+      "paraphrase_of": null,
+      "clip_P@5": 0.6,
+      "clip_P@10": 0.7,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c06",
+      "query": "a winter scene with snow",
+      "paraphrase_of": null,
+      "clip_P@5": 0.6,
+      "clip_P@10": 0.6,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c07",
+      "query": "a horse",
+      "paraphrase_of": null,
+      "clip_P@5": 1.0,
+      "clip_P@10": 0.9,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c08",
+      "query": "a bird",
+      "paraphrase_of": null,
+      "clip_P@5": 0.8,
+      "clip_P@10": 0.9,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.1,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c09",
+      "query": "a musical instrument",
+      "paraphrase_of": null,
+      "clip_P@5": 0.8,
+      "clip_P@10": 0.9,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c10",
+      "query": "a close-up of a woman's face",
+      "paraphrase_of": null,
+      "clip_P@5": 0.8,
+      "clip_P@10": 0.4,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c11",
+      "query": "a city street",
+      "paraphrase_of": null,
+      "clip_P@5": 0.2,
+      "clip_P@10": 0.2,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c12",
+      "query": "angels",
+      "paraphrase_of": null,
+      "clip_P@5": 0.0,
+      "clip_P@10": 0.2,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c13",
+      "query": "a skull",
+      "paraphrase_of": null,
+      "clip_P@5": 0.8,
+      "clip_P@10": 0.4,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c14",
+      "query": "a bridge",
+      "paraphrase_of": null,
+      "clip_P@5": 0.8,
+      "clip_P@10": 0.6,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c15",
+      "query": "a crowd of people",
+      "paraphrase_of": null,
+      "clip_P@5": 1.0,
+      "clip_P@10": 0.9,
+      "tfidf_P@5": 0.2,
+      "tfidf_P@10": 0.1,
+      "random_P@5": 0.0,
+      "random_P@10": 0.1
+    },
+    {
+      "id": "c16",
+      "query": "a scene at night",
+      "paraphrase_of": null,
+      "clip_P@5": 0.6,
+      "clip_P@10": 0.3,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.1,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c17",
+      "query": "a waterfall",
+      "paraphrase_of": null,
+      "clip_P@5": 0.0,
+      "clip_P@10": 0.0,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c18",
+      "query": "warriors in battle",
+      "paraphrase_of": null,
+      "clip_P@5": 0.2,
+      "clip_P@10": 0.2,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.1,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c19",
+      "query": "a bottle or a glass",
+      "paraphrase_of": null,
+      "clip_P@5": 0.8,
+      "clip_P@10": 0.8,
+      "tfidf_P@5": 0.2,
+      "tfidf_P@10": 0.1,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c20",
+      "query": "Which painting shows a stormy sea?",
+      "paraphrase_of": "c00",
+      "clip_P@5": 0.8,
+      "clip_P@10": 0.6,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    },
+    {
+      "id": "c21",
+      "query": "I would like to see portraits of children",
+      "paraphrase_of": "c01",
+      "clip_P@5": 0.6,
+      "clip_P@10": 0.4,
+      "tfidf_P@5": 0.0,
+      "tfidf_P@10": 0.0,
+      "random_P@5": 0.0,
+      "random_P@10": 0.0
+    }
+  ],
+  "phrasing": [
+    {
+      "id": "c20",
+      "query": "Which painting shows a stormy sea?",
+      "original_id": "c00",
+      "original": "a stormy sea",
+      "clip_top10_shared": 6,
+      "tfidf_top10_shared": 10
+    },
+    {
+      "id": "c21",
+      "query": "I would like to see portraits of children",
+      "original_id": "c01",
+      "original": "portraits of children",
+      "clip_top10_shared": 8,
+      "tfidf_top10_shared": 0
+    }
+  ],
+  "cost": {
+    "threads": 1,
+    "clip_latency": {
+      "median_ms": 10.76245900185313,
+      "p95_ms": 11.122166000859579,
+      "n": 155
+    },
+    "clip_text_encoder_latency": {
+      "median_ms": 10.58516700140899,
+      "p95_ms": 10.913679403893182,
+      "n": 155
+    },
+    "tfidf_latency": {
+      "median_ms": 0.24291699810419232,
+      "p95_ms": 0.27747940330300463,
+      "n": 155
+    },
+    "clip_model_mb": 605.220643,
+    "clip_text_tower_params": 63428097,
+    "clip_image_index_mb": 3.063808,
+    "clip_index_build_s_per_image": 0.009561640624951906,
+    "tfidf_index_mb": 0.426516,
+    "tfidf_vocabulary": 644,
+    "collection_size": 1496
+  },
+  "clip_model": "ViT-B-32/openai",
+  "seed": 0,
+  "provenance": {
+    "git_sha": "291ca8b72617bd9b06f04316769c7dc2421a14b0",
+    "git_dirty": false,
+    "dataset_fingerprint": "b407cd646527a202",
+    "created_utc": "2026-10-18T11:23:31+00:00",
+    "python": "3.11.17",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "versions": {
+      "torch": "2.14.1",
+      "torchvision": "0.29.1",
+      "numpy": "2.4.6",
+      "sklearn": "1.9.1"
+    },
+    "command": "07_text_search.py --data-dir data/wikiart_style5 --image-dir data/wikiart_style5_224 --out results/07_search",
+    "subset_info": {
+      "repo": "huggan/wikiart",
+      "revision": "d559852d2b232e0fcf195e775866964f0564f2b5",
+      "label": "style",
+      "classes": [
+        "Baroque",
+        "Cubism",
+        "Impressionism",
+        "Pop_Art",
+        "Ukiyo_e"
+      ],
+      "per_class": 300,
+      "size": 128,
+      "crop": true,
+      "seed": 0,
+      "strategy": "fewest-shards",
+      "max_per_artist": 50,
+      "shards": [
+        47,
+        48,
+        54,
+        61,
+        66,
+        68,
+        69,
+        70,
+        71
+      ],
+      "counts": {
+        "Baroque": 300,
+        "Cubism": 300,
+        "Impressionism": 300,
+        "Pop_Art": 300,
+        "Ukiyo_e": 300
+      },
+      "total": 1500,
+      "command": "python make_wikiart_subset.py --label style --classes Impressionism Baroque Cubism Ukiyo_e Pop_Art --per-class 300 --size 128 --out data/wikiart_style5 --index-cache /private/tmp/claude-501/-Users-dhiabencheikh-Projects-museum-art-guide/f470ba69-3ac4-4503-9644-a1135ab94bd0/scratchpad/wikiart_label_index.json",
+      "created_utc": "2026-10-17T18:51:56+00:00"
+    }
+  },
+  "image_provenance": {
+    "git_sha": "291ca8b72617bd9b06f04316769c7dc2421a14b0",
+    "git_dirty": false,
+    "dataset_fingerprint": "38794f02486eb307",
+    "created_utc": "2026-10-18T11:23:31+00:00",
+    "python": "3.11.17",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "versions": {
+      "torch": "2.14.1",
+      "torchvision": "0.29.1",
+      "numpy": "2.4.6",
+      "sklearn": "1.9.1"
+    },
+    "command": "07_text_search.py --data-dir data/wikiart_style5 --image-dir data/wikiart_style5_224 --out results/07_search",
+    "subset_info": {
+      "repo": "huggan/wikiart",
+      "revision": "d559852d2b232e0fcf195e775866964f0564f2b5",
+      "label": "style",
+      "classes": [
+        "Baroque",
+        "Cubism",
+        "Impressionism",
+        "Pop_Art",
+        "Ukiyo_e"
+      ],
+      "per_class": 300,
+      "size": 224,
+      "crop": true,
+      "seed": 0,
+      "strategy": "fewest-shards",
+      "max_per_artist": 50,
+      "named_only": false,
+      "shards": [
+        47,
+        48,
+        54,
+        61,
+        66,
+        68,
+        69,
+        70,
+        71
+      ],
+      "counts": {
+        "Baroque": 300,
+        "Cubism": 300,
+        "Impressionism": 300,
+        "Pop_Art": 300,
+        "Ukiyo_e": 300
+      },
+      "total": 1500,
+      "command": "python make_wikiart_subset.py --label style --classes Impressionism Baroque Cubism Ukiyo_e Pop_Art --per-class 300 --size 224 --out data/wikiart_style5_224 --index-cache /private/tmp/claude-501/-Users-dhiabencheikh-Projects-museum-art-guide/f470ba69-3ac4-4503-9644-a1135ab94bd0/scratchpad/wikiart_label_index.json",
+      "created_utc": "2026-10-17T20:14:19+00:00"
+    }
+  }
+}
