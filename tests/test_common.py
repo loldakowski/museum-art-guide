@@ -1,9 +1,11 @@
 import json
 
+import numpy as np
 import pytest
 import torch
 
 from museum_guide.common import check_checkpoint, dataset_fingerprint, provenance, save_json
+from museum_guide.features import compute_features
 
 
 def test_provenance_records_code_versions_and_dataset(fake_data, tmp_path):
@@ -37,3 +39,16 @@ def test_dataset_fingerprint_depends_on_image_content(fake_data, other_fake_data
 def test_provenance_survives_a_safe_torch_load(fake_data, tmp_path):
     torch.save({"provenance": provenance(fake_data)}, tmp_path / "c.pt")
     assert torch.load(tmp_path / "c.pt")["provenance"]["versions"]["torch"]  # weights_only=True by default
+
+
+def test_non_finite_floats_are_written_as_json_null(tmp_path):
+    save_json({"best_val_loss": float("inf"), "acc": [np.float64("nan"), 0.5]}, tmp_path / "x.json")
+    assert json.loads((tmp_path / "x.json").read_text()) == {"best_val_loss": None, "acc": [None, 0.5]}
+
+
+def test_feature_cache_key_sees_every_pixel(tmp_path):
+    X = np.zeros((4, 16, 16, 3), np.uint8)
+    a = compute_features("pixels32", X, tmp_path)
+    X[0, 1, 1, 0] = 255  # a pixel the old key (every 8th row and column) did not read
+    b = compute_features("pixels32", X, tmp_path)
+    assert len(list(tmp_path.glob("feat_pixels32_*.npy"))) == 2 and not np.array_equal(a, b)

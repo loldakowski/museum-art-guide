@@ -30,6 +30,12 @@ SWEEP = {
 }
 
 
+def generalisation_gap(h):
+    """Train acc - val acc at the best epoch (epochs count from 1; 0 = no epoch improved, e.g. divergence)."""
+    e = h["best_epoch"]
+    return h["train_acc"][e - 1] - h["val_acc"][e - 1] if e else None
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--data-dir", default="data/wikiart_style5")
@@ -99,6 +105,9 @@ def main():
     m0 = runs[0]["metrics"]
     summary = {
         "model": f"mlp_{a.features}", "features": a.features, "split": a.split, "selected": best,
+        # the exact training setting of the seed runs (step 3 reuses it for its reference scenario)
+        "train_config": {**{k: v for k, v in cfg.to_dict().items() if k != "seed"}, "batch_size": a.batch_size,
+                         "seed": a.seeds[0]},
         "n_parameters": runs[0]["history"]["n_parameters"], "sweep": sweep_rows,
         "test_accuracy": mean_std([r["metrics"]["accuracy"] for r in runs]),
         "test_macro_f1": mean_std([r["metrics"]["macro_f1"] for r in runs]),
@@ -106,8 +115,7 @@ def main():
         "train_time_s": mean_std([r["history"]["total_time_s"] for r in runs]),
         "initial_val_loss": runs[0]["history"]["initial_val_loss"],
         "expected_initial_loss": runs[0]["history"]["expected_initial_loss"],
-        "generalisation_gap_at_best": (runs[0]["history"]["train_acc"][runs[0]["history"]["best_epoch"] - 1]
-                                       - runs[0]["history"]["val_acc"][runs[0]["history"]["best_epoch"] - 1]),
+        "generalisation_gap_at_best": generalisation_gap(runs[0]["history"]),
         "metrics_seed0": m0, "most_confused_seed0": most_confused(m0["confusion_matrix"], d.classes),
         "device": str(device), "provenance": provenance(a.data_dir),
     }

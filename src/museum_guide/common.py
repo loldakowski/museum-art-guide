@@ -43,8 +43,8 @@ def _to_jsonable(o):
         return [_to_jsonable(v) for v in o]
     if isinstance(o, (np.integer,)):
         return int(o)
-    if isinstance(o, (np.floating,)):
-        return float(o)
+    if isinstance(o, (float, np.floating)):
+        return float(o) if np.isfinite(o) else None  # standard JSON has no NaN/Infinity: written as null
     if isinstance(o, np.ndarray):
         return o.tolist()
     if isinstance(o, Path):
@@ -55,7 +55,7 @@ def _to_jsonable(o):
 def save_json(obj, path) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(_to_jsonable(obj), indent=2), encoding="utf-8")
+    path.write_text(json.dumps(_to_jsonable(obj), indent=2, allow_nan=False), encoding="utf-8")
 
 
 def load_json(path):
