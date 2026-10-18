@@ -101,8 +101,16 @@ def lr_range_test(d, mlp_kwargs, lrs, epochs, device, batch_size):
                                                           track_updates=False), device, log=lambda *_: None)
         out.append({"lr": lr, "train_loss": h["train_loss"][-1] if h["epoch"] else float("nan"),
                     "val_loss": h["val_loss"][-1] if h["epoch"] else float("nan"), "status": h["status"]})
-        print(f"  lr {lr:.0e}: train loss {out[-1]['train_loss']:.3f} ({h['status']})")
+        print(f"  lr {lr:.0e}: train loss {out[-1]['train_loss']:.3f}, val loss {out[-1]['val_loss']:.3f} "
+              f"({h['status']})")
     return out
+
+
+def best_lr(lr_test, key="val_loss"):
+    """The learning rate with the lowest loss after the short run. Judged on VALIDATION loss: the lowest train
+    loss rewards fitting the training set fastest, not generalising."""
+    ok = [x for x in lr_test if math.isfinite(x[key])]
+    return min(ok, key=lambda x: x[key])["lr"] if ok else None
 
 
 def overview_figure(H, rows, lr_test, path, n_classes):
@@ -161,8 +169,13 @@ def overview_figure(H, rows, lr_test, path, n_classes):
     if lr_test:
         fig, ax = plt.subplots(figsize=(5.5, 3.5))
         lrs = [x["lr"] for x in lr_test]
-        ax.plot(lrs, [min(x["train_loss"], 10) if math.isfinite(x["train_loss"]) else 10 for x in lr_test],
-                marker="o", color=PALETTE[0], label="train loss after a few epochs")
+        for i, key in enumerate(("train_loss", "val_loss")):
+            ax.plot(lrs, [min(x[key], 10) if math.isfinite(x[key]) else 10 for x in lr_test], marker="o",
+                    color=PALETTE[i], ls="--" if key == "train_loss" else "-",
+                    label=f"{key.replace('_', ' ')} after a few epochs")
+        b = best_lr(lr_test)
+        if b:
+            ax.axvline(b, color=PALETTE[1], lw=0.8, ls=":", label=f"lowest val loss: lr {b:.0e}")
         ax.axhline(H["reference"]["expected_initial_loss"], color=MUTED, ls=":", lw=1, label="ln(K)")
         ax.set(xscale="log", yscale="log", xlabel="learning rate (AdamW)", title="Learning-rate range test")
         ax.legend(fontsize=7)
@@ -251,6 +264,8 @@ def main():
               f"{same['step2_seed0_test_acc']:.3f}")
     save_json({"reference_config": ref, "train_config": {**base_cfg, "batch_size": a.batch_size},
                "reference_vs_step2": same, "scenarios": rows, "lr_range_test": lr_test,
+               "lr_range_test_best": {"by_val_loss": best_lr(lr_test), "by_train_loss": best_lr(lr_test, "train_loss"),
+                                      "used_in_step2": base_cfg["lr"]},
                "provenance": provenance(a.data_dir)}, out / "summary.json")
     cols = ["scenario", "status", "initial_loss", "final_train_acc", "best_val_acc", "test_acc",
             "grad_first_over_out", "mean_update_ratio", "dead_or_saturated_end"]
