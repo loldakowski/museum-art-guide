@@ -12,6 +12,9 @@ Two ways to decode the photo:
   draft : im.draft() first (the JPEG decoder skips detail and decodes at 1/2, 1/4 or 1/8 scale, never below
           the requested size), then ImageOps.fit, bicubic. This is exactly how make_wikiart_subset.save_image
           built every training image, so it matches the training preprocessing.
+Both photo paths apply ImageOps.exif_transpose (phones store photos sideways with an EXIF orientation tag; without
+it the model sees the painting rotated). Its cost is measured by timing every photo path without it as well
+(exif_transpose=false rows); the 128 px dataset images carry no orientation tag.
 The recommended model is timed as deployed: the file written by step 4 (resnet.FrozenLogReg: backbone +
 scaler + logistic regression). Free-text search is timed per query (CLIP text encoder + dot product with the
 image index; TF-IDF). Latency does not depend on the values of the weights, so untrained models of the same
@@ -49,16 +52,21 @@ from museum_guide.training import TrainConfig, train
 PHOTO_SIZE = (4032, 3024)  # 12 MP, a common phone camera resolution
 
 
-def decode_fit(img_bytes: bytes, size: int, draft: bool) -> Image.Image:
-    """JPEG bytes -> size x size RGB image (centre crop). draft=True = the training-set preprocessing."""
+def decode(img_bytes: bytes, size: int, draft: bool, orient: bool) -> Image.Image:
+    """JPEG bytes -> RGB image, upright if orient (EXIF orientation applied after the reduced-scale decoding)."""
     with Image.open(io.BytesIO(img_bytes)) as im:
         if draft:
             im.draft("RGB", (size, size))
-        return ImageOps.fit(im.convert("RGB"), (size, size), method=Image.Resampling.BICUBIC)
+        return (ImageOps.exif_transpose(im) if orient else im).convert("RGB")
 
 
-def load_rgb(img_bytes: bytes, size: int, draft: bool = False) -> np.ndarray:
-    return np.asarray(decode_fit(img_bytes, size, draft), dtype=np.uint8)
+def decode_fit(img_bytes: bytes, size: int, draft: bool, orient: bool = True) -> Image.Image:
+    """JPEG bytes -> size x size RGB image (centre crop). draft=True = the training-set preprocessing."""
+    return ImageOps.fit(decode(img_bytes, size, draft, orient), (size, size), method=Image.Resampling.BICUBIC)
+
+
+def load_rgb(img_bytes: bytes, size: int, draft: bool = False, orient: bool = True) -> np.ndarray:
+    return np.asarray(decode_fit(img_bytes, size, draft, orient), dtype=np.uint8)
 
 
 def time_fn(fn, n_warmup=10, n_runs=100):
@@ -126,12 +134,9 @@ def sklearn_candidate(path, dim, n_classes, data_dir):
     return make_logreg(1.0).fit(rng.normal(size=(50, dim)), np.arange(50) % n_classes), False
 
 
-def resnet_input(img_bytes: bytes, size: int, draft: bool) -> Image.Image:
+def resnet_input(img_bytes: bytes, size: int, draft: bool, orient: bool = True) -> Image.Image:
     """full: the whole decoded photo (image_transform resizes it); draft: as the training images were made."""
-    if draft:
-        return decode_fit(img_bytes, size, True)
-    with Image.open(io.BytesIO(img_bytes)) as im:
-        return im.convert("RGB")
+    return decode_fit(img_bytes, size, True, orient) if draft else decode(img_bytes, size, False, orient)
 
 
 def frozen_logreg_candidate(ckpt_dir, n_classes, img_size, data_dir):
@@ -147,8 +152,9 @@ def frozen_logreg_candidate(ckpt_dir, n_classes, img_size, data_dir):
     return m, size, False
 
 
-def build_candidates(img_bytes, n_classes, img_size, data_dir, ckpt_dir, draft=False):
-    """Every classifier as a function of the photo bytes. draft: decoding as in make_wikiart_subset.save_image."""
+def build_candidates(img_bytes, n_classes, img_size, data_dir, ckpt_dir, draft=False, orient=True):
+    """Every classifier as a function of the photo bytes. draft: decoding as in make_wikiart_subset.save_image;
+    orient: apply the EXIF orientation."""
     ck_dir = Path(ckpt_dir)
     C = {}
     feats = {"pixels32": lambda x: pixels(x, 32), "handcrafted": handcrafted}
@@ -157,7 +163,7 @@ def build_candidates(img_bytes, n_classes, img_size, data_dir, ckpt_dir, draft=F
         dim = feat(np.zeros((1, 128, 128, 3), np.uint8)).shape[1]
         model, trained = sklearn_candidate(ck_dir / f"baseline_{name}.joblib", dim, n_classes, data_dir)
         C[f"logreg_{name}"] = {
-            "fn": (lambda m=model, f=feat: m.predict_proba(f(load_rgb(img_bytes, 128, draft)[None]))),
+            "fn": (lambda m=model, f=feat: m.predict_proba(f(load_rgb(img_bytes, 128, draft, orient)[None]))),
             "size_bytes": nbytes(model, "joblib"), "params": int(model[-1].coef_.size + model[-1].intercept_.size),
             "trained_weights": trained}
     # 3-4. from-scratch MLP on 32x32 pixels / hand-crafted features
@@ -172,7 +178,7 @@ def build_candidates(img_bytes, n_classes, img_size, data_dir, ckpt_dir, draft=F
 
         @torch.no_grad()
         def run_mlp(mlp=mlp, feat=feat):
-            x = feat(load_rgb(img_bytes, 128, draft)[None])
+            x = feat(load_rgb(img_bytes, 128, draft, orient)[None])
             return mlp(torch.as_tensor(x, dtype=torch.float32))
         C[f"mlp_{name}"] = {"fn": run_mlp, "size_bytes": nbytes(mlp.state_dict(), "torch"),
                             "params": mlp.n_parameters(), "trained_weights": c is not None}
@@ -181,7 +187,7 @@ def build_candidates(img_bytes, n_classes, img_size, data_dir, ckpt_dir, draft=F
     tf = image_transform(fl.img_size, train=False)
 
     def run_frozen_logreg(fl=fl, tf=tf):
-        return fl.predict_proba(tf(resnet_input(img_bytes, fl.img_size, draft))[None])
+        return fl.predict_proba(tf(resnet_input(img_bytes, fl.img_size, draft, orient))[None])
     C["resnet18_frozen_logreg"] = {"fn": run_frozen_logreg, "size_bytes": size,
                                    "params": fl.model.n_parameters() - sum(p.numel() for p in fl.model.net.fc.parameters())
                                    + int(fl.logreg[-1].coef_.size + fl.logreg[-1].intercept_.size),
@@ -198,7 +204,7 @@ def build_candidates(img_bytes, n_classes, img_size, data_dir, ckpt_dir, draft=F
 
         @torch.no_grad()
         def run_resnet(net=net, tf=tf, s=s):
-            return net(tf(resnet_input(img_bytes, s, draft))[None])
+            return net(tf(resnet_input(img_bytes, s, draft, orient))[None])
         C[f"resnet18_{s}px"] = {"fn": run_resnet, "size_bytes": nbytes(net.state_dict(), "torch"),
                                 "params": net.n_parameters(), "trained_weights": trained}
     return C
@@ -282,20 +288,22 @@ def main():
     print(env)
     n_images = len(load_metadata(a.data_dir)) if (Path(a.data_dir) / "metadata.csv").exists() else 1500
     # (input, decoding) -> candidates; draft decoding changes nothing on an image already at the target size
-    candidates = {(inp, dec): build_candidates(inputs[inp], a.n_classes, a.img_size, a.data_dir, a.checkpoint_dir,
-                                               draft=(dec == "draft"))
-                  for inp, dec in (("photo", "full"), ("photo", "draft"), ("small", "full"))}
-    candidates[("text query", "-")] = search_candidates(a.data_dir, n_images, clip=not a.no_clip)
+    candidates = {(inp, dec, orient): build_candidates(inputs[inp], a.n_classes, a.img_size, a.data_dir,
+                                                       a.checkpoint_dir, draft=(dec == "draft"), orient=orient)
+                  for inp, dec, orient in (("photo", "full", True), ("photo", "draft", True),
+                                           ("photo", "full", False), ("photo", "draft", False),
+                                           ("small", "full", False))}
+    candidates[("text query", "-", False)] = search_candidates(a.data_dir, n_images, clip=not a.no_clip)
     rows = []
     for t in threads:
         torch.set_num_threads(t)
-        for (inp, dec), C in candidates.items():
+        for (inp, dec, orient), C in candidates.items():
             for name, c in C.items():
                 r = time_fn(c["fn"], n_runs=a.runs)
-                rows.append({"model": name, "input": inp, "decode": dec, "threads": t, **r,
+                rows.append({"model": name, "input": inp, "decode": dec, "exif_transpose": orient, "threads": t, **r,
                              "size_mb": c["size_bytes"] / 1e6, "params": c["params"],
                              "trained_weights": c["trained_weights"]})
-                print(f"threads={t} {inp:10s} {dec:5s} {name:22s} median {r['median_ms']:8.2f} ms  "
+                print(f"threads={t} {inp:10s} {dec:5s} {'exif' if orient else '    '} {name:22s} median {r['median_ms']:8.2f} ms  "
                       f"p95 {r['p95_ms']:8.2f} ms  size {c['size_bytes'] / 1e6:7.2f} MB  params {c['params']:>11,}")
     res = {"environment": env, "results": rows}
     if not a.no_training_cost and (Path(a.data_dir) / "metadata.csv").exists():

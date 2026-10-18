@@ -88,7 +88,8 @@ def main():
     fb = R / "05_benchmark" / "benchmark.json"
     if fb.exists():
         for b in load_json(fb)["results"]:
-            if b["threads"] == a.threads and b.get("input", "small") == a.input:
+            if b["threads"] == a.threads and b.get("input", "small") == a.input and \
+                    b.get("exif_transpose", a.input == "photo") == (a.input == "photo"):  # photos are turned upright
                 bench[(b["model"], b.get("decode", "full"))] = b
     for r in rows:
         b = bench.get((r["latency_key"], "full"), {})
