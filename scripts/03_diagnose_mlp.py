@@ -30,7 +30,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from museum_guide.common import get_device, load_json, save_json, set_seed
+from museum_guide.common import get_device, load_json, provenance, save_json, set_seed
 from museum_guide.experiments import FeatureData, load_feature_data, run_mlp, tensor_loaders
 from museum_guide.mlp import MLP, standardization_stats
 from museum_guide.plots import MUTED, PALETTE, _save, plt, training_history
@@ -235,7 +235,8 @@ def main():
 
     if not a.only:
         overview_figure(H, rows, lr_test, out / "diagnosis_overview.png", len(d.classes))
-    save_json({"reference_config": ref, "scenarios": rows, "lr_range_test": lr_test}, out / "summary.json")
+    save_json({"reference_config": ref, "scenarios": rows, "lr_range_test": lr_test,
+               "provenance": provenance(a.data_dir)}, out / "summary.json")
     cols = ["scenario", "status", "initial_loss", "final_train_acc", "best_val_acc", "test_acc",
             "grad_first_over_out", "mean_update_ratio", "dead_or_saturated_end"]
     lines = ["| " + " | ".join(cols + ["expected symptom"]) + " |", "|" + "---|" * (len(cols) + 1)]

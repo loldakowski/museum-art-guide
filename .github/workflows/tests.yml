@@ -8,10 +8,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install (CPU-only PyTorch)
+      - name: Install (CPU-only PyTorch, pinned versions)
         run: |
-          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          pip install numpy pandas scikit-learn scikit-image matplotlib pillow joblib pytest
+          pip install torch==2.14.1 torchvision==0.29.1 --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements-lock.txt
           pip install -e .
       - name: Unit tests
         run: python -m pytest -q
+      - name: Smoke run of the whole pipeline (synthetic data, numbers are meaningless)
+        run: |
+          python scripts/make_fake_dataset.py --out "$RUNNER_TEMP/fake" --size 64
+          DATA="$RUNNER_TEMP/fake" SIZE=64 RESULTS="$RUNNER_TEMP/results" QUICK=1 bash scripts/run_all.sh

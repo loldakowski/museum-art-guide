@@ -23,7 +23,7 @@ import torch
 from PIL import Image, ImageOps
 
 from museum_guide.baseline import make_logreg
-from museum_guide.common import save_json
+from museum_guide.common import provenance, save_json
 from museum_guide.data import image_transform
 from museum_guide.features import handcrafted, pixels
 from museum_guide.mlp import MLP
@@ -136,7 +136,8 @@ def main():
                          "trained_weights": c["trained_weights"]})
             print(f"threads={t} {name:22s} median {r['median_ms']:7.2f} ms  p95 {r['p95_ms']:7.2f} ms  "
                   f"size {c['size_bytes'] / 1e6:6.2f} MB  params {c['params']:>10,}")
-    save_json({"environment": env, "results": rows}, Path(a.out) / "benchmark.json")
+    save_json({"environment": env, "results": rows, "provenance": provenance(a.data_dir)},
+              Path(a.out) / "benchmark.json")
     print(f"-> {a.out}/benchmark.json")
 
 

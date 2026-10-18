@@ -20,7 +20,7 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 
 from museum_guide.baseline import fit_logreg
-from museum_guide.common import get_device, save_json, set_seed
+from museum_guide.common import get_device, provenance, save_json, set_seed
 from museum_guide.data import class_names, load_image_array, load_metadata, make_image_loaders, make_split
 from museum_guide.evaluation import classification_metrics, fmt, most_confused, predict
 from museum_guide.plots import confusion, image_grid, training_history
@@ -75,7 +75,8 @@ def run_frozen(a, meta, split, names, device, out):
                "logreg_on_embeddings": {"metrics": m2, "val_acc_per_C": val_scores,
                                         "best_C": float(lr_model[-1].C)},
                "n_parameters": model.n_parameters(), "trainable_parameters": head.fc.weight.numel() + len(names),
-               "img_size": a.img_size, "pretrained": not a.no_pretrained}, out / "summary.json")
+               "img_size": a.img_size, "pretrained": not a.no_pretrained, "provenance": provenance(a.data_dir)},
+              out / "summary.json")
     save_json(h, out / "history.json")
     return model
 
@@ -97,7 +98,8 @@ def run_finetune(a, meta, split, names, device, out):
     save_json({"model": "resnet18_finetune", "metrics": m, "history_summary": _hsum(h),
                "most_confused": most_confused(m["confusion_matrix"], names),
                "n_parameters": model.n_parameters(), "trainable_parameters": model.n_parameters(True),
-               "img_size": a.img_size, "pretrained": not a.no_pretrained}, out / "summary.json")
+               "img_size": a.img_size, "pretrained": not a.no_pretrained, "provenance": provenance(a.data_dir)},
+              out / "summary.json")
     save_json(h, out / "history.json")
     return model
 
