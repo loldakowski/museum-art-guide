@@ -95,3 +95,16 @@ def test_frozen_logreg_file_round_trip(fake_data, other_fake_data, tmp_path):
     assert loaded.classes == list("abcde")
     with pytest.raises(ValueError, match="does not match"):
         FrozenLogReg.load(f, other_fake_data)
+
+
+def test_paired_comparison_counts_discordant_images():
+    from museum_guide.evaluation import holm, paired_comparison
+    y = np.zeros(100, int)
+    a = np.zeros(100, int)                     # A always right
+    b = np.zeros(100, int); b[:20] = 1         # B wrong on 20 images
+    r = paired_comparison(y, a, b)
+    assert (r["a_right_b_wrong"], r["a_wrong_b_right"]) == (20, 0)
+    assert abs(r["diff"] - 0.2) < 1e-12 and r["diff_ci95"][0] > 0 and r["mcnemar_p"] < 1e-5
+    same = paired_comparison(y, a, a)
+    assert same["mcnemar_p"] == 1.0 and same["diff_ci95"] == (0.0, 0.0)
+    assert holm([0.01, 0.04, 0.03]) == [0.03, 0.06, 0.06]

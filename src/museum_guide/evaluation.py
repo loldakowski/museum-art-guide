@@ -1,4 +1,4 @@
-"""Metrics with bootstrap confidence intervals (small test set)."""
+"""Metrics with bootstrap confidence intervals (small test set), and paired comparisons of two models."""
 from __future__ import annotations
 
 import numpy as np
@@ -41,6 +41,9 @@ def classification_metrics(y, pred, class_names, probs=None, ci=True) -> dict:
                       for i, c in enumerate(class_names)},
         "confusion_matrix": confusion_matrix(y, pred, labels=labels).tolist(),
         "class_names": list(class_names),
+        # per-image results, in test-set order: needed to compare two models on the same images
+        "labels": y.tolist(),
+        "predictions": pred.tolist(),
     }
     if probs is not None and len(class_names) > 2:
         top2 = np.argsort(-probs, axis=1)[:, :2]
@@ -49,6 +52,40 @@ def classification_metrics(y, pred, class_names, probs=None, ci=True) -> dict:
         out["accuracy_ci95"] = bootstrap_ci(y, pred, "accuracy")
         out["macro_f1_ci95"] = bootstrap_ci(y, pred, "macro_f1")
     return out
+
+
+def paired_comparison(y, pred_a, pred_b, n_boot=2000, alpha=0.05, seed=0) -> dict:
+    """Model A vs model B on the SAME test images.
+
+    Two separate confidence intervals that overlap do not show that two models are equivalent: the models are
+    scored on the same images, so their errors are correlated. Here:
+      * paired bootstrap: resample test images, recompute acc(A) - acc(B) on each resample -> CI of the difference;
+      * exact McNemar test: only the images where exactly one model is right carry information
+        (b = A right / B wrong, c = A wrong / B right); under 'same accuracy', b ~ Binomial(b + c, 1/2).
+    """
+    from scipy.stats import binomtest
+    y, pa, pb = np.asarray(y), np.asarray(pred_a), np.asarray(pred_b)
+    d = (pa == y).astype(float) - (pb == y).astype(float)
+    idx = np.random.default_rng(seed).integers(0, len(y), (n_boot, len(y)))
+    boot = d[idx].mean(axis=1)
+    b, c = int(np.sum(d > 0)), int(np.sum(d < 0))
+    return {"n": int(len(y)), "acc_a": float(np.mean(pa == y)), "acc_b": float(np.mean(pb == y)),
+            "diff": float(d.mean()), "diff_ci95": (float(np.quantile(boot, alpha / 2)),
+                                                   float(np.quantile(boot, 1 - alpha / 2))),
+            "a_right_b_wrong": b, "a_wrong_b_right": c,
+            "mcnemar_p": float(binomtest(b, b + c, 0.5).pvalue) if b + c else 1.0}
+
+
+def holm(pvalues) -> list:
+    """Holm-Bonferroni adjusted p-values (several comparisons at once; controls the family-wise error rate)."""
+    p = np.asarray(pvalues, dtype=float)
+    order = np.argsort(p)
+    adj = np.empty_like(p)
+    running = 0.0
+    for rank, i in enumerate(order):
+        running = max(running, min(1.0, (len(p) - rank) * p[i]))
+        adj[i] = running
+    return adj.tolist()
 
 
 def most_confused(cm, class_names, k=5):
