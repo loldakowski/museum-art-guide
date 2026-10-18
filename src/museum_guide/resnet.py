@@ -113,15 +113,18 @@ class FrozenLogReg:
     """Photo tensor -> class probabilities with a file written by save_frozen_logreg (no download needed).
     The file must come from the dataset in data_dir (check_checkpoint), as for every other checkpoint."""
 
-    def __init__(self, path, data_dir):
+    def __init__(self, model: ResNetClassifier, logreg, classes, img_size: int):
+        self.model, self.logreg, self.classes, self.img_size = model.eval(), logreg, list(classes), img_size
+
+    @classmethod
+    def load(cls, path, data_dir) -> "FrozenLogReg":
         ck = joblib.load(path)
         check_checkpoint(ck, data_dir, path)
-        self.classes, self.img_size, self.logreg = ck["classes"], ck["img_size"], ck["logreg"]
-        self.model = ResNetClassifier(len(self.classes), "frozen", pretrained=False)
-        missing, unexpected = self.model.load_state_dict(ck["backbone_state_dict"], strict=False)
+        model = ResNetClassifier(len(ck["classes"]), "frozen", pretrained=False)
+        missing, unexpected = model.load_state_dict(ck["backbone_state_dict"], strict=False)
         if unexpected or any(not k.startswith("net.fc.") for k in missing):
             raise ValueError(f"{path}: backbone weights do not match ResNet-18 ({missing[:3]}, {unexpected[:3]})")
-        self.model.eval()
+        return cls(model, ck["logreg"], ck["classes"], ck["img_size"])
 
     @torch.no_grad()
     def predict_proba(self, x: torch.Tensor):

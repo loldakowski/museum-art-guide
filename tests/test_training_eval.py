@@ -90,8 +90,8 @@ def test_frozen_logreg_file_round_trip(fake_data, other_fake_data, tmp_path):
     logreg = make_logreg(1.0).fit(E, np.arange(10) % 5)
     f = tmp_path / "resnet18_frozen_logreg.joblib"
     save_frozen_logreg(f, model, logreg, list("abcde"), 32, provenance(fake_data))
-    loaded = FrozenLogReg(f, fake_data)
+    loaded = FrozenLogReg.load(f, fake_data)
     np.testing.assert_allclose(loaded.predict_proba(x), logreg.predict_proba(E), rtol=1e-5, atol=1e-6)
     assert loaded.classes == list("abcde")
     with pytest.raises(ValueError, match="does not match"):
-        FrozenLogReg(f, other_fake_data)
+        FrozenLogReg.load(f, other_fake_data)
