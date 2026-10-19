@@ -15,6 +15,8 @@ jobs:
           pip install -e .
       - name: Unit tests
         run: python -m pytest -q
+      - name: Every number in README.md is in the committed results
+        run: python scripts/check_readme_numbers.py
       - name: Smoke run of the whole pipeline (synthetic data, numbers are meaningless)
         run: |
           python scripts/make_fake_dataset.py --out "$RUNNER_TEMP/fake" --size 64
