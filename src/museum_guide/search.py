@@ -22,7 +22,9 @@ import pandas as pd
 import torch
 from PIL import Image
 
-CLIP_MODEL, CLIP_PRETRAINED = "ViT-B-32", "openai"
+# The OpenAI weights were trained with QuickGELU: "ViT-B-32" would build plain GELU layers around them
+# (open_clip warns "QuickGELU mismatch"), a slightly different network from the one OpenAI trained.
+CLIP_MODEL, CLIP_PRETRAINED = "ViT-B-32-quickgelu", "openai"
 
 
 def _rank(scores: np.ndarray, ids, k: int, seed: int = 0) -> list:

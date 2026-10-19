@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 
 from museum_guide.data import load_metadata
-from museum_guide.search import (ClipSearcher, TfidfSearcher, _keywords, _rank, auto_relevance, metadata_documents,
-                                 precision_at_k)
+from museum_guide.search import (CLIP_MODEL, ClipSearcher, TfidfSearcher, _keywords, _rank, auto_relevance,
+                                 metadata_documents, precision_at_k)
 
 
 def _meta():
@@ -58,3 +58,9 @@ def test_clip_search_ranks_by_cosine(fake_data):
     E[:, 0] = np.linspace(0, 1, len(meta))                         # image i: similarity i / (N - 1) with query
     s = StubClip({"q": np.eye(8)[0]}).index(list(meta["id"]), E)
     assert s.search("q", 3) == list(meta["id"])[::-1][:3]
+
+
+def test_clip_model_uses_the_activation_the_openai_weights_were_trained_with():
+    import open_clip
+    model = open_clip.create_model(CLIP_MODEL)  # architecture only, no download
+    assert {type(m).__name__ for m in model.modules() if "GELU" in type(m).__name__} == {"QuickGELU"}
