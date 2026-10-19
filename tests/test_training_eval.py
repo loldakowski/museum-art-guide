@@ -97,6 +97,18 @@ def test_frozen_logreg_file_round_trip(fake_data, other_fake_data, tmp_path):
         FrozenLogReg.load(f, other_fake_data)
 
 
+@pytest.mark.skipif(not (torch.cuda.is_available() or torch.backends.mps.is_available()), reason="needs a GPU")
+def test_frozen_logreg_file_trained_on_gpu_holds_cpu_weights(fake_data, tmp_path):
+    import joblib
+    device = "cuda" if torch.cuda.is_available() else "mps"
+    model = ResNetClassifier(5, "frozen", pretrained=False).eval()
+    E = model.embed(torch.randn(10, 3, 32, 32)).numpy()
+    model.to(device)
+    f = tmp_path / "resnet18_frozen_logreg.joblib"
+    save_frozen_logreg(f, model, make_logreg(1.0).fit(E, np.arange(10) % 5), list("abcde"), 32, provenance(fake_data))
+    assert {v.device.type for v in joblib.load(f)["backbone_state_dict"].values()} == {"cpu"}
+
+
 def test_paired_comparison_counts_discordant_images():
     from museum_guide.evaluation import holm, paired_comparison
     y = np.zeros(100, int)
