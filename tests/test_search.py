@@ -1,3 +1,5 @@
+import re
+
 import numpy as np
 import pandas as pd
 
@@ -86,7 +88,7 @@ def test_make_pool_adds_only_unjudged_pairs_and_the_viewer_keeps_earlier_judgmen
     queries = {"content": [{"id": "c00", "query": "a stormy sea"}]}
     ev, img = tmp_path / "eval", tmp_path / "img"
     ev.mkdir()
-    a = types.SimpleNamespace(eval_dir=str(ev), image_dir=str(img), k=2, seed=0)
+    a = types.SimpleNamespace(eval_dir=str(ev), image_dir=str(img), k=2, seed=0, decoys=False)
     step7.make_pool(a, meta, {"clip": Fixed(list("ab")), "tfidf": Fixed(list("ab"))}, queries)
     first = pd.read_csv(ev / "to_judge.csv")
     judged = first.assign(relevant=1)[["query_id", "image_id", "relevant"]]
@@ -101,3 +103,30 @@ def test_make_pool_adds_only_unjudged_pairs_and_the_viewer_keeps_earlier_judgmen
     page = (img / ".cache" / "judge.html").read_text()
     assert page.count('data-key="c00|') == len(new)                   # only the new pairs are shown
     assert json.dumps([f"c00,{i},1" for i in judged.image_id]) in page  # earlier judgments go into the download
+
+    step7.make_pool(a, meta, {"clip": Fixed(list("ef")), "tfidf": Fixed(list("ab"))}, queries)  # run again
+    assert pd.read_csv(ev / "to_judge.csv").equals(pool)               # nothing appended twice
+
+    # Decoys: as many already-judged pairs of CLIP's current top-k as new pairs, mixed in; to_judge.csv unchanged
+    a.decoys = True
+    step7.make_pool(a, meta, {"clip": Fixed(list("ae")), "tfidf": Fixed(list("ab"))}, queries)
+    page = (img / ".cache" / "judge.html").read_text()
+    shown = {k.split("|")[1] for k in re.findall(r'data-key="([^"]+)"', page)}
+    unjudged = {"e"} - set(first.image_id)
+    assert shown == unjudged | ({"a"} if unjudged else set())          # 'a': judged before, in CLIP's top-2
+    assert json.loads((ev / "pool_info.json").read_text())["n_decoys"] == len(shown - unjudged)
+    assert "decoy_rejudgments.csv" in page
+
+
+def test_self_agreement_compares_second_verdicts_with_first(tmp_path):
+    import importlib.util
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location("step7", Path(__file__).parents[1] / "scripts" / "07_text_search.py")
+    step7 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(step7)
+    f = tmp_path / "decoy_rejudgments.csv"
+    pd.DataFrame({"query_id": ["c00"] * 4, "image_id": list("abcd"), "relevant": [1, 0, 0, 1]}).to_csv(f, index=False)
+    first = {("c00", "a"): 1, ("c00", "b"): 0, ("c00", "c"): 1, ("c00", "d"): 1, ("c00", "z"): 0}
+    r = step7.self_agreement(f, first)
+    assert (r["n"], r["agreement"], r["first_1_second_0"], r["first_0_second_0"]) == (4, 0.75, 1, 1)
+    assert step7.self_agreement(tmp_path / "missing.csv", first) is None
