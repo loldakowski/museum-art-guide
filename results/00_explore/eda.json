@@ -1,5 +1,5 @@
 {
-  "n_images": 1500,
+  "n_images": 1496,
   "classes": [
     "Baroque",
     "Cubism",
@@ -21,8 +21,8 @@
       }
     },
     "Cubism": {
-      "n": 300,
-      "unknown_artist_share": 0.86,
+      "n": 298,
+      "unknown_artist_share": 0.8590604026845637,
       "named_artists": 6,
       "top_artists": {
         "georges-braque": 15,
@@ -39,7 +39,7 @@
       "top_artists": {}
     },
     "Pop_Art": {
-      "n": 300,
+      "n": 298,
       "unknown_artist_share": 1.0,
       "named_artists": 0,
       "top_artists": {}
@@ -61,7 +61,7 @@
       0.333
     ],
     "Cubism": [
-      0.541,
+      0.542,
       0.505,
       0.448
     ],
@@ -71,9 +71,9 @@
       0.414
     ],
     "Pop_Art": [
-      0.599,
-      0.557,
-      0.516
+      0.601,
+      0.558,
+      0.517
     ],
     "Ukiyo_e": [
       0.614,
@@ -83,20 +83,20 @@
   },
   "split": {
     "n": {
-      "train": 1001,
-      "val": 263,
-      "test": 236
+      "train": 1032,
+      "val": 223,
+      "test": 241
     },
     "per_class": {
       "Baroque": {
-        "train": 206,
-        "val": 47,
+        "train": 207,
+        "val": 46,
         "test": 47
       },
       "Cubism": {
-        "train": 197,
-        "val": 54,
-        "test": 49
+        "train": 195,
+        "val": 49,
+        "test": 54
       },
       "Impressionism": {
         "train": 210,
@@ -104,13 +104,13 @@
         "test": 45
       },
       "Pop_Art": {
-        "train": 210,
+        "train": 208,
         "val": 45,
         "test": 45
       },
       "Ukiyo_e": {
-        "train": 178,
-        "val": 72,
+        "train": 212,
+        "val": 38,
         "test": 50
       }
     },
@@ -125,9 +125,75 @@
       "val-test": []
     }
   },
+  "duplicates": {
+    "verdicts": "wikiart_style5_duplicates.csv",
+    "removed_label_conflicts": [
+      "s54_r0417",
+      "s71_r0461",
+      "s71_r0523",
+      "s71_r0707"
+    ],
+    "duplicate_groups": 4,
+    "images_in_duplicate_groups": 10
+  },
   "image_shape": [
     128,
     128,
     3
-  ]
+  ],
+  "provenance": {
+    "git_sha": "747ac0eee787410e85c2e1358c8093c00efdbc72",
+    "git_dirty": false,
+    "dataset_fingerprint": "b407cd646527a202",
+    "created_utc": "2026-10-19T09:55:53+00:00",
+    "python": "3.13.15",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+    "versions": {
+      "torch": "2.14.1+cu130",
+      "torchvision": "0.29.1+cu130",
+      "numpy": "2.4.6",
+      "sklearn": "1.9.1"
+    },
+    "command": "00_explore.py --data-dir data/wikiart_style5 --size 128 --out /content/run_results/00_explore",
+    "subset_info": {
+      "repo": "huggan/wikiart",
+      "revision": "d559852d2b232e0fcf195e775866964f0564f2b5",
+      "label": "style",
+      "classes": [
+        "Baroque",
+        "Cubism",
+        "Impressionism",
+        "Pop_Art",
+        "Ukiyo_e"
+      ],
+      "per_class": 300,
+      "size": 128,
+      "crop": true,
+      "seed": 0,
+      "strategy": "fewest-shards",
+      "max_per_artist": 50,
+      "named_only": false,
+      "shards": [
+        47,
+        48,
+        54,
+        61,
+        66,
+        68,
+        69,
+        70,
+        71
+      ],
+      "counts": {
+        "Baroque": 300,
+        "Cubism": 300,
+        "Impressionism": 300,
+        "Pop_Art": 300,
+        "Ukiyo_e": 300
+      },
+      "total": 1500,
+      "command": "python make_wikiart_subset.py --label style --classes Impressionism Baroque Cubism Ukiyo_e Pop_Art --per-class 300 --size 128 --out data/wikiart_style5",
+      "created_utc": "2026-10-19T08:47:14+00:00"
+    }
+  }
 }

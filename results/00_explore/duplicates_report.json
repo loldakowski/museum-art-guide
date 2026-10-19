@@ -1,0 +1,746 @@
+{
+  "n_images": 1500,
+  "img_size": 128,
+  "cosine_all_pairs": {
+    "p50": 0.45600664615631104,
+    "p90": 0.5583332180976868,
+    "p99": 0.6531937122344971,
+    "max": 0.9913020730018616
+  },
+  "cosine_nearest_neighbour": {
+    "p50": 0.7169902324676514,
+    "p90": 0.7860593795776367,
+    "p99": 0.8468217849731445,
+    "max": 0.9913020730018616
+  },
+  "calibration_named_artists": {
+    "same_artist_pairs": 863,
+    "cosine_same_artist": {
+      "p50": 0.545570433139801,
+      "p90": 0.6652410626411438,
+      "p99": 0.764731228351593,
+      "max": 0.8389416933059692
+    },
+    "cosine_different_artist": {
+      "p50": 0.47991037368774414,
+      "p90": 0.5800161361694336,
+      "p99": 0.6619265675544739,
+      "max": 0.801584780216217
+    }
+  },
+  "pairs_cosine_ge": {
+    "0.95": 3,
+    "0.9": 4,
+    "0.86": 6,
+    "0.8": 75
+  },
+  "pairs_dhash_le": {
+    "3": 5,
+    "5": 8,
+    "10": 23
+  },
+  "test_images_with_train_neighbour_cosine_ge": {
+    "before_verdicts": {
+      "0.9": 1,
+      "0.86": 1,
+      "0.8": 7
+    },
+    "after_verdicts": {
+      "0.9": 0,
+      "0.86": 0,
+      "0.8": 10
+    }
+  },
+  "top_pairs": [
+    {
+      "a": "s54_r0417",
+      "b": "s71_r0461",
+      "cosine": 0.9913020730018616,
+      "dhash_hamming": 2,
+      "label_a": "Cubism",
+      "label_b": "Pop_Art",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "test"
+      ],
+      "split_after": [
+        "removed",
+        "removed"
+      ]
+    },
+    {
+      "a": "s54_r0743",
+      "b": "s71_r0721",
+      "cosine": 0.9829984903335571,
+      "dhash_hamming": 3,
+      "label_a": "Cubism",
+      "label_b": "Cubism",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "val",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s71_r0707",
+      "b": "s71_r0523",
+      "cosine": 0.9661272168159485,
+      "dhash_hamming": 3,
+      "label_a": "Cubism",
+      "label_b": "Pop_Art",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "removed",
+        "removed"
+      ]
+    },
+    {
+      "a": "s69_r0692",
+      "b": "s69_r0705",
+      "cosine": 0.915461540222168,
+      "dhash_hamming": 1,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s68_r0246",
+      "b": "s71_r0528",
+      "cosine": 0.8772284984588623,
+      "dhash_hamming": 5,
+      "label_a": "Pop_Art",
+      "label_b": "Pop_Art",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "test",
+        "test"
+      ]
+    },
+    {
+      "a": "s69_r0511",
+      "b": "s69_r0546",
+      "cosine": 0.863233745098114,
+      "dhash_hamming": 5,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "val",
+        "val"
+      ]
+    },
+    {
+      "a": "s68_r0507",
+      "b": "s71_r0599",
+      "cosine": 0.8573801517486572,
+      "dhash_hamming": 36,
+      "label_a": "Pop_Art",
+      "label_b": "Pop_Art",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "test"
+      ]
+    },
+    {
+      "a": "s69_r0626",
+      "b": "s69_r0705",
+      "cosine": 0.8515568971633911,
+      "dhash_hamming": 25,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0605",
+      "b": "s69_r0705",
+      "cosine": 0.8467739820480347,
+      "dhash_hamming": 26,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0605",
+      "b": "s69_r0626",
+      "cosine": 0.8434348106384277,
+      "dhash_hamming": 25,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0501",
+      "b": "s69_r0653",
+      "cosine": 0.8406398296356201,
+      "dhash_hamming": 29,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s68_r0570",
+      "b": "s68_r0774",
+      "cosine": 0.8395112156867981,
+      "dhash_hamming": 21,
+      "label_a": "Impressionism",
+      "label_b": "Impressionism",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "test"
+      ]
+    },
+    {
+      "a": "s47_r0190",
+      "b": "s48_r0836",
+      "cosine": 0.8389416933059692,
+      "dhash_hamming": 30,
+      "label_a": "Ukiyo_e",
+      "label_b": "Ukiyo_e",
+      "artist_a": "katsushika-hokusai",
+      "artist_b": "katsushika-hokusai",
+      "split_before": [
+        "val",
+        "val"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0563",
+      "b": "s69_r0628",
+      "cosine": 0.8387470245361328,
+      "dhash_hamming": 23,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "val",
+        "train"
+      ],
+      "split_after": [
+        "val",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0655",
+      "b": "s69_r0681",
+      "cosine": 0.837688684463501,
+      "dhash_hamming": 44,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0626",
+      "b": "s69_r0681",
+      "cosine": 0.8364908695220947,
+      "dhash_hamming": 31,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0554",
+      "b": "s69_r0692",
+      "cosine": 0.8319216966629028,
+      "dhash_hamming": 36,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "val",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0499",
+      "b": "s69_r0628",
+      "cosine": 0.8298414945602417,
+      "dhash_hamming": 34,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "test",
+        "train"
+      ],
+      "split_after": [
+        "val",
+        "train"
+      ]
+    },
+    {
+      "a": "s54_r0473",
+      "b": "s54_r0715",
+      "cosine": 0.8271530866622925,
+      "dhash_hamming": 23,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0518",
+      "b": "s69_r0655",
+      "cosine": 0.8256851434707642,
+      "dhash_hamming": 35,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "val",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "test"
+      ]
+    },
+    {
+      "a": "s69_r0548",
+      "b": "s69_r0631",
+      "cosine": 0.8256312608718872,
+      "dhash_hamming": 31,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "test",
+        "train"
+      ],
+      "split_after": [
+        "val",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0605",
+      "b": "s69_r0692",
+      "cosine": 0.8251094818115234,
+      "dhash_hamming": 25,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0554",
+      "b": "s69_r0705",
+      "cosine": 0.8250449299812317,
+      "dhash_hamming": 37,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "val",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    },
+    {
+      "a": "s69_r0666",
+      "b": "s69_r0692",
+      "cosine": 0.8241249322891235,
+      "dhash_hamming": 33,
+      "label_a": "Baroque",
+      "label_b": "Baroque",
+      "artist_a": "Unknown Artist",
+      "artist_b": "Unknown Artist",
+      "split_before": [
+        "train",
+        "train"
+      ],
+      "split_after": [
+        "train",
+        "train"
+      ]
+    }
+  ],
+  "verdicts": {
+    "file": "wikiart_style5_duplicates.csv",
+    "pairs_judged": 15,
+    "counts": {
+      "same_image": 6,
+      "different": 6,
+      "same_hidden_painter": 2,
+      "same_composition": 1
+    },
+    "rule_cosine_ge_0.86": {
+      "agree_duplicate": 6,
+      "agree_not_duplicate": 8,
+      "rule_only": [],
+      "human_only": [
+        {
+          "id_a": "s69_r0626",
+          "id_b": "s69_r0605",
+          "verdict": "same_image",
+          "cosine": 0.8434348106384277
+        }
+      ],
+      "unjudged_pairs_above_rule": 0
+    },
+    "pairs": [
+      {
+        "pair": "0",
+        "id_a": "s54_r0417",
+        "id_b": "s71_r0461",
+        "verdict": "same_image",
+        "note": "labelled Cubism and Pop_Art",
+        "cosine": 0.9913020730018616,
+        "dhash_hamming": 2
+      },
+      {
+        "pair": "1",
+        "id_a": "s54_r0743",
+        "id_b": "s71_r0721",
+        "verdict": "same_image",
+        "note": null,
+        "cosine": 0.9829984903335571,
+        "dhash_hamming": 3
+      },
+      {
+        "pair": "2",
+        "id_a": "s71_r0707",
+        "id_b": "s71_r0523",
+        "verdict": "same_image",
+        "note": "labelled Cubism and Pop_Art",
+        "cosine": 0.9661272168159485,
+        "dhash_hamming": 3
+      },
+      {
+        "pair": "3",
+        "id_a": "s69_r0692",
+        "id_b": "s69_r0705",
+        "verdict": "same_image",
+        "note": "different scan tone",
+        "cosine": 0.915461540222168,
+        "dhash_hamming": 1
+      },
+      {
+        "pair": "4",
+        "id_a": "s68_r0246",
+        "id_b": "s71_r0528",
+        "verdict": "same_composition",
+        "note": "different colours",
+        "cosine": 0.8772284984588623,
+        "dhash_hamming": 5
+      },
+      {
+        "pair": "5",
+        "id_a": "s69_r0511",
+        "id_b": "s69_r0546",
+        "verdict": "same_image",
+        "note": "different scan tone",
+        "cosine": 0.863233745098114,
+        "dhash_hamming": 5
+      },
+      {
+        "pair": "6",
+        "id_a": "s71_r0669",
+        "id_b": "s71_r0444",
+        "verdict": "different",
+        "note": null,
+        "cosine": 0.5756791830062866,
+        "dhash_hamming": 3
+      },
+      {
+        "pair": "7",
+        "id_a": "s71_r0370",
+        "id_b": "s71_r0628",
+        "verdict": "different",
+        "note": null,
+        "cosine": 0.6025750637054443,
+        "dhash_hamming": 5
+      },
+      {
+        "pair": "8",
+        "id_a": "s68_r0507",
+        "id_b": "s71_r0599",
+        "verdict": "different",
+        "note": null,
+        "cosine": 0.8573801517486572,
+        "dhash_hamming": 36
+      },
+      {
+        "pair": "9",
+        "id_a": "s69_r0626",
+        "id_b": "s69_r0705",
+        "verdict": "same_hidden_painter",
+        "note": "different works; grouped with pairs 3 and 10",
+        "cosine": 0.8515568971633911,
+        "dhash_hamming": 25
+      },
+      {
+        "pair": "10",
+        "id_a": "s69_r0605",
+        "id_b": "s69_r0705",
+        "verdict": "same_hidden_painter",
+        "note": "different works; grouped with pairs 3 and 9",
+        "cosine": 0.8467739820480347,
+        "dhash_hamming": 26
+      },
+      {
+        "pair": "11",
+        "id_a": "s68_r0570",
+        "id_b": "s68_r0774",
+        "verdict": "different",
+        "note": null,
+        "cosine": 0.8395112156867981,
+        "dhash_hamming": 21
+      },
+      {
+        "pair": "12",
+        "id_a": "s54_r0881",
+        "id_b": "s70_r0069",
+        "verdict": "different",
+        "note": null,
+        "cosine": 0.5953691601753235,
+        "dhash_hamming": 10
+      },
+      {
+        "pair": "13",
+        "id_a": "s61_r0659",
+        "id_b": "s68_r0531",
+        "verdict": "different",
+        "note": null,
+        "cosine": 0.6065479516983032,
+        "dhash_hamming": 9
+      },
+      {
+        "pair": "9/10",
+        "id_a": "s69_r0626",
+        "id_b": "s69_r0605",
+        "verdict": "same_image",
+        "note": "first images of pairs 9 and 10 (measured cosine 0.843 and dHash distance 25)",
+        "cosine": 0.8434348106384277,
+        "dhash_hamming": 25
+      }
+    ],
+    "removed_label_conflicts": [
+      {
+        "id": "s54_r0417",
+        "label": "Cubism",
+        "split_before": "train"
+      },
+      {
+        "id": "s71_r0461",
+        "label": "Pop_Art",
+        "split_before": "test"
+      },
+      {
+        "id": "s71_r0523",
+        "label": "Pop_Art",
+        "split_before": "train"
+      },
+      {
+        "id": "s71_r0707",
+        "label": "Cubism",
+        "split_before": "train"
+      }
+    ],
+    "duplicate_groups_after": {
+      "dup_s69_r0546": [
+        "s69_r0511",
+        "s69_r0546"
+      ],
+      "dup_s69_r0705": [
+        "s69_r0605",
+        "s69_r0626",
+        "s69_r0692",
+        "s69_r0705"
+      ],
+      "dup_s71_r0528": [
+        "s68_r0246",
+        "s71_r0528"
+      ],
+      "dup_s71_r0721": [
+        "s54_r0743",
+        "s71_r0721"
+      ]
+    }
+  },
+  "provenance": {
+    "git_sha": "747ac0eee787410e85c2e1358c8093c00efdbc72",
+    "git_dirty": false,
+    "dataset_fingerprint": "b407cd646527a202",
+    "created_utc": "2026-10-19T09:56:11+00:00",
+    "python": "3.13.15",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+    "versions": {
+      "torch": "2.14.1+cu130",
+      "torchvision": "0.29.1+cu130",
+      "numpy": "2.4.6",
+      "sklearn": "1.9.1"
+    },
+    "command": "find_duplicates.py --data-dir data/wikiart_style5 --out /content/run_results/00_explore",
+    "subset_info": {
+      "repo": "huggan/wikiart",
+      "revision": "d559852d2b232e0fcf195e775866964f0564f2b5",
+      "label": "style",
+      "classes": [
+        "Baroque",
+        "Cubism",
+        "Impressionism",
+        "Pop_Art",
+        "Ukiyo_e"
+      ],
+      "per_class": 300,
+      "size": 128,
+      "crop": true,
+      "seed": 0,
+      "strategy": "fewest-shards",
+      "max_per_artist": 50,
+      "named_only": false,
+      "shards": [
+        47,
+        48,
+        54,
+        61,
+        66,
+        68,
+        69,
+        70,
+        71
+      ],
+      "counts": {
+        "Baroque": 300,
+        "Cubism": 300,
+        "Impressionism": 300,
+        "Pop_Art": 300,
+        "Ukiyo_e": 300
+      },
+      "total": 1500,
+      "command": "python make_wikiart_subset.py --label style --classes Impressionism Baroque Cubism Ukiyo_e Pop_Art --per-class 300 --size 128 --out data/wikiart_style5",
+      "created_utc": "2026-10-19T08:47:14+00:00"
+    }
+  }
+}
