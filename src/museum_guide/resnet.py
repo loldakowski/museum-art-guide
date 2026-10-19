@@ -104,7 +104,8 @@ def make_head(dim: int, n_classes: int, variant: str = "standardised", train_emb
 
 def save_frozen_logreg(path, model: ResNetClassifier, logreg, classes, img_size: int, prov: dict) -> None:
     """The deployable kiosk model in one file: backbone weights (head left out) + scaler/logistic regression."""
-    backbone = {k: v for k, v in model.state_dict().items() if not k.startswith("net.fc.")}
+    # on CPU: a file trained on a GPU must still open on a kiosk without one
+    backbone = {k: v.detach().cpu() for k, v in model.state_dict().items() if not k.startswith("net.fc.")}
     joblib.dump({"backbone_state_dict": backbone, "logreg": logreg, "classes": list(classes),
                  "img_size": img_size, "provenance": prov}, path)
 

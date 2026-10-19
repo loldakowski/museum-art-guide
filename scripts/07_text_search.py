@@ -67,29 +67,67 @@ def random_ranking(ids, query_id: str, seed: int) -> list:
 
 
 def make_pool(a, meta, S, queries):
-    ids = list(meta["id"])
-    rows = []
-    for q in queries["content"]:
-        pool = set(S["clip"].search(q["query"], a.k)) | set(S["tfidf"].search(q["query"], a.k)) \
-            | set(random_ranking(ids, q["id"], a.seed)[:a.k])
-        order = np.random.default_rng([a.seed + 1, *q["id"].encode()]).permutation(sorted(pool))
-        rows += [{"query_id": q["id"], "query": q["query"], "image_id": i} for i in order]
+    """If judgments.csv exists (e.g. a system changed after judging), only the pairs it does not cover are added:
+    to_judge.csv keeps its rows and gets the new ones appended (never twice), and the viewer shows only the
+    unjudged pairs. Its download is judgments.csv = the existing judgments (unchanged) followed by the new ones.
+    --decoys: per query, as many already-judged pairs from the current CLIP top-k as there are unjudged pairs,
+    shuffled in with them, so the judge cannot tell new images from old ones. Their second verdicts go to
+    decoy_rejudgments.csv (agreement with the first round only); the first verdicts stay the official ones."""
+    prov = provenance(a.image_dir)  # before writing to_judge.csv (a tracked file: it would count as a code change)
     out = Path(a.eval_dir)
-    pd.DataFrame(rows).to_csv(out / "to_judge.csv", index=False)
-    save_json({"k": a.k, "systems": ["clip", "tfidf", "random"], "n_queries": len(queries["content"]),
-               "n_to_judge": len(rows), "clip_model": S["clip"].name, "image_dir": a.image_dir,
-               "image_provenance": provenance(a.image_dir)}, out / "pool_info.json")
+    jf, tf, pf = out / "judgments.csv", out / "to_judge.csv", out / "pool_info.json"
+    prior = pd.read_csv(jf, dtype=str) if jf.exists() else None
+    judged = set() if prior is None else set(zip(prior.query_id, prior.image_id))
+    old_rows = pd.read_csv(tf, dtype=str).to_dict("records") if prior is not None and tf.exists() else []
+    listed = {(r["query_id"], r["image_id"]) for r in old_rows}
+    ids = list(meta["id"])
+    pending, page = [], []
+    for q in queries["content"]:
+        clip_top = S["clip"].search(q["query"], a.k)
+        pool = set(clip_top) | set(S["tfidf"].search(q["query"], a.k)) | set(random_ranking(ids, q["id"], a.seed)[:a.k])
+        todo = sorted(i for i in pool if (q["id"], i) not in judged)
+        rng = np.random.default_rng([a.seed + 1, *q["id"].encode()])
+        order = rng.permutation(todo) if todo else []
+        rows_q = [{"query_id": q["id"], "query": q["query"], "image_id": i} for i in order]
+        pending += rows_q
+        if a.decoys and rows_q:
+            old = sorted(i for i in clip_top if (q["id"], i) in judged)
+            pick = np.random.default_rng([a.seed + 2, *q["id"].encode()]).permutation(old)[:len(rows_q)]
+            rows_q = rows_q + [{"query_id": q["id"], "query": q["query"], "image_id": i} for i in pick]
+            rows_q = [rows_q[j] for j in rng.permutation(len(rows_q))]
+        page += rows_q
+    new = [r for r in pending if (r["query_id"], r["image_id"]) not in listed]
+    rows = old_rows + new
+    pd.DataFrame(rows).to_csv(tf, index=False)
+    n_decoys = len(page) - len(pending)
+    if new or not pf.exists():
+        info = {"k": a.k, "systems": ["clip", "tfidf", "random"], "n_queries": len(queries["content"]),
+                "n_to_judge": len(rows), "n_new": len(new), "clip_model": S["clip"].name, "image_dir": a.image_dir,
+                "image_provenance": prov}
+        if prior is not None and pf.exists():
+            info["previous"] = load_json(pf)  # the pool before this extension
+    else:
+        info = load_json(pf)
+    info["n_decoys"] = n_decoys
+    save_json(info, pf)
+    if not pending:
+        print(f"judgments.csv already covers the whole pool ({len(rows)} pairs): nothing new to judge")
+        return
 
     path_of = dict(zip(meta["id"], meta["path"]))
     viewer = Path(a.image_dir) / ".cache" / "judge.html"
     viewer.parent.mkdir(parents=True, exist_ok=True)
-    viewer.write_text(viewer_html(rows, path_of), encoding="utf-8")
-    print(f"{len(rows)} (query, image) pairs to judge -> {out / 'to_judge.csv'}\nviewer: {viewer.resolve()}")
+    viewer.write_text(viewer_html(page, path_of, [] if prior is None else prior.values.tolist(), n_decoys > 0),
+                      encoding="utf-8")
+    print(f"{len(pending)} unjudged (query, image) pairs + {n_decoys} decoys on the page ({len(rows)} in the pool)"
+          f" -> {tf}\nviewer: {viewer.resolve()}")
 
 
-def viewer_html(rows, path_of) -> str:
+def viewer_html(rows, path_of, prior=(), decoys=False) -> str:
     """Self-contained page: one section per query, each image with its id and a 'relevant' checkbox.
-    Ticks are kept in the browser (localStorage); 'Download judgments.csv' writes query_id,image_id,relevant."""
+    Ticks are kept in the browser (localStorage); 'Download judgments.csv' writes query_id,image_id,relevant:
+    the earlier judgments (prior, not shown) first, unchanged, then one row per new image on the page. With decoys
+    (images of the page that are in prior), the same click also writes decoy_rejudgments.csv with their new ticks."""
     sections, current = [], None
     for r in rows:
         if r["query_id"] != current:
@@ -111,19 +149,40 @@ header{position:sticky;top:0;background:#fff;padding:8px 0;border-bottom:1px sol
 .cell img{width:100%;aspect-ratio:1;object-fit:contain;background:#eee}
 .cell:has(input:checked) img{outline:4px solid #1baf7a}
 </style></head><body><header><b>Tick every image that is relevant to the query.</b> Unticked = not relevant.
-Progress is saved in this browser. <button id="dl">Download judgments.csv</button> <span id="n"></span></header>
+Progress is saved in this browser. <button id="dl">Download judgments.csv</button> <span id="n"></span>""" + (
+        f"<br>{len(prior)} earlier judgments are not shown; the download keeps them unchanged, followed by this page."
+        if prior else "") + ("<br>Some images were already judged in the first round: judge every image as if new. "
+                             "The button saves two files: judgments.csv and decoy_rejudgments.csv." if decoys else
+                             "") + """</header>
 """ + "\n".join(sections) + """
 <script>
+const prior=""" + json.dumps([",".join(map(str, p)) for p in prior]) + """;
+const store='judgments'+(prior.length?':'+prior.length:'');  // a new pool round does not reuse old ticks
 const boxes=[...document.querySelectorAll('input[data-key]')];
-let saved={};try{saved=JSON.parse(localStorage.getItem('judgments')||'{}')}catch(e){}
+let saved={};try{saved=JSON.parse(localStorage.getItem(store)||'{}')}catch(e){}
 const count=()=>{document.getElementById('n').textContent=boxes.filter(b=>b.checked).length+' ticked / '+boxes.length};
 boxes.forEach(b=>{b.checked=!!saved[b.dataset.key];b.onchange=()=>{saved[b.dataset.key]=b.checked;
- try{localStorage.setItem('judgments',JSON.stringify(saved))}catch(e){};count()}});count();
-document.getElementById('dl').onclick=()=>{const lines=['query_id,image_id,relevant'].concat(
- boxes.map(b=>{const[q,i]=b.dataset.key.split('|');return q+','+i+','+(b.checked?1:0)}));
- const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lines.join('\\n')+'\\n'],{type:'text/csv'}));
- a.download='judgments.csv';a.click()};
+ try{localStorage.setItem(store,JSON.stringify(saved))}catch(e){};count()}});count();
+const old=new Set(prior.map(l=>l.split(',').slice(0,2).join('|')));  // pairs judged before = decoys
+const row=b=>{const[q,i]=b.dataset.key.split('|');return q+','+i+','+(b.checked?1:0)};
+const save=(name,lines)=>{const a=document.createElement('a');
+ const csv=['query_id,image_id,relevant'].concat(lines).join('\\n')+'\\n';
+ a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+ a.download=name;a.click()};
+document.getElementById('dl').onclick=()=>{
+ save('judgments.csv',prior.concat(boxes.filter(b=>!old.has(b.dataset.key)).map(row)));
+ const d=boxes.filter(b=>old.has(b.dataset.key));if(d.length)save('decoy_rejudgments.csv',d.map(row))};
 </script></body></html>"""
+
+
+def self_agreement(f: Path, judged: dict) -> dict | None:
+    """Blind second verdicts on already-judged pairs (decoys) vs the first verdicts, which stay the official ones."""
+    if not f.exists():
+        return None
+    second = {(r.query_id, r.image_id): int(r.relevant) for r in pd.read_csv(f).itertuples()}
+    pairs = [(judged[k], v) for k, v in second.items()]
+    return {"n": len(pairs), "agreement": float(np.mean([x == y for x, y in pairs])),
+            **{f"first_{x}_second_{y}": sum(p == (x, y) for p in pairs) for x in (0, 1) for y in (0, 1)}}
 
 
 def latency(fn, queries, repeats: int) -> dict:
@@ -177,6 +236,7 @@ def evaluate(a, meta, S, queries) -> dict:
             raise SystemExit(f"judgments.csv does not cover {len(set(unjudged))} pooled images, e.g. "
                              f"{sorted(set(unjudged))[:5]}: re-run --make-pool and judge again")
         res["content"] = rows
+        res["self_agreement"] = self_agreement(Path(a.eval_dir) / "decoy_rejudgments.csv", judged)
     res["phrasing"] = phrasing(S, queries)
 
     torch.set_num_threads(1)  # kiosk-like: one core
@@ -248,6 +308,7 @@ def main():
     p.add_argument("--repeats", type=int, default=5, help="latency: passes over all queries")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--make-pool", action="store_true")
+    p.add_argument("--decoys", action="store_true", help="--make-pool: mix already-judged pairs in (blind re-judging)")
     a = p.parse_args()
     queries = load_json(Path(a.eval_dir) / "queries.json")
     meta = collection(a)
@@ -275,6 +336,13 @@ def main():
     lines += ["## Content queries (relevance judged by hand, search_eval/judgments.csv)", ""]
     lines += mean_table([r for r in res["content"] if not r["paraphrase_of"]], ["clip", "tfidf", "random"]) \
         if res["content"] else ["Not evaluated yet: judgments.csv does not exist."]
+    sa = res.get("self_agreement")
+    if sa:
+        lines += ["", f"Judge consistency: {sa['n']} already-judged pairs were shown again, blind, among the new pairs "
+                  f"of the second round: {sa['agreement']:.0%} same verdict (relevant both times "
+                  f"{sa['first_1_second_1']}, not relevant both times {sa['first_0_second_0']}, relevant only the "
+                  f"first time {sa['first_1_second_0']}, only the second time {sa['first_0_second_1']}). "
+                  "The first-round verdicts are the ones used above."]
     lines += ["", "## Phrasing: the brief's wording vs the short query", "",
               "The brief's questions, verbatim, next to the short query on the same topic (left out of the mean "
               "above). Shared = images that appear in the top 10 of both wordings.", ""]
