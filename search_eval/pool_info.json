@@ -6,14 +6,15 @@
     "random"
   ],
   "n_queries": 22,
-  "n_to_judge": 654,
-  "clip_model": "ViT-B-32/openai",
+  "n_to_judge": 721,
+  "n_new": 67,
+  "clip_model": "ViT-B-32-quickgelu/openai",
   "image_dir": "data/wikiart_style5_224",
   "image_provenance": {
-    "git_sha": "0554f8fbc1e2a5ba6b6aa436abff1c55c5ec7574",
-    "git_dirty": true,
+    "git_sha": "9d846ed2256c7932f82f36ffe022c8b07668e43a",
+    "git_dirty": false,
     "dataset_fingerprint": "38794f02486eb307",
-    "created_utc": "2026-10-17T22:34:23+00:00",
+    "created_utc": "2026-10-19T07:30:02+00:00",
     "python": "3.11.17",
     "platform": "macOS-26.5.1-arm64-arm-64bit",
     "versions": {
@@ -62,6 +63,73 @@
       "total": 1500,
       "command": "python make_wikiart_subset.py --label style --classes Impressionism Baroque Cubism Ukiyo_e Pop_Art --per-class 300 --size 224 --out data/wikiart_style5_224 --index-cache /private/tmp/claude-501/-Users-dhiabencheikh-Projects-museum-art-guide/f470ba69-3ac4-4503-9644-a1135ab94bd0/scratchpad/wikiart_label_index.json",
       "created_utc": "2026-10-17T20:14:19+00:00"
+    }
+  },
+  "previous": {
+    "k": 10,
+    "systems": [
+      "clip",
+      "tfidf",
+      "random"
+    ],
+    "n_queries": 22,
+    "n_to_judge": 654,
+    "clip_model": "ViT-B-32/openai",
+    "image_dir": "data/wikiart_style5_224",
+    "image_provenance": {
+      "git_sha": "0554f8fbc1e2a5ba6b6aa436abff1c55c5ec7574",
+      "git_dirty": true,
+      "dataset_fingerprint": "38794f02486eb307",
+      "created_utc": "2026-10-17T22:34:23+00:00",
+      "python": "3.11.17",
+      "platform": "macOS-26.5.1-arm64-arm-64bit",
+      "versions": {
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "numpy": "2.4.6",
+        "sklearn": "1.9.1"
+      },
+      "command": "07_text_search.py --make-pool",
+      "subset_info": {
+        "repo": "huggan/wikiart",
+        "revision": "d559852d2b232e0fcf195e775866964f0564f2b5",
+        "label": "style",
+        "classes": [
+          "Baroque",
+          "Cubism",
+          "Impressionism",
+          "Pop_Art",
+          "Ukiyo_e"
+        ],
+        "per_class": 300,
+        "size": 224,
+        "crop": true,
+        "seed": 0,
+        "strategy": "fewest-shards",
+        "max_per_artist": 50,
+        "named_only": false,
+        "shards": [
+          47,
+          48,
+          54,
+          61,
+          66,
+          68,
+          69,
+          70,
+          71
+        ],
+        "counts": {
+          "Baroque": 300,
+          "Cubism": 300,
+          "Impressionism": 300,
+          "Pop_Art": 300,
+          "Ukiyo_e": 300
+        },
+        "total": 1500,
+        "command": "python make_wikiart_subset.py --label style --classes Impressionism Baroque Cubism Ukiyo_e Pop_Art --per-class 300 --size 224 --out data/wikiart_style5_224 --index-cache /private/tmp/claude-501/-Users-dhiabencheikh-Projects-museum-art-guide/f470ba69-3ac4-4503-9644-a1135ab94bd0/scratchpad/wikiart_label_index.json",
+        "created_utc": "2026-10-17T20:14:19+00:00"
+      }
     }
   }
 }
