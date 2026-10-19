@@ -67,29 +67,47 @@ def random_ranking(ids, query_id: str, seed: int) -> list:
 
 
 def make_pool(a, meta, S, queries):
+    """If judgments.csv exists (e.g. a system changed after judging), only the pairs it does not cover are added:
+    to_judge.csv keeps its rows and gets the new ones appended, the viewer shows only the new pairs, and its
+    download is the existing judgments (unchanged) followed by the new ones."""
+    prov = provenance(a.image_dir)  # before writing to_judge.csv (a tracked file: it would count as a code change)
+    out = Path(a.eval_dir)
+    jf, tf, pf = out / "judgments.csv", out / "to_judge.csv", out / "pool_info.json"
+    prior = pd.read_csv(jf, dtype=str) if jf.exists() else None
+    judged = set() if prior is None else set(zip(prior.query_id, prior.image_id))
+    old_rows = pd.read_csv(tf, dtype=str).to_dict("records") if prior is not None and tf.exists() else []
     ids = list(meta["id"])
-    rows = []
+    new = []
     for q in queries["content"]:
         pool = set(S["clip"].search(q["query"], a.k)) | set(S["tfidf"].search(q["query"], a.k)) \
             | set(random_ranking(ids, q["id"], a.seed)[:a.k])
-        order = np.random.default_rng([a.seed + 1, *q["id"].encode()]).permutation(sorted(pool))
-        rows += [{"query_id": q["id"], "query": q["query"], "image_id": i} for i in order]
-    out = Path(a.eval_dir)
-    pd.DataFrame(rows).to_csv(out / "to_judge.csv", index=False)
-    save_json({"k": a.k, "systems": ["clip", "tfidf", "random"], "n_queries": len(queries["content"]),
-               "n_to_judge": len(rows), "clip_model": S["clip"].name, "image_dir": a.image_dir,
-               "image_provenance": provenance(a.image_dir)}, out / "pool_info.json")
+        pool = sorted(i for i in pool if (q["id"], i) not in judged)
+        order = np.random.default_rng([a.seed + 1, *q["id"].encode()]).permutation(pool) if pool else []
+        new += [{"query_id": q["id"], "query": q["query"], "image_id": i} for i in order]
+    rows = old_rows + new
+    pd.DataFrame(rows).to_csv(tf, index=False)
+    info = {"k": a.k, "systems": ["clip", "tfidf", "random"], "n_queries": len(queries["content"]),
+            "n_to_judge": len(rows), "n_new": len(new), "clip_model": S["clip"].name, "image_dir": a.image_dir,
+            "image_provenance": prov}
+    if prior is not None and pf.exists():
+        info["previous"] = load_json(pf)  # the pool before this extension
+    save_json(info, pf)
+    if not new:
+        print(f"judgments.csv already covers the whole pool ({len(rows)} pairs): nothing new to judge")
+        return
 
     path_of = dict(zip(meta["id"], meta["path"]))
     viewer = Path(a.image_dir) / ".cache" / "judge.html"
     viewer.parent.mkdir(parents=True, exist_ok=True)
-    viewer.write_text(viewer_html(rows, path_of), encoding="utf-8")
-    print(f"{len(rows)} (query, image) pairs to judge -> {out / 'to_judge.csv'}\nviewer: {viewer.resolve()}")
+    viewer.write_text(viewer_html(new, path_of, [] if prior is None else prior.values.tolist()), encoding="utf-8")
+    print(f"{len(new)} new (query, image) pairs to judge ({len(rows)} in the pool) -> {tf}\n"
+          f"viewer: {viewer.resolve()}")
 
 
-def viewer_html(rows, path_of) -> str:
+def viewer_html(rows, path_of, prior=()) -> str:
     """Self-contained page: one section per query, each image with its id and a 'relevant' checkbox.
-    Ticks are kept in the browser (localStorage); 'Download judgments.csv' writes query_id,image_id,relevant."""
+    Ticks are kept in the browser (localStorage); 'Download judgments.csv' writes query_id,image_id,relevant:
+    the earlier judgments (prior, not shown) first, unchanged, then one row per image on the page."""
     sections, current = [], None
     for r in rows:
         if r["query_id"] != current:
@@ -111,15 +129,19 @@ header{position:sticky;top:0;background:#fff;padding:8px 0;border-bottom:1px sol
 .cell img{width:100%;aspect-ratio:1;object-fit:contain;background:#eee}
 .cell:has(input:checked) img{outline:4px solid #1baf7a}
 </style></head><body><header><b>Tick every image that is relevant to the query.</b> Unticked = not relevant.
-Progress is saved in this browser. <button id="dl">Download judgments.csv</button> <span id="n"></span></header>
+Progress is saved in this browser. <button id="dl">Download judgments.csv</button> <span id="n"></span>""" + (
+        f"<br>{len(prior)} earlier judgments are not shown; the download keeps them unchanged, followed by this page."
+        if prior else "") + """</header>
 """ + "\n".join(sections) + """
 <script>
+const prior=""" + json.dumps([",".join(map(str, p)) for p in prior]) + """;
+const store='judgments'+(prior.length?':'+prior.length:'');  // a new pool round does not reuse old ticks
 const boxes=[...document.querySelectorAll('input[data-key]')];
-let saved={};try{saved=JSON.parse(localStorage.getItem('judgments')||'{}')}catch(e){}
+let saved={};try{saved=JSON.parse(localStorage.getItem(store)||'{}')}catch(e){}
 const count=()=>{document.getElementById('n').textContent=boxes.filter(b=>b.checked).length+' ticked / '+boxes.length};
 boxes.forEach(b=>{b.checked=!!saved[b.dataset.key];b.onchange=()=>{saved[b.dataset.key]=b.checked;
- try{localStorage.setItem('judgments',JSON.stringify(saved))}catch(e){};count()}});count();
-document.getElementById('dl').onclick=()=>{const lines=['query_id,image_id,relevant'].concat(
+ try{localStorage.setItem(store,JSON.stringify(saved))}catch(e){};count()}});count();
+document.getElementById('dl').onclick=()=>{const lines=['query_id,image_id,relevant'].concat(prior,
  boxes.map(b=>{const[q,i]=b.dataset.key.split('|');return q+','+i+','+(b.checked?1:0)}));
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lines.join('\\n')+'\\n'],{type:'text/csv'}));
  a.download='judgments.csv';a.click()};

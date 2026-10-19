@@ -64,3 +64,40 @@ def test_clip_model_uses_the_activation_the_openai_weights_were_trained_with():
     import open_clip
     model = open_clip.create_model(CLIP_MODEL)  # architecture only, no download
     assert {type(m).__name__ for m in model.modules() if "GELU" in type(m).__name__} == {"QuickGELU"}
+
+
+def test_make_pool_adds_only_unjudged_pairs_and_the_viewer_keeps_earlier_judgments(tmp_path):
+    import importlib.util
+    import json
+    import types
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location("step7", Path(__file__).parents[1] / "scripts" / "07_text_search.py")
+    step7 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(step7)
+
+    class Fixed:  # a searcher that always returns the same ranking
+        def __init__(self, ranking, name="fixed"):
+            self.ranking, self.name = ranking, name
+
+        def search(self, query, k):
+            return self.ranking[:k]
+
+    meta = pd.DataFrame({"id": list("abcdef"), "path": [f"x/{i}.jpg" for i in "abcdef"]})
+    queries = {"content": [{"id": "c00", "query": "a stormy sea"}]}
+    ev, img = tmp_path / "eval", tmp_path / "img"
+    ev.mkdir()
+    a = types.SimpleNamespace(eval_dir=str(ev), image_dir=str(img), k=2, seed=0)
+    step7.make_pool(a, meta, {"clip": Fixed(list("ab")), "tfidf": Fixed(list("ab"))}, queries)
+    first = pd.read_csv(ev / "to_judge.csv")
+    judged = first.assign(relevant=1)[["query_id", "image_id", "relevant"]]
+    judged.to_csv(ev / "judgments.csv", index=False)
+
+    step7.make_pool(a, meta, {"clip": Fixed(list("ef")), "tfidf": Fixed(list("ab"))}, queries)  # CLIP changed
+    pool = pd.read_csv(ev / "to_judge.csv")
+    assert pool.iloc[:len(first)].equals(first)                       # earlier rows kept, in order
+    new = set(pool.image_id[len(first):])
+    assert new == {"e", "f"} - set(first.image_id)                    # only pairs not judged yet
+    assert json.loads((ev / "pool_info.json").read_text())["n_new"] == len(new)
+    page = (img / ".cache" / "judge.html").read_text()
+    assert page.count('data-key="c00|') == len(new)                   # only the new pairs are shown
+    assert json.dumps([f"c00,{i},1" for i in judged.image_id]) in page  # earlier judgments go into the download
