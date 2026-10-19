@@ -1,107 +1,231 @@
-[
-  {
-    "model": "LogReg - pixels32",
-    "family": "classical",
-    "test_acc": 0.3516949152542373,
-    "ci_lo": 0.288135593220339,
-    "ci_hi": 0.4152542372881356,
-    "seed_std": null,
-    "macro_f1": 0.34288926965088884,
-    "latency_key": "logreg_pixels32",
-    "train_time_s": 39.501850085,
-    "note": "",
-    "latency_ms": 1.8553460000703126,
-    "size_mb": 0.198065,
-    "params": 15365
-  },
-  {
-    "model": "LogReg - handcrafted",
-    "family": "classical",
-    "test_acc": 0.6271186440677966,
-    "ci_lo": 0.5677966101694916,
-    "ci_hi": 0.690677966101695,
-    "seed_std": null,
-    "macro_f1": 0.6226355611815204,
-    "latency_key": "logreg_handcrafted",
-    "train_time_s": 3.749967427999991,
-    "note": "",
-    "latency_ms": 16.695688000027076,
-    "size_mb": 0.127841,
-    "params": 9880
-  },
-  {
-    "model": "MLP - pixels32",
-    "family": "MLP (from scratch)",
-    "test_acc": 0.3474576271186441,
-    "ci_lo": 0.288135593220339,
-    "ci_hi": 0.4110169491525424,
-    "seed_std": 0.010663607959421964,
-    "macro_f1": 0.31762551379715,
-    "latency_key": "mlp_pixels32",
-    "train_time_s": 0.9217218759999545,
-    "note": "3 seeds: 0.357 +/- 0.011",
-    "latency_ms": 1.253784500022448,
-    "size_mb": 6.851597,
-    "params": 1705989
-  },
-  {
-    "model": "MLP - handcrafted",
-    "family": "MLP (from scratch)",
-    "test_acc": 0.5889830508474576,
-    "ci_lo": 0.5296610169491526,
-    "ci_hi": 0.652542372881356,
-    "seed_std": 0.015277759641796585,
-    "macro_f1": 0.5843902646383408,
-    "latency_key": null,
-    "train_time_s": 0.8633076486666292,
-    "note": "3 seeds: 0.576 +/- 0.015",
-    "latency_ms": null,
-    "size_mb": null,
-    "params": null
-  },
-  {
-    "model": "ResNet-18 frozen + linear head",
-    "family": "CNN (pretrained)",
-    "test_acc": 0.6991525423728814,
-    "ci_lo": 0.6398305084745762,
-    "ci_hi": 0.7543432203389825,
-    "seed_std": null,
-    "macro_f1": 0.6959787423355243,
-    "latency_key": "resnet18_128px",
-    "train_time_s": 1.3620214279999345,
-    "note": "",
-    "latency_ms": 23.089464500003487,
-    "size_mb": 44.794059,
-    "params": 11179077
-  },
-  {
-    "model": "ResNet-18 frozen + LogReg",
-    "family": "CNN features + classical",
-    "test_acc": 0.7627118644067796,
-    "ci_lo": 0.7076271186440678,
-    "ci_hi": 0.8135593220338984,
-    "seed_std": null,
-    "macro_f1": 0.7616956132595655,
-    "latency_key": "resnet18_128px",
-    "train_time_s": null,
-    "note": "",
-    "latency_ms": 23.089464500003487,
-    "size_mb": 44.794059,
-    "params": 11179077
-  },
-  {
-    "model": "ResNet-18 fine-tuned",
-    "family": "CNN (pretrained)",
-    "test_acc": 0.7711864406779662,
-    "ci_lo": 0.7161016949152542,
-    "ci_hi": 0.826271186440678,
-    "seed_std": null,
-    "macro_f1": 0.7669179186826246,
-    "latency_key": "resnet18_128px",
-    "train_time_s": 63.34331318700015,
-    "note": "",
-    "latency_ms": 23.089464500003487,
-    "size_mb": 44.794059,
-    "params": 11179077
-  }
-]
+{
+  "models": [
+    {
+      "model": "LogReg - pixels32",
+      "family": "classical",
+      "test_acc": 0.34854771784232363,
+      "ci_lo": 0.2863070539419087,
+      "ci_hi": 0.4107883817427386,
+      "seed_std": null,
+      "macro_f1": 0.331457861488502,
+      "latency_key": "logreg_pixels32",
+      "train_time_s": 28.312616975999845,
+      "note": "",
+      "seeds": null,
+      "latency_ms": 269.43034799978705,
+      "size_mb": 0.136637,
+      "params": 15365,
+      "latency_draft_ms": 42.19689950014072
+    },
+    {
+      "model": "LogReg - handcrafted",
+      "family": "classical",
+      "test_acc": 0.6099585062240664,
+      "ci_lo": 0.5477178423236515,
+      "ci_hi": 0.6680497925311203,
+      "seed_std": null,
+      "macro_f1": 0.6073205072290113,
+      "latency_key": "logreg_handcrafted",
+      "train_time_s": 3.0013789510003335,
+      "note": "",
+      "seeds": null,
+      "latency_ms": 285.1351845001773,
+      "size_mb": 0.088365,
+      "params": 9880,
+      "latency_draft_ms": 58.18777400008912
+    },
+    {
+      "model": "MLP - pixels32",
+      "family": "MLP (from scratch)",
+      "test_acc": 0.3900414937759336,
+      "ci_lo": 0.3278008298755187,
+      "ci_hi": 0.44813278008298757,
+      "seed_std": 0.009582577081985488,
+      "macro_f1": 0.37529677751848023,
+      "latency_key": "mlp_pixels32",
+      "train_time_s": 1.2814814989997103,
+      "note": "",
+      "seeds": {
+        "mean": 0.3845089903181189,
+        "std": 0.009582577081985488,
+        "values": [
+          0.3900414937759336,
+          0.3900414937759336,
+          0.37344398340248963
+        ]
+      },
+      "latency_ms": 255.38911549983823,
+      "size_mb": 6.851597,
+      "params": 1705989,
+      "latency_draft_ms": 41.58167749938002
+    },
+    {
+      "model": "MLP - handcrafted",
+      "family": "MLP (from scratch)",
+      "test_acc": 0.5933609958506224,
+      "ci_lo": 0.5311203319502075,
+      "ci_hi": 0.6597510373443983,
+      "seed_std": 0.049503541267422645,
+      "macro_f1": 0.5923406052076002,
+      "latency_key": "mlp_handcrafted",
+      "train_time_s": 1.3107790046666803,
+      "note": "",
+      "seeds": {
+        "mean": 0.5712309820193638,
+        "std": 0.049503541267422645,
+        "values": [
+          0.5933609958506224,
+          0.5145228215767634,
+          0.6058091286307054
+        ]
+      },
+      "latency_ms": 274.01312400024835,
+      "size_mb": 10.742725,
+      "params": 2680837,
+      "latency_draft_ms": 57.84640199999558
+    },
+    {
+      "model": "ResNet-18 frozen + linear head",
+      "family": "CNN (pretrained)",
+      "test_acc": 0.7634854771784232,
+      "ci_lo": 0.7095435684647303,
+      "ci_hi": 0.8174273858921162,
+      "seed_std": null,
+      "macro_f1": 0.7598365562772516,
+      "latency_key": "resnet18_128px",
+      "train_time_s": 1.3058022120003443,
+      "note": "",
+      "seeds": null,
+      "latency_ms": 247.89812550034185,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "latency_draft_ms": 63.79229049980495
+    },
+    {
+      "model": "ResNet-18 frozen + LogReg",
+      "family": "CNN features + classical",
+      "test_acc": 0.7593360995850622,
+      "ci_lo": 0.7053941908713693,
+      "ci_hi": 0.8132780082987552,
+      "seed_std": null,
+      "macro_f1": 0.7574070564128834,
+      "latency_key": "resnet18_frozen_logreg",
+      "train_time_s": null,
+      "note": "",
+      "seeds": null,
+      "latency_ms": 259.13986999967165,
+      "size_mb": 44.807276,
+      "params": 11179077,
+      "latency_draft_ms": 65.31474749999688
+    },
+    {
+      "model": "ResNet-18 fine-tuned",
+      "family": "CNN (pretrained)",
+      "test_acc": 0.8132780082987552,
+      "ci_lo": 0.7634854771784232,
+      "ci_hi": 0.8630705394190872,
+      "seed_std": null,
+      "macro_f1": 0.8122895624504505,
+      "latency_key": "resnet18_128px",
+      "train_time_s": 46.617038012000194,
+      "note": "",
+      "seeds": null,
+      "latency_ms": 247.89812550034185,
+      "size_mb": 44.798855,
+      "params": 11179077,
+      "latency_draft_ms": 63.79229049980495
+    }
+  ],
+  "paired_comparisons": [
+    {
+      "model": "LogReg - pixels32",
+      "n": 241,
+      "acc_a": 0.7593360995850622,
+      "acc_b": 0.34854771784232363,
+      "diff": 0.4107883817427386,
+      "diff_ci95": [
+        0.34014522821576765,
+        0.4896265560165975
+      ],
+      "a_right_b_wrong": 112,
+      "a_wrong_b_right": 13,
+      "mcnemar_p": 8.124346519772117e-21,
+      "mcnemar_p_holm": 4.8746079118632704e-20
+    },
+    {
+      "model": "LogReg - handcrafted",
+      "n": 241,
+      "acc_a": 0.7593360995850622,
+      "acc_b": 0.6099585062240664,
+      "diff": 0.14937759336099585,
+      "diff_ci95": [
+        0.07883817427385892,
+        0.22406639004149378
+      ],
+      "a_right_b_wrong": 61,
+      "a_wrong_b_right": 25,
+      "mcnemar_p": 0.00013037942991199537,
+      "mcnemar_p_holm": 0.00039113828973598615
+    },
+    {
+      "model": "MLP - pixels32",
+      "n": 241,
+      "acc_a": 0.7593360995850622,
+      "acc_b": 0.3900414937759336,
+      "diff": 0.36929460580912865,
+      "diff_ci95": [
+        0.2946058091286307,
+        0.44813278008298757
+      ],
+      "a_right_b_wrong": 105,
+      "a_wrong_b_right": 16,
+      "mcnemar_p": 3.162946279828288e-17,
+      "mcnemar_p_holm": 1.581473139914144e-16
+    },
+    {
+      "model": "MLP - handcrafted",
+      "n": 241,
+      "acc_a": 0.7593360995850622,
+      "acc_b": 0.5933609958506224,
+      "diff": 0.16597510373443983,
+      "diff_ci95": [
+        0.0912863070539419,
+        0.24481327800829875
+      ],
+      "a_right_b_wrong": 69,
+      "a_wrong_b_right": 29,
+      "mcnemar_p": 6.572240952992274e-05,
+      "mcnemar_p_holm": 0.00026288963811969097
+    },
+    {
+      "model": "ResNet-18 frozen + linear head",
+      "n": 241,
+      "acc_a": 0.7593360995850622,
+      "acc_b": 0.7634854771784232,
+      "diff": -0.004149377593360996,
+      "diff_ci95": [
+        -0.029045643153526972,
+        0.02074688796680498
+      ],
+      "a_right_b_wrong": 4,
+      "a_wrong_b_right": 5,
+      "mcnemar_p": 1.0,
+      "mcnemar_p_holm": 1.0
+    },
+    {
+      "model": "ResNet-18 fine-tuned",
+      "n": 241,
+      "acc_a": 0.7593360995850622,
+      "acc_b": 0.8132780082987552,
+      "diff": -0.05394190871369295,
+      "diff_ci95": [
+        -0.1037344398340249,
+        -0.004149377593360996
+      ],
+      "a_right_b_wrong": 14,
+      "a_wrong_b_right": 27,
+      "mcnemar_p": 0.05958388801809633,
+      "mcnemar_p_holm": 0.11916777603619266
+    }
+  ]
+}
