@@ -76,7 +76,8 @@ FEATURE_SETS = {
 
 
 def compute_features(name: str, X: np.ndarray, cache_dir=None) -> np.ndarray:
-    """FEATURE_SETS[name](X), cached on disk (hand-crafted features take ~1 min for 1 500 images)."""
+    """FEATURE_SETS[name](X), cached on disk (hand-crafted features: 3.6 s for 1 255 images on the M5 laptop,
+    results/09_feature_ablation)."""
     import hashlib
     from pathlib import Path
     if cache_dir is None:
