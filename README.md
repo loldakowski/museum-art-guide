@@ -146,6 +146,14 @@ what the ResNet learns is the painter's hand, not only the style. The ranking do
 the main test accuracy is probably optimistic for paintings by painters the model has not seen. These are
 different styles from the main task, so the cost cannot be subtracted from the main numbers as is.
 
+### Hand-crafted feature ablation (step 9: exploratory, validation only, no default changed)
+
+Each block alone, all blocks minus one, and three parameter changes, with the same pipeline as step 1, scored on the
+223 validation images only; the test set is never loaded (`results/09_feature_ablation/summary.md`). **No variant
+beats the current set** (validation 0.583): none is above its CI, and no paired difference is significant. HOG is 1764
+of the 1975 features, yet removing it does not hurt on validation (0.641, paired difference +0.058 [−0.013, +0.130]).
+These scores are optimistic (C is chosen on the same images): the default features and the test results stay as they are.
+
 ### Deliverable 2: monitoring and failure diagnosis
 
 We broke the MLP on purpose to check that the monitoring shows each problem (`results/03_diagnosis/summary.md`):
@@ -261,7 +269,7 @@ The full run was done with `notebooks/colab_run_all.ipynb` on Google Colab (GPU 
 
 ```
 src/museum_guide/   data and split, features, baseline, MLP, training loop, ResNet, search, metrics, plots
-scripts/            00_explore.py ... 08_unseen_painters.py, run_all.sh, dataset scripts, README check
+scripts/            00_explore.py ... 09_feature_ablation.py, run_all.sh, dataset scripts, README check
 annotations/        duplicate verdicts (image ids only, made by hand)
 search_eval/        search queries and relevance judgments (made by hand)
 notebooks/          Colab notebook

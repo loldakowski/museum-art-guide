@@ -40,14 +40,15 @@ def color_moments(X: np.ndarray) -> np.ndarray:
     return np.concatenate([mu, sd, skew], 1).astype(np.float32)
 
 
-def hog_features(X: np.ndarray, size: int = 64) -> np.ndarray:
-    """Histogram of oriented gradients on a 64x64 grey image (shapes, contours): 1764 dims."""
+def hog_features(X: np.ndarray, size: int = 64, pixels_per_cell: int = 8) -> np.ndarray:
+    """Histogram of oriented gradients on a 64x64 grey image (shapes, contours): 1764 dims with 8x8 cells."""
     out = []
     for img in X:
         g = rgb2gray(img)
         if g.shape[0] != size:
             g = resize(g, (size, size), anti_aliasing=True)
-        out.append(hog(g, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(2, 2), feature_vector=True))
+        out.append(hog(g, orientations=9, pixels_per_cell=(pixels_per_cell, pixels_per_cell),
+                       cells_per_block=(2, 2), feature_vector=True))
     return np.asarray(out, dtype=np.float32)
 
 
@@ -75,7 +76,8 @@ FEATURE_SETS = {
 
 
 def compute_features(name: str, X: np.ndarray, cache_dir=None) -> np.ndarray:
-    """FEATURE_SETS[name](X), cached on disk (hand-crafted features take ~1 min for 1 500 images)."""
+    """FEATURE_SETS[name](X), cached on disk (hand-crafted features: 3.6 s for 1 255 images on the M5 laptop,
+    results/09_feature_ablation)."""
     import hashlib
     from pathlib import Path
     if cache_dir is None:
