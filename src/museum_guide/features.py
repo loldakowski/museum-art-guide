@@ -40,14 +40,15 @@ def color_moments(X: np.ndarray) -> np.ndarray:
     return np.concatenate([mu, sd, skew], 1).astype(np.float32)
 
 
-def hog_features(X: np.ndarray, size: int = 64) -> np.ndarray:
-    """Histogram of oriented gradients on a 64x64 grey image (shapes, contours): 1764 dims."""
+def hog_features(X: np.ndarray, size: int = 64, pixels_per_cell: int = 8) -> np.ndarray:
+    """Histogram of oriented gradients on a 64x64 grey image (shapes, contours): 1764 dims with 8x8 cells."""
     out = []
     for img in X:
         g = rgb2gray(img)
         if g.shape[0] != size:
             g = resize(g, (size, size), anti_aliasing=True)
-        out.append(hog(g, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(2, 2), feature_vector=True))
+        out.append(hog(g, orientations=9, pixels_per_cell=(pixels_per_cell, pixels_per_cell),
+                       cells_per_block=(2, 2), feature_vector=True))
     return np.asarray(out, dtype=np.float32)
 
 
