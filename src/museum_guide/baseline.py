@@ -6,8 +6,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-# Finer search around the previous best setting: C = 0.01
-C_GRID = (0.002, 0.005, 0.01, 0.02, 0.05)
+# Wide grid shared by every logistic regression (pixels, hand-crafted features, ResNet embeddings).
+# A finer grid around 0.01 for the ResNet embeddings is tried separately in scripts/10_frozen_tuning.py.
+C_GRID = (1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0)
 
 
 def make_logreg(C: float):
