@@ -6,8 +6,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-# 1e-3 was the edge of the earlier grid and was chosen by every model: the grid now goes two decades lower
-C_GRID = (1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0)
+# Finer search around the previous best setting: C = 0.01
+C_GRID = (0.002, 0.005, 0.01, 0.02, 0.05)
 
 
 def make_logreg(C: float):
